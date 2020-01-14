@@ -34,8 +34,9 @@ for the considered SVM baseline.
 ## Repository Structure
 The repo is structured as follows:
 ```
-src/ -> baseline/        {rulebased and SVM baselines}
-        -> StORMeD/      {StORMeD[1] client and adapted baselines}     
+crawl_lkml.py            {Python code to obain a 30 e-mail sample from LKML, seed is fixed}
+src/ -> baseline/         {rulebased and SVM baselines}
+        -> StORMeD/       {StORMeD[1] client and adapted baselines}     
         preprocessor/    {corpus construction scripts for the two corpora used}
         tagger/          {Main model code and utils}
         evaluate.py      {Script to evaluate the main model for current config}
