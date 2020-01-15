@@ -100,6 +100,44 @@ Similarly to `evaluate.py`, `process.py` can be run; however, it requires a furt
 $ python src/process.py ./<path to model.weights> ./<path to data to process>
 ```
 
+### Model input/output format
+
+The BiLSTM model expects a free-form textual input that it first segments by sentence and then tokenises it with one
+remark: the interactive prompt after an evaluation (as performed by `evaluate.py`) expects input as a sentence at a 
+time.
+
+As output, depending if the model is trained with language ID or not, the model provides either `(word, tag)` pairs or
+the nested tuple of `(word, (tag, language id))`. When output is stored to a file, it is saved as a sentence per line
+where each token is presented with `+` as a separator, i.e. `word+tag[+language id]`.
+
+Let's take the following sentence as an example input to a model with language ID output (the first sentence from 
+[here](https://stackoverflow.com/questions/53955027/conv4d-in-tf-nn-convolution)):
+```
+I tried using tf.nn.convolution() for 6D input with 4D filter.
+```
+
+The model to outputs the following (once collected to a list):
+```python
+[
+    ('I', ('PRON', 0)),
+    ('tried', ('VERB', 0)),
+    ('using', ('VERB', 0)),
+    ('tf.nn.convolution()', ('method_name', 1)),
+    ('for', ('ADP', 0)),
+    ('6D', ('NUM', 0)),
+    ('input', ('NOUN', 0)),
+    ('with', ('CONJ', 0)),
+    ('4D', ('NUM', 0)),
+    ('filter', ('NOUN', 0)),
+    ('.', ('.', 0)),
+]
+```
+
+Which if stored to a file using the scripts provided in this repository produce a file with the following single line:
+```
+I+PRON+0 tried+VERB+0 using+VERB+0 tf.nn.convolution()+method_name+1 for+ADP+0 6D+NUM+0 input+NOUN+0 with+CONJ+0 4D+NUM+0 filter+NOUN+0 .+.+0
+```
+
 ## Running the Rule-based and SVM Baselines
 For the baselines, please run as follows:
 ```bash
