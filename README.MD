@@ -87,7 +87,7 @@ For example:
                             corpus name (under data/corpora) --^      ^--- Use Language IDs?
 ```
 
-A convenience zip is provided under: `data/corpora/SO_n_Lucid_Id.zip`.
+A convenience zip is provided under: `data/corpora/SO_n_Lucid_Id.zip` and ``.
 
 ## Running the BiLSTM model
 To run the model, make sure that the necessary `train/dev/eval.txt` files have been generated with 
@@ -111,7 +111,7 @@ $ python src/process.py ./<path to model.weights> ./<path to data to process>
 
 For example, to run an evaluation on the trained weights provided with this repository, run:
 ```bash
-$ python src/evaluate.py ./results/test/SO_n_Lucid_Id/742a4ecd-de67-423e-b4ea-b6217dfa6c12/model.weights
+$ python src/evaluate.py ./results/test/SO_Freq_Id/7dec5e7f-9c9b-4e7b-a52a-cdb6183f83de_with_crf_with_chars_with_features_epochs_30_dropout_0.500_batch_16_opt_rmsprop_lr_0.0100_lrdecay_0.9500/model.weights
 ```
 The script should automatically match the hyper-parameters based on the `<model_path>/config.json` file. 
 Should that fail, manually copying them over to `./src/tagger/config.py` should solve the issue. 

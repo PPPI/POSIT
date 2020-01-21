@@ -44,7 +44,7 @@ class Configuration:
 
     # general config
     with_l_id = True
-    project = "SO_n_Lucid"
+    project = "SO_Freq"
     project += '_Id' if with_l_id else ''
     # project += '5'
     # embeddings
