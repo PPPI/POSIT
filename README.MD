@@ -32,11 +32,15 @@ scikit-learn
 for the considered SVM baseline.
 
 ## Repository Structure
-The repo is structured as follows:
+The repository is structured as follows:
 ```
 crawl_lkml.py            {Python code to obain a 30 e-mail sample from LKML, seed is fixed}
-src/ -> baseline/         {rulebased and SVM baselines}
-        -> StORMeD/       {StORMeD[1] client and adapted baselines}     
+data/                    {Auxilery data used to train the model}
+misc.zip/                {Additional scripts and files used during evaluation with a human provided oracle (Sec. 6.1)}
+results.zip/ -> test/    {Trained model weights}
+                manual/  {Output and scripts used for manual evaluation}
+src/ -> baseline/        {rulebased and SVM baselines}
+        -> StORMeD/      {StORMeD[1] client and adapted baselines}     
         preprocessor/    {corpus construction scripts for the two corpora used}
         tagger/          {Main model code and utils}
         evaluate.py      {Script to evaluate the main model for current config}
@@ -80,6 +84,8 @@ For example:
                             corpus name (under data/corpora) --^      ^--- Use Language IDs?
 ```
 
+A convenience zip is provided under: `data/corpora/SO_n_Lucid_Id.zip`.
+
 ## Running the BiLSTM model
 To run the model, make sure that the necessary `train/dev/eval.txt` files have been generated with 
 the pre-processor scripts and update `./src/tagger/config.py` to point to them. Once that is done, simply
@@ -93,12 +99,19 @@ model.weights folder needs to be provided:
 ```bash
 $ python src/evaluate.py ./<path to model.weights>/<uuid>/model.weights>
 ```
-The path to model.weights is usually under results/<corpus Name>
+The path to model.weights is usually under `results/test/<corpus Name>`/
 
 Similarly to `evaluate.py`, `process.py` can be run; however, it requires a further argument:
 ```bash
 $ python src/process.py ./<path to model.weights> ./<path to data to process>
 ```
+
+For example, to run an evaluation on the trained weights provided with this repository, run:
+```bash
+$ python src/evaluate.py ./results/test/SO_n_Lucid_Id/742a4ecd-de67-423e-b4ea-b6217dfa6c12/model.weights
+```
+The script should automatically match the hyper-parameters based on the `<model_path>/config.json` file. 
+Should that fail, manually copying them over to `./src/tagger/config.py` should solve the issue. 
 
 ### Model input/output format
 
@@ -138,6 +151,13 @@ Which if stored to a file using the scripts provided in this repository produce 
 I+PRON+0 tried+VERB+0 using+VERB+0 tf.nn.convolution()+method_name+1 for+ADP+0 6D+NUM+0 input+NOUN+0 with+CONJ+0 4D+NUM+0 filter+NOUN+0 .+.+0
 ```
 
+### Manual Investigation Scripts
+
+The scripts and model output used for the manual investigation of POSIT performance on StackOverflow and LKML data are 
+provided under `./results/manual/`. In the root of this folder, one can find the model output and the script used to 
+produce the `True/False` annotations. The two annotations and the script to compute the score is provided under 
+`./results/manual/Scores/`.
+
 ## Running the Rule-based and SVM Baselines
 For the baselines, please run as follows:
 ```bash
@@ -173,9 +193,51 @@ using it from within Python.
 
 The client code is a slightly adapted version of the python client provided by Ponzanelli et al.
 
+### Evaluation on the Java subset of POSIT data
+
+The dataset used to evaluate the adapted StORMeD on the Java subset of `SO_n_Lucid_Id` is provided via a zip located at
+`./data/java.zip`. 
+
+This unzips to create the folder `./data/java/stormed_eval_parse` which contains the chunked dataset as 4 JSON files 
+per chunk: 
+- `stormed_n.json` (the StORMeD HAST output), 
+- `stormed_n_expected.json` (the expected Language ID output), 
+- `stormed_n_expected_tags.json` (the expected AST/PoS tag output), 
+- `stormed_n_toks.json` (the raw token stream). 
+
+To compute the evaluation of our adapted StORMeD use-case, one need only run:
+```bash
+$ python ./baseline/StORMeD/stormed_evaluate.py ./data/java/stormed_eval_parse
+```
+
+## Predicting code-tags for StackOverflow
+
+The data used to see how well the model would predict missed code-tags (Section 6.1) as well as the scripts to generate
+it are provided under `./misc/SO_Posts_Edited`.
+
+`SO-Ids.csv` was obtained by querying the SOTorrent[2] dataset to form an initial set of candidates. This provides those
+SO posts which have been edited with the edit comment "code formatting".
+
+These were then filtered manually to those that satisfy the following criteria:
+- Must contain introduction of single or triple backticks. 
+- May contain whitespace edits. 
+- Cannot contain any other form of edits. 
+
+Filtering was performed by uniform random sampling without replacement from the initial set of revisions. 
+
+A log of the run used to generate the dataset is provided as `./misc/SO_Posts_Edited/run_log.txt`.
+
+POSIT's output on this dataset is under `./misc/SO_Posts_Edited/results/paired_posts`, while StORMeD[1]'s is under
+`./misc/SO_Posts_Edited/results/stormed/paired_posts`.
+
+
 ## References
 
 [1] Ponzanelli, L., Mocci, A., & Lanza, M. (2015). 
 [StORMeD: Stack overflow ready made data.](https://stormed.inf.usi.ch/) 
 IEEE International Working Conference on Mining Software Repositories, 
 2015-Augus, 474–477. https://doi.org/10.1109/MSR.2015.67
+
+[2] Baltes, S., Dumani, L., Treude, C., & Diehl, S. (2018, May). 
+Sotorrent: Reconstructing and analyzing the evolution of stack overflow posts. 
+In Proceedings of the 15th international conference on mining software repositories (pp. 319-330).
