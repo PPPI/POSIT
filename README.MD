@@ -231,6 +231,11 @@ POSIT's output on this dataset is under `./misc/SO_Posts_Edited/results/paired_p
 `./misc/SO_Posts_Edited/results/stormed/paired_posts`.
 
 
+## TaskNav++
+
+While the TaskNav source-code is not provided in this repository, the TaskNav++ output, manual investigation results
+and scripts used to perform and analyse the manual investigation are made available via the zip: `./TaskNav++_LKML.zip`.
+
 ## References
 
 [1] Ponzanelli, L., Mocci, A., & Lanza, M. (2015). 
