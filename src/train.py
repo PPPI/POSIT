@@ -1,9 +1,9 @@
 import json
 import os
 
-from .tagger.config import Configuration
-from .tagger.data_utils import CorpusIterator
-from .tagger.model import CodePoSModel
+from src.tagger.config import Configuration
+from src.tagger.data_utils import CorpusIterator
+from src.tagger.model import CodePoSModel
 
 
 def main():

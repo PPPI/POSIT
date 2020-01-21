@@ -1,9 +1,9 @@
 import os
 import sys
 
-from .preprocessor.preprocess import tokenize_SO_row
-from .tagger.config import Configuration
-from .tagger.model import CodePoSModel
+from src.preprocessor.preprocess import tokenize_SO_row
+from src.tagger.config import Configuration
+from src.tagger.model import CodePoSModel
 
 
 def process_one_rev(model, target_data, rev, post_id):

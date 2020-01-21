@@ -5,10 +5,10 @@ import sys
 
 from nltk import casual_tokenize
 
-from .preprocessor.preprocess import CODE_TOKENISATION_REGEX
-from .tagger.config import Configuration
-from .tagger.data_utils import CorpusIterator
-from .tagger.model import CodePoSModel
+from src.preprocessor.preprocess import CODE_TOKENISATION_REGEX
+from src.tagger.config import Configuration
+from src.tagger.data_utils import CorpusIterator
+from src.tagger.model import CodePoSModel
 
 
 def interactive_shell(model, casual=False):

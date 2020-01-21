@@ -1,8 +1,8 @@
 import sys
 
-from .preprocessor.preprocess import tokenise_SO, tokenise_lkml
-from .tagger.config import Configuration
-from .tagger.model import CodePoSModel
+from src.preprocessor.preprocess import tokenise_SO, tokenise_lkml
+from src.tagger.config import Configuration
+from src.tagger.model import CodePoSModel
 
 
 def process_data(model, target_data, stackoverflow=False):

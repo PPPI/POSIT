@@ -1,4 +1,7 @@
 # POSIT
+[![DOI](https://zenodo.org/badge/233908281.svg)](https://zenodo.org/badge/latestdoi/233908281)
+
+
 This a project to simultaneously provide language ID tags and Part-Of-Speech 
 or compiler tags (which are taken from CLANG compilations of C and C++ code).
 
