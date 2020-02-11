@@ -30,7 +30,7 @@ xmltodict, beautifulsoup4, html5lib
 ```
 for corpus preprocessing; and
 ```
-scikit-learn
+scikit-learn, tqdm
 ```
 for the considered SVM baseline.
 
