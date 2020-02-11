@@ -15,7 +15,7 @@ setup(name='POSIT',
             'StORMeD': 'src/baseline/StORMeD',
             },
       package_data={'tagger': ['data/*.pkl']}, 
-      install_requires=[
+      requires=[
             'tensorflow', 
             'numpy', 
             'gensim', 
@@ -23,7 +23,7 @@ setup(name='POSIT',
             'xmltodict',
             'beautifulsoup4', 
             'html5lib', 
-            'scikit-learn',
+            'sklearn',
             'tqdm',
       ]
       )
