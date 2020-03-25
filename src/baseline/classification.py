@@ -8,10 +8,10 @@ from nltk import pos_tag
 from sklearn import svm, metrics
 from tqdm import tqdm
 
-from ..preprocessor.preprocess import annotate_comment_line
-from ..preprocessor.util import operators, line_comment_start, keywords
-from ..tagger.data_utils import camel, snake, O
-from ..tagger.data_utils import generate_feature_vector as feature_vector
+from src.preprocessor.preprocess import annotate_comment_line
+from src.preprocessor.util import operators, line_comment_start, keywords
+from src.tagger.data_utils import camel, snake, O
+from src.tagger.data_utils import generate_feature_vector as feature_vector
 
 
 def flip_single_english_to_code(sent):

@@ -3,7 +3,7 @@ import tensorflow as tf
 
 from .base_model import BaseModel
 from .general_utils import Progbar
-from ..tagger.data_utils import pad_sequences, minibatches
+from .data_utils import pad_sequences, minibatches
 
 
 class CodePoSModel(BaseModel):

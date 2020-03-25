@@ -4,7 +4,7 @@ from io import StringIO
 from typing.io import TextIO
 import sys
 
-from .PhpBaseLexer import PhpBaseLexer
+from src.antlr4_language_parsers.php.PhpBaseLexer import PhpBaseLexer
 
 
 def serializedATN():

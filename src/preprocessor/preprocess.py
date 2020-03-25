@@ -9,9 +9,9 @@ from bs4 import BeautifulSoup
 from nltk import pos_tag, casual_tokenize
 from nltk.tokenize import sent_tokenize
 
-from ..preprocessor.util import operators, line_comment_start, _UNIVERSAL_TAGS, keywords, CODE_TOKENISATION_REGEX, \
+from src.preprocessor.util import operators, line_comment_start, _UNIVERSAL_TAGS, keywords, CODE_TOKENISATION_REGEX, \
     HTML_PARSER
-from ..tagger.data_utils import O, snake, camel
+from src.tagger.data_utils import O, snake, camel
 
 
 def parse_stackoverflow_posts(file_location, for_stormed_=False):

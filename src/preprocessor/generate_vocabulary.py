@@ -3,7 +3,7 @@ import sys
 
 from gensim.corpora import Dictionary
 
-from ..tagger.data_utils import UNK, O
+from src.tagger.data_utils import UNK, O
 
 if __name__ == '__main__':
     dataset = sys.argv[1]
