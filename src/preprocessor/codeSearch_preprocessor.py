@@ -4,20 +4,20 @@ import antlr4
 import json_lines as jl
 
 # Individual languages that we want to parse
-from ..antlr4_language_parsers.golang.GoLexer import GoLexer as gol
-from ..antlr4_language_parsers.golang.GoParser import GoParser as gop
-from ..antlr4_language_parsers.java.Java9Lexer import Java9Lexer as javal
-from ..antlr4_language_parsers.java.Java9Parser import Java9Parser as javap
-from ..antlr4_language_parsers.javadoc.JavadocLexer import JavadocLexer as javadocl
-from ..antlr4_language_parsers.javadoc.JavadocParser import JavadocParser as javadocp
-from ..antlr4_language_parsers.javascript.ECMAScriptLexer import ECMAScriptLexer as jsl
-from ..antlr4_language_parsers.javascript.ECMAScriptParser import ECMAScriptParser as jsp
-from ..antlr4_language_parsers.php.PhpLexer import PhpLexer as phpl
-from ..antlr4_language_parsers.php.PhpParser import PhpParser as phpp
-from ..antlr4_language_parsers.python.Python3Lexer import Python3Lexer as pyl
-from ..antlr4_language_parsers.python.Python3Parser import Python3Parser as pyp
-from ..antlr4_language_parsers.ruby.CorundumLexer import CorundumLexer as rubyl
-from ..antlr4_language_parsers.ruby.CorundumParser import CorundumParser as rubyp
+from src.antlr4_language_parsers.golang.GoLexer import GoLexer as gol
+from src.antlr4_language_parsers.golang.GoParser import GoParser as gop
+from src.antlr4_language_parsers.java.Java9Lexer import Java9Lexer as javal
+from src.antlr4_language_parsers.java.Java9Parser import Java9Parser as javap
+from src.antlr4_language_parsers.javadoc.JavadocLexer import JavadocLexer as javadocl
+from src.antlr4_language_parsers.javadoc.JavadocParser import JavadocParser as javadocp
+from src.antlr4_language_parsers.javascript.ECMAScriptLexer import ECMAScriptLexer as jsl
+from src.antlr4_language_parsers.javascript.ECMAScriptParser import ECMAScriptParser as jsp
+from src.antlr4_language_parsers.php.PhpLexer import PhpLexer as phpl
+from src.antlr4_language_parsers.php.PhpParser import PhpParser as phpp
+from src.antlr4_language_parsers.python.Python3Lexer import Python3Lexer as pyl
+from src.antlr4_language_parsers.python.Python3Parser import Python3Parser as pyp
+from src.antlr4_language_parsers.ruby.CorundumLexer import CorundumLexer as rubyl
+from src.antlr4_language_parsers.ruby.CorundumParser import CorundumParser as rubyp
 
 # Configuration
 languages = [
@@ -42,7 +42,7 @@ folds = [
     'test',
     'validation',
 ]
-# (language, language, fold, fold number)
+# (language, fold, language, fold, fold number)
 jsonl_location_format = '%s\\final\\jsonl\\%s\\%s_%s_%d.jsonl.gz'
 
 
@@ -120,3 +120,12 @@ def read_corpus_file(location, language):
                 pass
 
             # TODO: Do something with AST and docstring to save for POSIT
+
+
+def main():
+    location = (location_format + jsonl_location_format) % ('ruby', 'ruby', 'train', 'ruby', 'train', 0)
+    read_corpus_file(location, 'ruby')
+
+
+if __name__ == '__main__':
+    main()
