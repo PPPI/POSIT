@@ -25,5 +25,7 @@ setup(name='POSIT',
             'html5lib', 
             'sklearn',
             'tqdm',
+            'json_lines',
+            'antlr4'
       ]
       )
