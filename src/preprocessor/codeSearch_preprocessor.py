@@ -1,12 +1,12 @@
-# Enables reading the corpus
 # Used to parse code to ASTs
 import antlr4
+# Enables reading the corpus
 import json_lines as jl
 
+# Individual languages that we want to parse
 from ..antlr4_language_parsers.golang.GoLexer import GoLexer as gol
 from ..antlr4_language_parsers.golang.GoParser import GoParser as gop
 from ..antlr4_language_parsers.java.Java9Lexer import Java9Lexer as javal
-# Individual languages that we want to parse
 from ..antlr4_language_parsers.java.Java9Parser import Java9Parser as javap
 from ..antlr4_language_parsers.javadoc.JavadocLexer import JavadocLexer as javadocl
 from ..antlr4_language_parsers.javadoc.JavadocParser import JavadocParser as javadocp
@@ -60,7 +60,7 @@ def parse_javadoc(entry):
     lexer = javadocl(antlr4.InputStream(docstring))
     stream = antlr4.CommonTokenStream(lexer)
     parser = javadocp(stream)
-    tree = parser. < entry > ()
+    tree = parser.documentation()
     return tree.toStringTree(recog=parser)
 
 
@@ -69,7 +69,7 @@ def parse_golang(entry):
     lexer = gol(antlr4.InputStream(code))
     stream = antlr4.CommonTokenStream(lexer)
     parser = gop(stream)
-    tree = parser. < entry > ()
+    tree = parser.methodDecl()
     return tree.toStringTree(recog=parser)
 
 
@@ -78,7 +78,7 @@ def parse_js(entry):
     lexer = jsl(antlr4.InputStream(code))
     stream = antlr4.CommonTokenStream(lexer)
     parser = jsp(stream)
-    tree = parser. < entry > ()
+    tree = parser.program()
     return tree.toStringTree(recog=parser)
 
 
@@ -87,7 +87,7 @@ def parse_php(entry):
     lexer = phpl(antlr4.InputStream(code))
     stream = antlr4.CommonTokenStream(lexer)
     parser = phpp(stream)
-    tree = parser. < entry > ()
+    tree = parser.functionDeclaration()
     return tree.toStringTree(recog=parser)
 
 
@@ -96,7 +96,7 @@ def parse_python(entry):
     lexer = pyl(antlr4.InputStream(code))
     stream = antlr4.CommonTokenStream(lexer)
     parser = pyp(stream)
-    tree = parser. < entry > ()
+    tree = parser.file_input()
     return tree.toStringTree(recog=parser)
 
 
@@ -105,7 +105,7 @@ def parse_ruby(entry):
     lexer = rubyl(antlr4.InputStream(code))
     stream = antlr4.CommonTokenStream(lexer)
     parser = rubyp(stream)
-    tree = parser. < entry > ()
+    tree = parser.prog()
     return tree.toStringTree(recog=parser)
 
 
