@@ -1,12 +1,14 @@
+import gzip
+import json
 from collections import deque
 
 # Used to parse code to ASTs
 import antlr4
 # Enables reading the corpus
 import json_lines as jl
-# Individual languages that we want to parse
 from nltk import sent_tokenize, casual_tokenize, pos_tag
 
+# Individual languages that we want to parse
 from src.antlr4_language_parsers.golang.GoLexer import GoLexer as gol
 from src.antlr4_language_parsers.golang.GoParser import GoParser as gop
 from src.antlr4_language_parsers.java.Java9Lexer import Java9Lexer as javal
@@ -51,7 +53,6 @@ folds = [
 ]
 # (language, fold, language, fold, fold number)
 jsonl_location_format = '%s\\final\\jsonl\\%s\\%s_%s_%d.jsonl.gz'
-
 
 UNDEF = 'UNDEF'
 
@@ -186,7 +187,8 @@ def parse_docstring(entry, language, code_context):
     return result
 
 
-def read_corpus_file(location, language):
+def preprocess_corpus_file(location, language):
+    preprocessed_data = ''
     with jl.open(location) as f:
         for entry in f:
             ast = globals()["parse_%s" % language](entry)
@@ -195,12 +197,25 @@ def read_corpus_file(location, language):
                 for tok, tag in ast_to_tagged_list(ast)
             ]
             tagged_docstring_list = parse_docstring(entry, language, dict(tagged_code_list))
+            entry['code_parsed'] = json.dumps(tagged_code_list)
+            entry['docstring_parsed'] = json.dumps(tagged_docstring_list)
+            preprocessed_data += json.dumps(entry) + '\n'
 
+    with gzip.open(location[:-len('.jsonl.gz')] + '_parsed.jsonl.gz', 'wb') as f:
+        f.write(preprocessed_data)
 
 
 def main():
-    location = (location_format + jsonl_location_format) % ('java', 'java', 'train', 'java', 'train', 0)
-    read_corpus_file(location, 'java')
+    for language in languages:
+        for fold in folds:
+            i = 0
+            while True:
+                try:
+                    location = (location_format + jsonl_location_format) % (language, language, fold, language, fold, i)
+                    preprocess_corpus_file(location, language)
+                    i += 1
+                except FileNotFoundError:
+                    break
 
 
 if __name__ == '__main__':
