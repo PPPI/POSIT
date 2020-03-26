@@ -4,9 +4,8 @@ from collections import deque
 import antlr4
 # Enables reading the corpus
 import json_lines as jl
-
 # Individual languages that we want to parse
-from nltk import sent_tokenize, casual_tokenize
+from nltk import sent_tokenize, casual_tokenize, pos_tag
 
 from src.antlr4_language_parsers.golang.GoLexer import GoLexer as gol
 from src.antlr4_language_parsers.golang.GoParser import GoParser as gop
@@ -52,6 +51,9 @@ folds = [
 ]
 # (language, fold, language, fold, fold number)
 jsonl_location_format = '%s\\final\\jsonl\\%s\\%s_%s_%d.jsonl.gz'
+
+
+UNDEF = 'UNDEF'
 
 
 def parse_java(entry):
@@ -138,30 +140,48 @@ def ast_to_tagged_list(tree):
     return [l for l in reversed(result)]
 
 
+def java_doc_string_to_nltk(tagged_list):
+    output = ''
+    add_be_after_next = False
+    for text, tag in tagged_list:
+        if tag == 'DescriptionLineNoSpaceNoAt':
+            if text == '.':
+                output = output[:-1]
+            output += text + ' '
+        elif tag == 'BlockTagTextElement' or tag == 'BlockTagContent':
+            if tag == 'BlockTagContent' and output[-1] != '.':
+                output += '.'
+            output += text
+            if tag == 'BlockTagTextElement' and add_be_after_next:
+                output += ' is'
+                add_be_after_next = False
+        elif tag == 'BlockTagName':
+            if text == 'param':
+                add_be_after_next = True
+
+    return output
+
+
 def parse_docstring(entry, language, code_context):
     result = list()
     if language == 'java':
         docstring_parse = parse_javadoc(entry)
         tagged_list = ast_to_tagged_list(docstring_parse)
-        # TODO: Reconstruct sentences for NLTK.
-        for snippet_or_tok, tag in tagged_list:
-            if tag == "":
-                toks = [casual_tokenize(s) for s in sent_tokenize(snippet_or_tok)]
-                for tok, tag_ in toks:
-                    if tok in code_context.keys():
-                        context = code_context[tok]
-                        result.append((tok, ('English', context[-1]+{'English': tag_})))
-            else:
-                # TODO: Output the code-entity tag
-                if snippet_or_tok in code_context.keys():
-                    context = code_context[snippet_or_tok]
-                    result.append((snippet_or_tok, ('English', context[-1]+{'English': tag})))
+        docstring = java_doc_string_to_nltk(tagged_list)
     else:
-        toks = [casual_tokenize(s) for s in sent_tokenize(entry['docstring'])]
-        for tok, tag_ in toks:
+        docstring = entry['docstring']
+
+    tagged_sents = [pos_tag(casual_tokenize(s)) for s in sent_tokenize(docstring)]
+    for sent in tagged_sents:
+        for tok, tag_ in sent:
             if tok in code_context.keys():
                 context = code_context[tok]
-                result.append((tok, ('English', context[-1] + {'English': tag_})))
+                result.append(
+                    (tok, ('English', {k: context[-1][k] if k != 'English' else tag_ for k in context[-1].keys()}))
+                )
+            else:
+                result.append(
+                    (tok, ('English', {l: tag_ if l == 'English' else UNDEF for l in languages + natural_languages})))
 
     return result
 
@@ -171,9 +191,11 @@ def read_corpus_file(location, language):
         for entry in f:
             ast = globals()["parse_%s" % language](entry)
             tagged_code_list = [
-                (tok, (language, {l: tag if l == language else '' for l in languages + natural_languages}))
-                for tok, tag in ast_to_tagged_list(ast)]
+                (tok, (language, {l: tag if l == language else UNDEF for l in languages + natural_languages}))
+                for tok, tag in ast_to_tagged_list(ast)
+            ]
             tagged_docstring_list = parse_docstring(entry, language, dict(tagged_code_list))
+
 
 
 def main():
