@@ -4735,7 +4735,7 @@ class GoParser ( GoParserBase ):
             if la_ == 1:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 660
-                if not noTerminatorAfterParams(2):
+                if not self.noTerminatorAfterParams(2):
                     from antlr4.error.Errors import FailedPredicateException
                     raise FailedPredicateException(self, "noTerminatorAfterParams(2)")
                 self.state = 661
@@ -4850,7 +4850,7 @@ class GoParser ( GoParserBase ):
             if la_ == 1:
                 self.enterOuterAlt(localctx, 1)
                 self.state = 673
-                if not noTerminatorAfterParams(1):
+                if not self.noTerminatorAfterParams(1):
                     from antlr4.error.Errors import FailedPredicateException
                     raise FailedPredicateException(self, "noTerminatorAfterParams(1)")
                 self.state = 674
@@ -6448,7 +6448,7 @@ class GoParser ( GoParserBase ):
             la_ = self._interp.adaptivePredict(self._input,90,self._ctx)
             if la_ == 1:
                 self.state = 856
-                if not noTerminatorBetween(2):
+                if not self.noTerminatorBetween(2):
                     from antlr4.error.Errors import FailedPredicateException
                     raise FailedPredicateException(self, "noTerminatorBetween(2)")
                 self.state = 857
@@ -7068,7 +7068,7 @@ class GoParser ( GoParserBase ):
             elif la_ == 3:
                 self.enterOuterAlt(localctx, 3)
                 self.state = 942
-                if not lineTerminatorAhead():
+                if not self.lineTerminatorAhead():
                     from antlr4.error.Errors import FailedPredicateException
                     raise FailedPredicateException(self, "lineTerminatorAhead()")
                 pass
@@ -7076,7 +7076,7 @@ class GoParser ( GoParserBase ):
             elif la_ == 4:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 943
-                if not checkPreviousTokenText("}"):
+                if not self.checkPreviousTokenText("}"):
                     from antlr4.error.Errors import FailedPredicateException
                     raise FailedPredicateException(self, "checkPreviousTokenText(\"}\")")
                 pass
@@ -7109,12 +7109,12 @@ class GoParser ( GoParserBase ):
 
     def methodSpec_sempred(self, localctx:MethodSpecContext, predIndex:int):
             if predIndex == 0:
-                return noTerminatorAfterParams(2)
+                return self.noTerminatorAfterParams(2)
          
 
     def signature_sempred(self, localctx:SignatureContext, predIndex:int):
             if predIndex == 1:
-                return noTerminatorAfterParams(1)
+                return self.noTerminatorAfterParams(1)
          
 
     def expression_sempred(self, localctx:ExpressionContext, predIndex:int):
@@ -7145,16 +7145,16 @@ class GoParser ( GoParserBase ):
 
     def fieldDecl_sempred(self, localctx:FieldDeclContext, predIndex:int):
             if predIndex == 8:
-                return noTerminatorBetween(2)
+                return self.noTerminatorBetween(2)
          
 
     def eos_sempred(self, localctx:EosContext, predIndex:int):
             if predIndex == 9:
-                return lineTerminatorAhead()
+                return self.lineTerminatorAhead()
          
 
             if predIndex == 10:
-                return checkPreviousTokenText("}")
+                return self.checkPreviousTokenText("}")
          
 
 

@@ -1,12 +1,14 @@
 from antlr4 import *
 
+from src.antlr4_language_parsers.golang.GoLexer import GoLexer
+
 """
 All parser methods that used in grammar (p, prev, notLineTerminator, etc.)
 should start with lower case char similar to parser rules.
 """
 class GoParserBase(Parser):
-    def __init__(self, input):
-        super(self, GoParserBase).__init__(input)
+    def __init__(self, _input, output):
+        super(GoParserBase, self).__init__(_input, output)
     
     """
     Returns {@code true} iff on the current index of the parser's
@@ -26,7 +28,7 @@ class GoParserBase(Parser):
         if possibleIndexEosToken == -1:
             return True
         
-        ahead = _input.get(possibleIndexEosToken)
+        ahead = self._input.get(possibleIndexEosToken)
         if ahead.getChannel() != Lexer.HIDDEN:
             # We're only interested in tokens on the HIDDEN channel.
             return False
@@ -39,7 +41,7 @@ class GoParserBase(Parser):
             # Get the token ahead of the current whitespaces.
             possibleIndexEosToken = self.getCurrentToken().getTokenIndex() - 2
             
-            ahead = _input.get(possibleIndexEosToken)
+            ahead = self._input.get(possibleIndexEosToken)
 
         # Get the token's text and type
         text = ahead.getText()
@@ -56,7 +58,7 @@ class GoParserBase(Parser):
     token offset and the prior one on the {@code HIDDEN} channel.
     """
     def noTerminatorBetween(self, tokenOffset):
-        stream = BufferedTokenStream(_input);
+        stream = BufferedTokenStream(self._input);
         tokens = stream.getHiddenTokensToLeft(stream.LT(tokenOffset).getTokenIndex())
         
         if tokens is None:
@@ -78,7 +80,7 @@ class GoParserBase(Parser):
     {@code HIDDEN} channel.
     """
     def noTerminatorAfterParams(self, tokenOffset):
-        stream = BufferedTokenStream(_input)
+        stream = BufferedTokenStream(self._input)
         leftParams = 1
         rightParams = 0
 
@@ -94,15 +96,15 @@ class GoParserBase(Parser):
                     rightParams += 1
 
             tokenOffset += 1
-            return noTerminatorBetween(tokenOffset)
+            return self.noTerminatorBetween(tokenOffset)
 
         return True
     
     def checkPreviousTokenText(self, text):
-        stream = BufferedTokenStream(_input)
+        stream = BufferedTokenStream(self._input)
         prevTokenText = stream.LT(1).getText()
         
-        if (prevTokenText == null):
-            return false
+        if (prevTokenText == None):
+            return False
         
         return prevTokenText.equals(text)
