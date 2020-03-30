@@ -9,6 +9,8 @@ import json_lines as jl
 from nltk import sent_tokenize, casual_tokenize, pos_tag
 
 # Individual languages that we want to parse
+from tqdm import tqdm
+
 from src.antlr4_language_parsers.golang.GoLexer import GoLexer as gol
 from src.antlr4_language_parsers.golang.GoParser import GoParser as gop
 from src.antlr4_language_parsers.java.Java9Lexer import Java9Lexer as javal
@@ -75,7 +77,7 @@ def parse_javadoc(entry):
     return tree
 
 
-def parse_golang(entry):
+def parse_go(entry):
     code = entry['code']
     lexer = gol(antlr4.InputStream(code))
     stream = antlr4.CommonTokenStream(lexer)
@@ -190,7 +192,7 @@ def parse_docstring(entry, language, code_context):
 def preprocess_corpus_file(location, language):
     preprocessed_data = ''
     with jl.open(location) as f:
-        for entry in f:
+        for entry in tqdm(f, leave=False, desc="Entries"):
             ast = globals()["parse_%s" % language](entry)
             tagged_code_list = [
                 (tok, (language, {l: tag if l == language else UNDEF for l in languages + natural_languages}))
@@ -206,16 +208,19 @@ def preprocess_corpus_file(location, language):
 
 
 def main():
-    for language in languages:
-        for fold in folds:
+    for language in tqdm(languages, desc="Languages"):
+        for fold in tqdm(folds, leave=False, desc="Fold"):
+            t = tqdm(leave=False, desc="Files")
             i = 0
             while True:
                 try:
                     location = (location_format + jsonl_location_format) % (language, language, fold, language, fold, i)
                     preprocess_corpus_file(location, language)
                     i += 1
+                    t.update(n=i)
                 except FileNotFoundError:
                     break
+            t.close()
 
 
 if __name__ == '__main__':
