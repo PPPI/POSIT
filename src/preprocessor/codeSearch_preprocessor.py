@@ -248,7 +248,7 @@ def main():
                         entries.append(entry)
 
                 with Pool(processes=cpu_count() - 1) as wp:
-                    for processed_entry in tqdm(wp.imap(process_entry_mp, entries,),
+                    for processed_entry in tqdm(wp.imap_unordered(process_entry_mp, entries,),
                                                 leave=False, desc='Entries', total=idx + 1):
                         preprocessed_data.append(json.dumps(processed_entry))
 
