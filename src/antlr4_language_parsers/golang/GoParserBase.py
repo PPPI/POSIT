@@ -58,7 +58,7 @@ class GoParserBase(Parser):
     token offset and the prior one on the {@code HIDDEN} channel.
     """
     def noTerminatorBetween(self, tokenOffset):
-        stream = BufferedTokenStream(self._input);
+        stream = BufferedTokenStream.BufferedTokenStream(GoLexer(self._input))
         tokens = stream.getHiddenTokensToLeft(stream.LT(tokenOffset).getTokenIndex())
         
         if tokens is None:
@@ -80,7 +80,7 @@ class GoParserBase(Parser):
     {@code HIDDEN} channel.
     """
     def noTerminatorAfterParams(self, tokenOffset):
-        stream = BufferedTokenStream(self._input)
+        stream = BufferedTokenStream.BufferedTokenStream(GoLexer(self._input))
         leftParams = 1
         rightParams = 0
 
@@ -101,7 +101,7 @@ class GoParserBase(Parser):
         return True
     
     def checkPreviousTokenText(self, text):
-        stream = BufferedTokenStream(self._input)
+        stream = BufferedTokenStream.BufferedTokenStream(GoLexer(self._input))
         prevTokenText = stream.LT(1).getText()
         
         if (prevTokenText == None):
