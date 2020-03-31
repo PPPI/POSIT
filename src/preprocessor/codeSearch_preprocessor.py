@@ -1,16 +1,17 @@
 import gzip
 import json
 from collections import deque
-
+from multiprocessing.pool import Pool
 # Used to parse code to ASTs
+from os import cpu_count
+
 import antlr4
 # Enables reading the corpus
 import json_lines as jl
 from nltk import sent_tokenize, casual_tokenize, pos_tag
-
-# Individual languages that we want to parse
 from tqdm import tqdm
 
+# Individual languages that we want to parse
 from src.antlr4_language_parsers.golang.GoLexer import GoLexer as gol
 from src.antlr4_language_parsers.golang.GoParser import GoParser as gop
 from src.antlr4_language_parsers.java.Java9Lexer import Java9Lexer as javal
@@ -86,7 +87,7 @@ def parse_go(entry):
     return tree
 
 
-def parse_js(entry):
+def parse_javascript(entry):
     code = entry['code']
     lexer = jsl(antlr4.InputStream(code))
     stream = antlr4.CommonTokenStream(lexer)
@@ -189,38 +190,70 @@ def parse_docstring(entry, language, code_context):
     return result
 
 
+def process_entry(entry, language):
+    ast = globals()["parse_%s" % language](entry)
+    tagged_code_list = [
+        (tok, (language, {l: tag if l == language else UNDEF for l in languages + natural_languages}))
+        for tok, tag in ast_to_tagged_list(ast)
+    ]
+    tagged_docstring_list = parse_docstring(entry, language, dict(tagged_code_list))
+    entry['code_parsed'] = json.dumps(tagged_code_list)
+    entry['docstring_parsed'] = json.dumps(tagged_docstring_list)
+    return entry
+
+
 def preprocess_corpus_file(location, language):
     preprocessed_data = ''
     with jl.open(location) as f:
         for entry in tqdm(f, leave=False, desc="Entries"):
-            ast = globals()["parse_%s" % language](entry)
-            tagged_code_list = [
-                (tok, (language, {l: tag if l == language else UNDEF for l in languages + natural_languages}))
-                for tok, tag in ast_to_tagged_list(ast)
-            ]
-            tagged_docstring_list = parse_docstring(entry, language, dict(tagged_code_list))
-            entry['code_parsed'] = json.dumps(tagged_code_list)
-            entry['docstring_parsed'] = json.dumps(tagged_docstring_list)
+            entry = process_entry(entry, language)
             preprocessed_data += json.dumps(entry) + '\n'
 
     with gzip.open(location[:-len('.jsonl.gz')] + '_parsed.jsonl.gz', 'wb') as f:
-        f.write(preprocessed_data)
+        f.write(preprocessed_data.encode('utf8'))
+
+
+class ProcessEntryWrapper(object):
+    def __init__(self, language):
+        self.language = language
+
+    def __call__(self, entry):
+        return process_entry(entry, self.language)
 
 
 def main():
     for language in tqdm(languages, desc="Languages"):
+        process_entry_mp = ProcessEntryWrapper(language)
         for fold in tqdm(folds, leave=False, desc="Fold"):
-            t = tqdm(leave=False, desc="Files")
-            i = 0
+            # Determine number of files, we error fast, but don't actually read the file by using jl.open()
+            n_files = 0
             while True:
                 try:
-                    location = (location_format + jsonl_location_format) % (language, language, fold, language, fold, i)
-                    preprocess_corpus_file(location, language)
-                    i += 1
-                    t.update(n=i)
+                    location = (location_format + jsonl_location_format) \
+                               % (language, language, fold, language, fold, n_files)
+                    with jl.open(location) as _:
+                        pass
                 except FileNotFoundError:
                     break
-            t.close()
+                finally:
+                    n_files += 1
+
+            for i in tqdm(range(n_files - 1), leave=False, desc='Files'):
+                # We load the full file in memory before we process it
+                preprocessed_data = []
+                entries = list()
+                location = (location_format + jsonl_location_format) % (language, language, fold, language, fold, i)
+                with jl.open(location) as f:
+                    for idx, entry in enumerate(f):
+                        entries.append(entry)
+
+                with Pool(processes=cpu_count() - 1) as wp:
+                    for processed_entry in tqdm(wp.imap(process_entry_mp, entries,),
+                                                leave=False, desc='Entries', total=idx + 1):
+                        preprocessed_data.append(json.dumps(processed_entry))
+
+                with gzip.open(location[:-len('.jsonl.gz')] + '_parsed.jsonl.gz', 'wb') as f:
+                    f.write('\n'.join(preprocessed_data).encode('utf8'))
 
 
 if __name__ == '__main__':
