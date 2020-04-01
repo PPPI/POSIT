@@ -29,10 +29,10 @@ from src.antlr4_language_parsers.ruby.CorundumParser import CorundumParser as ru
 
 # Configuration
 languages = [
-    'go',
+    'go',  # Issues with the Lexer
     'java',
     'javascript',
-    'php',
+    'php',  # Issues with the Lexer
     'python',
     'ruby',
 ]
@@ -52,7 +52,7 @@ pickles = [
 folds = [
     'train',
     'test',
-    'validation',
+    'valid',
 ]
 # (language, fold, language, fold, fold number)
 jsonl_location_format = '%s\\final\\jsonl\\%s\\%s_%s_%d.jsonl.gz'
