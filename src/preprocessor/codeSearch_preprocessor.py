@@ -1,6 +1,7 @@
 import gzip
 import io
 import json
+import re
 import sys
 from collections import deque
 from multiprocessing.pool import Pool
@@ -10,7 +11,9 @@ from os import cpu_count
 import antlr4
 # Enables reading the corpus
 import json_lines as jl
+# NLP tokenisation and tagging
 from nltk import sent_tokenize, casual_tokenize, pos_tag
+# Progress bars
 from tqdm import tqdm
 
 # Individual languages that we want to parse
@@ -28,6 +31,7 @@ from src.antlr4_language_parsers.python.Python3Lexer import Python3Lexer as pyl
 from src.antlr4_language_parsers.python.Python3Parser import Python3Parser as pyp
 from src.antlr4_language_parsers.ruby.CorundumLexer import CorundumLexer as rubyl
 from src.antlr4_language_parsers.ruby.CorundumParser import CorundumParser as rubyp
+from src.preprocessor.formal_lang_heuristics import is_diff_header, is_email, is_URI
 
 # Configuration
 languages = [
@@ -41,6 +45,12 @@ languages = [
 
 natural_languages = [
     'English',
+]
+
+formal_languages = [
+    'uri',
+    'email',
+    'diff'
 ]
 
 # language
@@ -188,9 +198,49 @@ def parse_docstring(entry, language, code_context):
                 result.append(
                     (tok, ('English', {k: context[-1][k] if k != 'English' else tag_ for k in context[-1].keys()}))
                 )
+            elif is_URI(tok):
+                if tok.startswith('file'):
+                    tag = 'file'
+                elif tok.startswith('http'):
+                    tag = 'http'
+                elif tok.startswith('ftp'):
+                    tag = 'ftp'
+                elif tok.startswith('localhost'):
+                    tag = 'localhost'
+                elif re.match(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", tag) is not None:
+                    tag = 'ipv4'
+
+                tag_built = ('uri', {l: tag_ if l == 'English' else UNDEF
+                                     for l in languages + natural_languages + formal_languages})
+                tag_built[-1]['uri'] = tag
+
+                result.append(tag_built)
+            elif is_email(tok):
+                tag = 'email'
+
+                tag_built = ('email', {l: tag_ if l == 'English' else UNDEF
+                                     for l in languages + natural_languages + formal_languages})
+                tag_built[-1]['email'] = tag
+
+                result.append(tag_built)
+            elif is_diff_header(tok):
+                if tok.startswith('diff'):
+                    tag = 'diff_line'
+                elif tok.startswith('index'):
+                    tag = 'index_line'
+                else:
+                    tag = 'path_line'
+
+                tag_built = ('diff', {l: tag_ if l == 'English' else UNDEF
+                                     for l in languages + natural_languages + formal_languages})
+                tag_built[-1]['diff'] = tag
+
+                result.append(tag_built)
+
             else:
                 result.append(
-                    (tok, ('English', {l: tag_ if l == 'English' else UNDEF for l in languages + natural_languages})))
+                    (tok, ('English', {l: tag_ if l == 'English' else UNDEF
+                                       for l in languages + natural_languages + formal_languages})))
 
     return result
 
@@ -198,7 +248,8 @@ def parse_docstring(entry, language, code_context):
 def process_entry(entry, language):
     ast = globals()["parse_%s" % language](entry)
     tagged_code_list = [
-        (tok, (language, {l: tag if l == language else UNDEF for l in languages + natural_languages}))
+        (tok, (language, {l: tag if l == language else UNDEF
+                          for l in languages + natural_languages + formal_languages}))
         for tok, tag in ast_to_tagged_list(ast)
     ]
     tagged_docstring_list = parse_docstring(entry, language, dict(tagged_code_list))
