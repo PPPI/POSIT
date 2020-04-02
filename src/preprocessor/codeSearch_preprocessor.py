@@ -1,5 +1,6 @@
 import gzip
 import json
+import sys
 from collections import deque
 from multiprocessing.pool import Pool
 # Used to parse code to ASTs
@@ -248,7 +249,7 @@ def main():
                         entries.append(entry)
 
                 with Pool(processes=cpu_count() - 1) as wp:
-                    for processed_entry in tqdm(wp.imap_unordered(process_entry_mp, entries,),
+                    for processed_entry in tqdm(wp.imap_unordered(process_entry_mp, entries, ),
                                                 leave=False, desc='Entries', total=idx + 1):
                         preprocessed_data.append(json.dumps(processed_entry))
 
@@ -256,5 +257,33 @@ def main():
                     f.write('\n'.join(preprocessed_data).encode('utf8'))
 
 
+def main_single_threaded():
+    """
+    This method is mainly for debugging.
+    The multithreaded main() works fine provided the underlying parsers and lexers work,
+    """
+    for language in tqdm(languages, desc="Languages"):
+        for fold in tqdm(folds, leave=False, desc="Fold"):
+            # Determine number of files, we error fast, but don't actually read the file by using jl.open()
+            n_files = 0
+            while True:
+                try:
+                    location = (location_format + jsonl_location_format) \
+                               % (language, language, fold, language, fold, n_files)
+                    with jl.open(location) as _:
+                        pass
+                except FileNotFoundError:
+                    break
+                finally:
+                    n_files += 1
+
+            for i in tqdm(range(n_files - 1), leave=False, desc='Files'):
+                location = (location_format + jsonl_location_format) % (language, language, fold, language, fold, i)
+                preprocess_corpus_file(location, language)
+
+
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) > 0 and sys.argv[1].lower() == 'debug':
+        main_single_threaded()
+    else:
+        main()
