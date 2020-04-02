@@ -1,4 +1,4 @@
-from typing import re
+import re
 
 URI = re.compile(
     r'^(?:http|ftp|file|smtp)s?://'  # http:// or https://
