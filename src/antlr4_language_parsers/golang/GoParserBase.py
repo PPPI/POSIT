@@ -23,32 +23,32 @@ class GoParserBase(Parser):
     """
     def lineTerminatorAhead(self,):
         # Get the token ahead of teh current index.
-        possibleIndexEosToken = self.getCurrentToken().getTokenIndex() - 1
+        possibleIndexEosToken = self.getCurrentToken().tokenIndex - 1
 
         if possibleIndexEosToken == -1:
             return True
         
         ahead = self._input.get(possibleIndexEosToken)
-        if ahead.getChannel() != Lexer.HIDDEN:
+        if ahead.channel != Lexer.HIDDEN:
             # We're only interested in tokens on the HIDDEN channel.
             return False
         
-        if ahead.getType() == GoLexer.TERMINATOR:
+        if ahead.type == GoLexer.TERMINATOR:
             # There is definitely a line terminator ahead.
             return True
 
-        if ahead.getType() == GoLexer.WS:
+        if ahead.type == GoLexer.WS:
             # Get the token ahead of the current whitespaces.
-            possibleIndexEosToken = self.getCurrentToken().getTokenIndex() - 2
+            possibleIndexEosToken = self.getCurrentToken().tokenIndex - 2
             
             ahead = self._input.get(possibleIndexEosToken)
 
         # Get the token's text and type
-        text = ahead.getText()
-        _type = ahead.getType()
+        text = ahead.text
+        _type = ahead.type
 
         # Check if the token is, or contains a line terminator
-        return (_type == GoLexer.COMMENT and (text.contains('\r') or text.contains('\n'))) or (_type == GoLexer.TERMINATOR)
+        return (_type == GoLexer.COMMENT and ('\r' in text or '\n' in text)) or (_type == GoLexer.TERMINATOR)
 
     """
     Returns {@code true} if no line terminator exists between the specified
@@ -58,14 +58,14 @@ class GoParserBase(Parser):
     token offset and the prior one on the {@code HIDDEN} channel.
     """
     def noTerminatorBetween(self, tokenOffset):
-        stream = BufferedTokenStream.BufferedTokenStream(GoLexer(self._input))
-        tokens = stream.getHiddenTokensToLeft(stream.LT(tokenOffset).getTokenIndex())
+        stream = self._input
+        tokens = stream.getHiddenTokensToLeft(stream.LT(tokenOffset).tokenIndex)
         
         if tokens is None:
             return True
 
         for token in tokens:
-            if token.getText().contains("\n"):
+            if '\n' in token.text:
                 return False
 
         return True
@@ -80,15 +80,15 @@ class GoParserBase(Parser):
     {@code HIDDEN} channel.
     """
     def noTerminatorAfterParams(self, tokenOffset):
-        stream = BufferedTokenStream.BufferedTokenStream(GoLexer(self._input))
+        stream = self._input
         leftParams = 1
         rightParams = 0
 
-        if (stream.LT(tokenOffset).getType() == GoLexer.L_PAREN):
+        if (stream.LT(tokenOffset).type == GoLexer.L_PAREN):
             # Scan past parameters
             while (leftParams != rightParams):
                 tokenOffset += 1
-                valueType = stream.LT(tokenOffset).getType()
+                valueType = stream.LT(tokenOffset).type
 
                 if (valueType == GoLexer.L_PAREN):
                     leftParams += 1
@@ -101,10 +101,10 @@ class GoParserBase(Parser):
         return True
     
     def checkPreviousTokenText(self, text):
-        stream = BufferedTokenStream.BufferedTokenStream(GoLexer(self._input))
-        prevTokenText = stream.LT(1).getText()
+        stream = self._input
+        prevTokenText = stream.LT(1).text
         
         if (prevTokenText == None):
             return False
         
-        return prevTokenText.equals(text)
+        return prevTokenText == text
