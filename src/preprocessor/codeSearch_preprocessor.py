@@ -207,8 +207,10 @@ def parse_docstring(entry, language, code_context):
                     tag = 'ftp'
                 elif tok.startswith('localhost'):
                     tag = 'localhost'
-                elif re.match(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", tag) is not None:
+                elif re.match(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", tok) is not None:
                     tag = 'ipv4'
+                else:
+                    tag = 'uri'
 
                 tag_built = ('uri', {l: tag_ if l == 'English' else UNDEF
                                      for l in languages + natural_languages + formal_languages})
