@@ -1,8 +1,9 @@
 # Generated from /mnt/d/antlrv4/grammars-v4/php/PhpLexer.g4 by ANTLR 4.7.1
-from antlr4 import *
-from io import StringIO
-from typing.io import TextIO
 import sys
+from io import StringIO
+
+from antlr4 import *
+from typing.io import TextIO
 
 from src.antlr4_language_parsers.php.PhpBaseLexer import PhpBaseLexer
 
@@ -1052,10 +1053,9 @@ def serializedATN():
 
 
 class PhpLexer(PhpBaseLexer):
-
     atn = ATNDeserializer().deserialize(serializedATN())
 
-    decisionsToDFA = [ DFA(ds, i) for i, ds in enumerate(atn.decisionToState) ]
+    decisionsToDFA = [DFA(ds, i) for i, ds in enumerate(atn.decisionToState)]
 
     PhpComments = 2
     ErrorLexem = 3
@@ -1310,167 +1310,166 @@ class PhpLexer(PhpBaseLexer):
     HereDocText = 236
     XmlText2 = 237
 
-    channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN", u"PhpComments", 
-                                                          u"ErrorLexem", 
-                                                          u"SkipChannel" ]
+    channelNames = [u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN", u"PhpComments",
+                    u"ErrorLexem",
+                    u"SkipChannel"]
 
-    modeNames = [ "DEFAULT_MODE", "XML", "INSIDE", "HtmlQuoteStringMode", 
-                  "HtmlDoubleQuoteStringMode", "SCRIPT", "STYLE", "PHP", 
-                  "InterpolationString", "SingleLineCommentMode", "HereDoc" ]
+    modeNames = ["DEFAULT_MODE", "XML", "INSIDE", "HtmlQuoteStringMode",
+                 "HtmlDoubleQuoteStringMode", "SCRIPT", "STYLE", "PHP",
+                 "InterpolationString", "SingleLineCommentMode", "HereDoc"]
 
-    literalNames = [ "<INVALID>",
-            "'/>'", "'abstract'", "'array'", "'as'", "'binary'", "'break'", 
-            "'callable'", "'case'", "'catch'", "'class'", "'clone'", "'const'", 
-            "'continue'", "'declare'", "'default'", "'do'", "'real'", "'double'", 
-            "'echo'", "'else'", "'elseif'", "'empty'", "'enddeclare'", "'endfor'", 
-            "'endforeach'", "'endif'", "'endswitch'", "'endwhile'", "'eval'", 
-            "'die'", "'extends'", "'final'", "'finally'", "'float'", "'for'", 
-            "'foreach'", "'function'", "'global'", "'goto'", "'if'", "'implements'", 
-            "'import'", "'include'", "'include_once'", "'instanceof'", "'insteadof'", 
-            "'int8'", "'int16'", "'int64'", "'interface'", "'isset'", "'list'", 
-            "'and'", "'or'", "'xor'", "'namespace'", "'new'", "'null'", 
-            "'object'", "'parent'", "'partial'", "'print'", "'private'", 
-            "'protected'", "'public'", "'require'", "'require_once'", "'resource'", 
-            "'return'", "'static'", "'string'", "'switch'", "'throw'", "'trait'", 
-            "'try'", "'clrtypeof'", "'unicode'", "'unset'", "'use'", "'var'", 
-            "'while'", "'yield'", "'from'", "'fn'", "'__get'", "'__set'", 
-            "'__call'", "'__callstatic'", "'__construct'", "'__destruct'", 
-            "'__wakeup'", "'__sleep'", "'__autoload'", "'__isset'", "'__unset'", 
-            "'__tostring'", "'__invoke'", "'__set_state'", "'__clone'", 
-            "'__debuginfo'", "'__namespace__'", "'__class__'", "'__trait__'", 
-            "'__function__'", "'__method__'", "'__line__'", "'__file__'", 
-            "'__dir__'", "'<=>'", "'<:'", "':>'", "'=>'", "'++'", "'--'", 
-            "'==='", "'!=='", "'=='", "'<='", "'>='", "'+='", "'-='", "'*='", 
-            "'**'", "'**='", "'/='", "'.='", "'%='", "'<<='", "'>>='", "'&='", 
-            "'|='", "'^='", "'||'", "'&&'", "'??'", "'??='", "'<<'", "'>>'", 
-            "'::'", "'->'", "'\\'", "'...'", "'&'", "'|'", "'!'", "'^'", 
-            "'+'", "'-'", "'*'", "'%'", "'~'", "'@'", "'.'", "'('", "')'", 
-            "'['", "']'", "'}'", "','", "':'", "';'", "'''", "'`'" ]
+    literalNames = ["<INVALID>",
+                    "'/>'", "'abstract'", "'array'", "'as'", "'binary'", "'break'",
+                    "'callable'", "'case'", "'catch'", "'class'", "'clone'", "'const'",
+                    "'continue'", "'declare'", "'default'", "'do'", "'real'", "'double'",
+                    "'echo'", "'else'", "'elseif'", "'empty'", "'enddeclare'", "'endfor'",
+                    "'endforeach'", "'endif'", "'endswitch'", "'endwhile'", "'eval'",
+                    "'die'", "'extends'", "'final'", "'finally'", "'float'", "'for'",
+                    "'foreach'", "'function'", "'global'", "'goto'", "'if'", "'implements'",
+                    "'import'", "'include'", "'include_once'", "'instanceof'", "'insteadof'",
+                    "'int8'", "'int16'", "'int64'", "'interface'", "'isset'", "'list'",
+                    "'and'", "'or'", "'xor'", "'namespace'", "'new'", "'null'",
+                    "'object'", "'parent'", "'partial'", "'print'", "'private'",
+                    "'protected'", "'public'", "'require'", "'require_once'", "'resource'",
+                    "'return'", "'static'", "'string'", "'switch'", "'throw'", "'trait'",
+                    "'try'", "'clrtypeof'", "'unicode'", "'unset'", "'use'", "'var'",
+                    "'while'", "'yield'", "'from'", "'fn'", "'__get'", "'__set'",
+                    "'__call'", "'__callstatic'", "'__construct'", "'__destruct'",
+                    "'__wakeup'", "'__sleep'", "'__autoload'", "'__isset'", "'__unset'",
+                    "'__tostring'", "'__invoke'", "'__set_state'", "'__clone'",
+                    "'__debuginfo'", "'__namespace__'", "'__class__'", "'__trait__'",
+                    "'__function__'", "'__method__'", "'__line__'", "'__file__'",
+                    "'__dir__'", "'<=>'", "'<:'", "':>'", "'=>'", "'++'", "'--'",
+                    "'==='", "'!=='", "'=='", "'<='", "'>='", "'+='", "'-='", "'*='",
+                    "'**'", "'**='", "'/='", "'.='", "'%='", "'<<='", "'>>='", "'&='",
+                    "'|='", "'^='", "'||'", "'&&'", "'??'", "'??='", "'<<'", "'>>'",
+                    "'::'", "'->'", "'\\'", "'...'", "'&'", "'|'", "'!'", "'^'",
+                    "'+'", "'-'", "'*'", "'%'", "'~'", "'@'", "'.'", "'('", "')'",
+                    "'['", "']'", "'}'", "','", "':'", "';'", "'''", "'`'"]
 
-    symbolicNames = [ "<INVALID>",
-            "SeaWhitespace", "HtmlText", "XmlStart", "PHPStart", "HtmlScriptOpen", 
-            "HtmlStyleOpen", "HtmlComment", "HtmlDtd", "HtmlOpen", "Shebang", 
-            "Error", "XmlText", "XmlClose", "PHPStartInside", "HtmlClose", 
-            "HtmlSlashClose", "HtmlSlash", "HtmlEquals", "HtmlStartQuoteString", 
-            "HtmlStartDoubleQuoteString", "HtmlHex", "HtmlDecimal", "HtmlSpace", 
-            "HtmlName", "ErrorInside", "PHPStartInsideQuoteString", "HtmlEndQuoteString", 
-            "HtmlQuoteString", "ErrorHtmlQuote", "PHPStartDoubleQuoteString", 
-            "HtmlEndDoubleQuoteString", "HtmlDoubleQuoteString", "ErrorHtmlDoubleQuote", 
-            "ScriptText", "ScriptClose", "PHPStartInsideScript", "StyleBody", 
-            "PHPEnd", "Whitespace", "MultiLineComment", "SingleLineComment", 
-            "ShellStyleComment", "Abstract", "Array", "As", "BinaryCast", 
-            "BoolType", "BooleanConstant", "Break", "Callable", "Case", 
-            "Catch", "Class", "Clone", "Const", "Continue", "Declare", "Default", 
-            "Do", "DoubleCast", "DoubleType", "Echo", "Else", "ElseIf", 
-            "Empty", "EndDeclare", "EndFor", "EndForeach", "EndIf", "EndSwitch", 
-            "EndWhile", "Eval", "Exit", "Extends", "Final", "Finally", "FloatCast", 
-            "For", "Foreach", "Function", "Global", "Goto", "If", "Implements", 
-            "Import", "Include", "IncludeOnce", "InstanceOf", "InsteadOf", 
-            "Int8Cast", "Int16Cast", "Int64Type", "IntType", "Interface", 
-            "IsSet", "List", "LogicalAnd", "LogicalOr", "LogicalXor", "Namespace", 
-            "New", "Null", "ObjectType", "Parent_", "Partial", "Print", 
-            "Private", "Protected", "Public", "Require", "RequireOnce", 
-            "Resource", "Return", "Static", "StringType", "Switch", "Throw", 
-            "Trait", "Try", "Typeof", "UintCast", "UnicodeCast", "Unset", 
-            "Use", "Var", "While", "Yield", "From", "LambdaFn", "Get", "Set", 
-            "Call", "CallStatic", "Constructor", "Destruct", "Wakeup", "Sleep", 
-            "Autoload", "IsSet__", "Unset__", "ToString__", "Invoke", "SetState", 
-            "Clone__", "DebugInfo", "Namespace__", "Class__", "Traic__", 
-            "Function__", "Method__", "Line__", "File__", "Dir__", "Spaceship", 
-            "Lgeneric", "Rgeneric", "DoubleArrow", "Inc", "Dec", "IsIdentical", 
-            "IsNoidentical", "IsEqual", "IsNotEq", "IsSmallerOrEqual", "IsGreaterOrEqual", 
-            "PlusEqual", "MinusEqual", "MulEqual", "Pow", "PowEqual", "DivEqual", 
-            "Concaequal", "ModEqual", "ShiftLeftEqual", "ShiftRightEqual", 
-            "AndEqual", "OrEqual", "XorEqual", "BooleanOr", "BooleanAnd", 
-            "NullCoalescing", "NullCoalescingEqual", "ShiftLeft", "ShiftRight", 
-            "DoubleColon", "ObjectOperator", "NamespaceSeparator", "Ellipsis", 
-            "Less", "Greater", "Ampersand", "Pipe", "Bang", "Caret", "Plus", 
-            "Minus", "Asterisk", "Percent", "Divide", "Tilde", "SuppressWarnings", 
-            "Dollar", "Dot", "QuestionMark", "OpenRoundBracket", "CloseRoundBracket", 
-            "OpenSquareBracket", "CloseSquareBracket", "OpenCurlyBracket", 
-            "CloseCurlyBracket", "Comma", "Colon", "SemiColon", "Eq", "Quote", 
-            "BackQuote", "VarName", "Label", "Octal", "Decimal", "Real", 
-            "Hex", "Binary", "BackQuoteString", "SingleQuoteString", "DoubleQuote", 
-            "StartNowDoc", "StartHereDoc", "ErrorPhp", "CurlyDollar", "UnicodeEscape", 
-            "StringPart", "Comment", "PHPEndSingleLineComment", "CommentEnd", 
-            "HereDocText", "XmlText2" ]
+    symbolicNames = ["<INVALID>",
+                     "SeaWhitespace", "HtmlText", "XmlStart", "PHPStart", "HtmlScriptOpen",
+                     "HtmlStyleOpen", "HtmlComment", "HtmlDtd", "HtmlOpen", "Shebang",
+                     "Error", "XmlText", "XmlClose", "PHPStartInside", "HtmlClose",
+                     "HtmlSlashClose", "HtmlSlash", "HtmlEquals", "HtmlStartQuoteString",
+                     "HtmlStartDoubleQuoteString", "HtmlHex", "HtmlDecimal", "HtmlSpace",
+                     "HtmlName", "ErrorInside", "PHPStartInsideQuoteString", "HtmlEndQuoteString",
+                     "HtmlQuoteString", "ErrorHtmlQuote", "PHPStartDoubleQuoteString",
+                     "HtmlEndDoubleQuoteString", "HtmlDoubleQuoteString", "ErrorHtmlDoubleQuote",
+                     "ScriptText", "ScriptClose", "PHPStartInsideScript", "StyleBody",
+                     "PHPEnd", "Whitespace", "MultiLineComment", "SingleLineComment",
+                     "ShellStyleComment", "Abstract", "Array", "As", "BinaryCast",
+                     "BoolType", "BooleanConstant", "Break", "Callable", "Case",
+                     "Catch", "Class", "Clone", "Const", "Continue", "Declare", "Default",
+                     "Do", "DoubleCast", "DoubleType", "Echo", "Else", "ElseIf",
+                     "Empty", "EndDeclare", "EndFor", "EndForeach", "EndIf", "EndSwitch",
+                     "EndWhile", "Eval", "Exit", "Extends", "Final", "Finally", "FloatCast",
+                     "For", "Foreach", "Function", "Global", "Goto", "If", "Implements",
+                     "Import", "Include", "IncludeOnce", "InstanceOf", "InsteadOf",
+                     "Int8Cast", "Int16Cast", "Int64Type", "IntType", "Interface",
+                     "IsSet", "List", "LogicalAnd", "LogicalOr", "LogicalXor", "Namespace",
+                     "New", "Null", "ObjectType", "Parent_", "Partial", "Print",
+                     "Private", "Protected", "Public", "Require", "RequireOnce",
+                     "Resource", "Return", "Static", "StringType", "Switch", "Throw",
+                     "Trait", "Try", "Typeof", "UintCast", "UnicodeCast", "Unset",
+                     "Use", "Var", "While", "Yield", "From", "LambdaFn", "Get", "Set",
+                     "Call", "CallStatic", "Constructor", "Destruct", "Wakeup", "Sleep",
+                     "Autoload", "IsSet__", "Unset__", "ToString__", "Invoke", "SetState",
+                     "Clone__", "DebugInfo", "Namespace__", "Class__", "Traic__",
+                     "Function__", "Method__", "Line__", "File__", "Dir__", "Spaceship",
+                     "Lgeneric", "Rgeneric", "DoubleArrow", "Inc", "Dec", "IsIdentical",
+                     "IsNoidentical", "IsEqual", "IsNotEq", "IsSmallerOrEqual", "IsGreaterOrEqual",
+                     "PlusEqual", "MinusEqual", "MulEqual", "Pow", "PowEqual", "DivEqual",
+                     "Concaequal", "ModEqual", "ShiftLeftEqual", "ShiftRightEqual",
+                     "AndEqual", "OrEqual", "XorEqual", "BooleanOr", "BooleanAnd",
+                     "NullCoalescing", "NullCoalescingEqual", "ShiftLeft", "ShiftRight",
+                     "DoubleColon", "ObjectOperator", "NamespaceSeparator", "Ellipsis",
+                     "Less", "Greater", "Ampersand", "Pipe", "Bang", "Caret", "Plus",
+                     "Minus", "Asterisk", "Percent", "Divide", "Tilde", "SuppressWarnings",
+                     "Dollar", "Dot", "QuestionMark", "OpenRoundBracket", "CloseRoundBracket",
+                     "OpenSquareBracket", "CloseSquareBracket", "OpenCurlyBracket",
+                     "CloseCurlyBracket", "Comma", "Colon", "SemiColon", "Eq", "Quote",
+                     "BackQuote", "VarName", "Label", "Octal", "Decimal", "Real",
+                     "Hex", "Binary", "BackQuoteString", "SingleQuoteString", "DoubleQuote",
+                     "StartNowDoc", "StartHereDoc", "ErrorPhp", "CurlyDollar", "UnicodeEscape",
+                     "StringPart", "Comment", "PHPEndSingleLineComment", "CommentEnd",
+                     "HereDocText", "XmlText2"]
 
-    ruleNames = [ "SeaWhitespace", "HtmlText", "XmlStart", "PHPStartEcho", 
-                  "PHPStart", "HtmlScriptOpen", "HtmlStyleOpen", "HtmlComment", 
-                  "HtmlDtd", "HtmlOpen", "Shebang", "NumberSign", "Error", 
-                  "XmlText", "XmlClose", "XmlText2", "PHPStartEchoInside", 
-                  "PHPStartInside", "HtmlClose", "HtmlSlashClose", "HtmlSlash", 
-                  "HtmlEquals", "HtmlStartQuoteString", "HtmlStartDoubleQuoteString", 
-                  "HtmlHex", "HtmlDecimal", "HtmlSpace", "HtmlName", "ErrorInside", 
-                  "PHPStartEchoInsideQuoteString", "PHPStartInsideQuoteString", 
-                  "HtmlEndQuoteString", "HtmlQuoteString", "ErrorHtmlQuote", 
-                  "PHPStartEchoDoubleQuoteString", "PHPStartDoubleQuoteString", 
-                  "HtmlEndDoubleQuoteString", "HtmlDoubleQuoteString", "ErrorHtmlDoubleQuote", 
-                  "ScriptText", "ScriptClose", "PHPStartInsideScriptEcho", 
-                  "PHPStartInsideScript", "ScriptText2", "StyleBody", "PHPEnd", 
-                  "Whitespace", "MultiLineComment", "SingleLineComment", 
-                  "ShellStyleComment", "Abstract", "Array", "As", "BinaryCast", 
-                  "BoolType", "BooleanConstant", "Break", "Callable", "Case", 
-                  "Catch", "Class", "Clone", "Const", "Continue", "Declare", 
-                  "Default", "Do", "DoubleCast", "DoubleType", "Echo", "Else", 
-                  "ElseIf", "Empty", "EndDeclare", "EndFor", "EndForeach", 
-                  "EndIf", "EndSwitch", "EndWhile", "Eval", "Exit", "Extends", 
-                  "Final", "Finally", "FloatCast", "For", "Foreach", "Function", 
-                  "Global", "Goto", "If", "Implements", "Import", "Include", 
-                  "IncludeOnce", "InstanceOf", "InsteadOf", "Int8Cast", 
-                  "Int16Cast", "Int64Type", "IntType", "Interface", "IsSet", 
-                  "List", "LogicalAnd", "LogicalOr", "LogicalXor", "Namespace", 
-                  "New", "Null", "ObjectType", "Parent_", "Partial", "Print", 
-                  "Private", "Protected", "Public", "Require", "RequireOnce", 
-                  "Resource", "Return", "Static", "StringType", "Switch", 
-                  "Throw", "Trait", "Try", "Typeof", "UintCast", "UnicodeCast", 
-                  "Unset", "Use", "Var", "While", "Yield", "From", "LambdaFn", 
-                  "Get", "Set", "Call", "CallStatic", "Constructor", "Destruct", 
-                  "Wakeup", "Sleep", "Autoload", "IsSet__", "Unset__", "ToString__", 
-                  "Invoke", "SetState", "Clone__", "DebugInfo", "Namespace__", 
-                  "Class__", "Traic__", "Function__", "Method__", "Line__", 
-                  "File__", "Dir__", "Spaceship", "Lgeneric", "Rgeneric", 
-                  "DoubleArrow", "Inc", "Dec", "IsIdentical", "IsNoidentical", 
-                  "IsEqual", "IsNotEq", "IsSmallerOrEqual", "IsGreaterOrEqual", 
-                  "PlusEqual", "MinusEqual", "MulEqual", "Pow", "PowEqual", 
-                  "DivEqual", "Concaequal", "ModEqual", "ShiftLeftEqual", 
-                  "ShiftRightEqual", "AndEqual", "OrEqual", "XorEqual", 
-                  "BooleanOr", "BooleanAnd", "NullCoalescing", "NullCoalescingEqual", 
-                  "ShiftLeft", "ShiftRight", "DoubleColon", "ObjectOperator", 
-                  "NamespaceSeparator", "Ellipsis", "Less", "Greater", "Ampersand", 
-                  "Pipe", "Bang", "Caret", "Plus", "Minus", "Asterisk", 
-                  "Percent", "Divide", "Tilde", "SuppressWarnings", "Dollar", 
-                  "Dot", "QuestionMark", "OpenRoundBracket", "CloseRoundBracket", 
-                  "OpenSquareBracket", "CloseSquareBracket", "OpenCurlyBracket", 
-                  "CloseCurlyBracket", "Comma", "Colon", "SemiColon", "Eq", 
-                  "Quote", "BackQuote", "VarName", "Label", "Octal", "Decimal", 
-                  "Real", "Hex", "Binary", "BackQuoteString", "SingleQuoteString", 
-                  "DoubleQuote", "StartNowDoc", "StartHereDoc", "ErrorPhp", 
-                  "VarNameInInterpolation", "DollarString", "CurlyDollar", 
-                  "CurlyString", "EscapedChar", "DoubleQuoteInInterpolation", 
-                  "UnicodeEscape", "StringPart", "Comment", "PHPEndSingleLineComment", 
-                  "CommentQuestionMark", "CommentEnd", "HereDocText", "PhpStartEchoFragment", 
-                  "PhpStartFragment", "NameChar", "NameStartChar", "ExponentPart", 
-                  "Digit", "HexDigit" ]
+    ruleNames = ["SeaWhitespace", "HtmlText", "XmlStart", "PHPStartEcho",
+                 "PHPStart", "HtmlScriptOpen", "HtmlStyleOpen", "HtmlComment",
+                 "HtmlDtd", "HtmlOpen", "Shebang", "NumberSign", "Error",
+                 "XmlText", "XmlClose", "XmlText2", "PHPStartEchoInside",
+                 "PHPStartInside", "HtmlClose", "HtmlSlashClose", "HtmlSlash",
+                 "HtmlEquals", "HtmlStartQuoteString", "HtmlStartDoubleQuoteString",
+                 "HtmlHex", "HtmlDecimal", "HtmlSpace", "HtmlName", "ErrorInside",
+                 "PHPStartEchoInsideQuoteString", "PHPStartInsideQuoteString",
+                 "HtmlEndQuoteString", "HtmlQuoteString", "ErrorHtmlQuote",
+                 "PHPStartEchoDoubleQuoteString", "PHPStartDoubleQuoteString",
+                 "HtmlEndDoubleQuoteString", "HtmlDoubleQuoteString", "ErrorHtmlDoubleQuote",
+                 "ScriptText", "ScriptClose", "PHPStartInsideScriptEcho",
+                 "PHPStartInsideScript", "ScriptText2", "StyleBody", "PHPEnd",
+                 "Whitespace", "MultiLineComment", "SingleLineComment",
+                 "ShellStyleComment", "Abstract", "Array", "As", "BinaryCast",
+                 "BoolType", "BooleanConstant", "Break", "Callable", "Case",
+                 "Catch", "Class", "Clone", "Const", "Continue", "Declare",
+                 "Default", "Do", "DoubleCast", "DoubleType", "Echo", "Else",
+                 "ElseIf", "Empty", "EndDeclare", "EndFor", "EndForeach",
+                 "EndIf", "EndSwitch", "EndWhile", "Eval", "Exit", "Extends",
+                 "Final", "Finally", "FloatCast", "For", "Foreach", "Function",
+                 "Global", "Goto", "If", "Implements", "Import", "Include",
+                 "IncludeOnce", "InstanceOf", "InsteadOf", "Int8Cast",
+                 "Int16Cast", "Int64Type", "IntType", "Interface", "IsSet",
+                 "List", "LogicalAnd", "LogicalOr", "LogicalXor", "Namespace",
+                 "New", "Null", "ObjectType", "Parent_", "Partial", "Print",
+                 "Private", "Protected", "Public", "Require", "RequireOnce",
+                 "Resource", "Return", "Static", "StringType", "Switch",
+                 "Throw", "Trait", "Try", "Typeof", "UintCast", "UnicodeCast",
+                 "Unset", "Use", "Var", "While", "Yield", "From", "LambdaFn",
+                 "Get", "Set", "Call", "CallStatic", "Constructor", "Destruct",
+                 "Wakeup", "Sleep", "Autoload", "IsSet__", "Unset__", "ToString__",
+                 "Invoke", "SetState", "Clone__", "DebugInfo", "Namespace__",
+                 "Class__", "Traic__", "Function__", "Method__", "Line__",
+                 "File__", "Dir__", "Spaceship", "Lgeneric", "Rgeneric",
+                 "DoubleArrow", "Inc", "Dec", "IsIdentical", "IsNoidentical",
+                 "IsEqual", "IsNotEq", "IsSmallerOrEqual", "IsGreaterOrEqual",
+                 "PlusEqual", "MinusEqual", "MulEqual", "Pow", "PowEqual",
+                 "DivEqual", "Concaequal", "ModEqual", "ShiftLeftEqual",
+                 "ShiftRightEqual", "AndEqual", "OrEqual", "XorEqual",
+                 "BooleanOr", "BooleanAnd", "NullCoalescing", "NullCoalescingEqual",
+                 "ShiftLeft", "ShiftRight", "DoubleColon", "ObjectOperator",
+                 "NamespaceSeparator", "Ellipsis", "Less", "Greater", "Ampersand",
+                 "Pipe", "Bang", "Caret", "Plus", "Minus", "Asterisk",
+                 "Percent", "Divide", "Tilde", "SuppressWarnings", "Dollar",
+                 "Dot", "QuestionMark", "OpenRoundBracket", "CloseRoundBracket",
+                 "OpenSquareBracket", "CloseSquareBracket", "OpenCurlyBracket",
+                 "CloseCurlyBracket", "Comma", "Colon", "SemiColon", "Eq",
+                 "Quote", "BackQuote", "VarName", "Label", "Octal", "Decimal",
+                 "Real", "Hex", "Binary", "BackQuoteString", "SingleQuoteString",
+                 "DoubleQuote", "StartNowDoc", "StartHereDoc", "ErrorPhp",
+                 "VarNameInInterpolation", "DollarString", "CurlyDollar",
+                 "CurlyString", "EscapedChar", "DoubleQuoteInInterpolation",
+                 "UnicodeEscape", "StringPart", "Comment", "PHPEndSingleLineComment",
+                 "CommentQuestionMark", "CommentEnd", "HereDocText", "PhpStartEchoFragment",
+                 "PhpStartFragment", "NameChar", "NameStartChar", "ExponentPart",
+                 "Digit", "HexDigit"]
 
     grammarFileName = "PhpLexer.g4"
 
-    def __init__(self, input=None, output:TextIO = sys.stdout):
+    def __init__(self, input=None, output: TextIO = sys.stdout):
         super().__init__(input, output)
         self.checkVersion("4.7.1")
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
         self._predicates = None
 
-
-    def action(self, localctx:RuleContext, ruleIndex:int, actionIndex:int):
+    def action(self, localctx: RuleContext, ruleIndex: int, actionIndex: int):
         if self._actions is None:
             actions = dict()
-            actions[5] = self.HtmlScriptOpen_action 
-            actions[6] = self.HtmlStyleOpen_action 
-            actions[18] = self.HtmlClose_action 
-            actions[217] = self.CloseCurlyBracket_action 
-            actions[239] = self.CurlyDollar_action 
+            actions[5] = self.HtmlScriptOpen_action
+            actions[6] = self.HtmlStyleOpen_action
+            actions[18] = self.HtmlClose_action
+            actions[217] = self.CloseCurlyBracket_action
+            actions[239] = self.CurlyDollar_action
             self._actions = actions
         action = self._actions.get(ruleIndex, None)
         if action is not None:
@@ -1478,32 +1477,27 @@ class PhpLexer(PhpBaseLexer):
         else:
             raise Exception("No registered action for:" + str(ruleIndex))
 
-    def HtmlScriptOpen_action(self, localctx:RuleContext , actionIndex:int):
+    def HtmlScriptOpen_action(self, localctx: RuleContext, actionIndex: int):
         if actionIndex == 0:
-             _scriptTag = true; 
-     
+            _scriptTag = True
 
-    def HtmlStyleOpen_action(self, localctx:RuleContext , actionIndex:int):
+    def HtmlStyleOpen_action(self, localctx: RuleContext, actionIndex: int):
         if actionIndex == 1:
-             _styleTag = true; 
-     
+            _styleTag = True
 
-    def HtmlClose_action(self, localctx:RuleContext , actionIndex:int):
+    def HtmlClose_action(self, localctx: RuleContext, actionIndex: int):
         if actionIndex == 2:
-             this.PushModeOnHtmlClose(); 
-     
+            self.PushModeOnHtmlClose()
 
-    def CloseCurlyBracket_action(self, localctx:RuleContext , actionIndex:int):
+    def CloseCurlyBracket_action(self, localctx: RuleContext, actionIndex: int):
         if actionIndex == 3:
-             this.PopModeOnCurlyBracketClose(); 
-     
+            self.PopModeOnCurlyBracketClose();
 
-    def CurlyDollar_action(self, localctx:RuleContext , actionIndex:int):
+    def CurlyDollar_action(self, localctx: RuleContext, actionIndex: int):
         if actionIndex == 4:
-             this.SetInsideString(); 
-     
+            self.SetInsideString()
 
-    def sempred(self, localctx:RuleContext, ruleIndex:int, predIndex:int):
+    def sempred(self, localctx: RuleContext, ruleIndex: int, predIndex: int):
         if self._predicates is None:
             preds = dict()
             preds[10] = self.Shebang_sempred
@@ -1520,43 +1514,33 @@ class PhpLexer(PhpBaseLexer):
         else:
             raise Exception("No registered predicate for:" + str(ruleIndex))
 
-    def Shebang_sempred(self, localctx:RuleContext, predIndex:int):
-            if predIndex == 0:
-                return  this.IsNewLineOrStart(-2) 
-         
+    def Shebang_sempred(self, localctx: RuleContext, predIndex: int):
+        if predIndex == 0:
+            return self.IsNewLineOrStart(-2)
 
-    def PHPEnd_sempred(self, localctx:RuleContext, predIndex:int):
-            if predIndex == 1:
-                return this.HasAspTags()
-         
+    def PHPEnd_sempred(self, localctx: RuleContext, predIndex: int):
+        if predIndex == 1:
+            return self.HasAspTags()
 
-            if predIndex == 2:
-                return this.HasPhpScriptTag()
-         
+        if predIndex == 2:
+            return self.HasPhpScriptTag()
 
-    def StartNowDoc_sempred(self, localctx:RuleContext, predIndex:int):
-            if predIndex == 3:
-                return  this.ShouldPushHereDocMode(1) 
-         
+    def StartNowDoc_sempred(self, localctx: RuleContext, predIndex: int):
+        if predIndex == 3:
+            return self.ShouldPushHereDocMode(1)
 
-    def StartHereDoc_sempred(self, localctx:RuleContext, predIndex:int):
-            if predIndex == 4:
-                return  this.ShouldPushHereDocMode(1) 
-         
+    def StartHereDoc_sempred(self, localctx: RuleContext, predIndex: int):
+        if predIndex == 4:
+            return self.ShouldPushHereDocMode(1)
 
-    def CurlyDollar_sempred(self, localctx:RuleContext, predIndex:int):
-            if predIndex == 5:
-                return  this.IsCurlyDollar(1) 
-         
+    def CurlyDollar_sempred(self, localctx: RuleContext, predIndex: int):
+        if predIndex == 5:
+            return self.IsCurlyDollar(1)
 
-    def PhpStartEchoFragment_sempred(self, localctx:RuleContext, predIndex:int):
-            if predIndex == 6:
-                return  this.HasAspTags() 
-         
+    def PhpStartEchoFragment_sempred(self, localctx: RuleContext, predIndex: int):
+        if predIndex == 6:
+            return self.HasAspTags()
 
-    def PhpStartFragment_sempred(self, localctx:RuleContext, predIndex:int):
-            if predIndex == 7:
-                return  this.HasAspTags() 
-         
-
-
+    def PhpStartFragment_sempred(self, localctx: RuleContext, predIndex: int):
+        if predIndex == 7:
+            return self.HasAspTags()

@@ -1,11 +1,12 @@
 import gzip
+import io
 import json
 import sys
 from collections import deque
 from multiprocessing.pool import Pool
-# Used to parse code to ASTs
 from os import cpu_count
 
+# Used to parse code to ASTs
 import antlr4
 # Enables reading the corpus
 import json_lines as jl
@@ -30,10 +31,10 @@ from src.antlr4_language_parsers.ruby.CorundumParser import CorundumParser as ru
 
 # Configuration
 languages = [
-    'go',  # Issues with the Lexer
+    'go',
     'java',
     'javascript',
-    'php',  # Issues with the Lexer
+    'php',
     'python',
     'ruby',
 ]
@@ -81,10 +82,13 @@ def parse_javadoc(entry):
 
 def parse_go(entry):
     code = entry['code']
-    lexer = gol(antlr4.InputStream(code))
+    lexer_output = io.StringIO()
+    lexer = gol(antlr4.InputStream(code), output=lexer_output)
     stream = antlr4.CommonTokenStream(lexer)
     parser = gop(stream)
     tree = parser.methodDecl()
+    if len(lexer_output.read()) > 0:
+        tree = parser.functionDecl()
     return tree
 
 
@@ -102,7 +106,7 @@ def parse_php(entry):
     lexer = phpl(antlr4.InputStream(code))
     stream = antlr4.CommonTokenStream(lexer)
     parser = phpp(stream)
-    tree = parser.functionDeclaration()
+    tree = parser.phpBlock()
     return tree
 
 
