@@ -338,7 +338,8 @@ def main_single_threaded():
 
 
 if __name__ == '__main__':
-    if len(sys.argv) > 0 and sys.argv[1].lower() == 'debug':
-        main_single_threaded()
+    if len(sys.argv) > 0:
+        if sys.argv[1].lower() == 'debug':
+            main_single_threaded()
     else:
         main()
