@@ -1,6 +1,7 @@
 import gzip
 import io
 import json
+import os
 import re
 import sys
 from collections import deque
@@ -301,17 +302,21 @@ def main():
                 preprocessed_data = []
                 entries = list()
                 location = (location_format + jsonl_location_format) % (language, language, fold, language, fold, i)
-                with jl.open(location) as f:
-                    for idx, entry in enumerate(f):
-                        entries.append(entry)
+                # Process file only if we haven't done so already
+                if not os.path.isfile(location[:-len('.jsonl.gz')] + '_parsed.jsonl.gz'):
+                    with jl.open(location) as f:
+                        for idx, entry in enumerate(f):
+                            entries.append(entry)
 
-                with Pool(processes=cpu_count() - 1) as wp:
-                    for processed_entry in tqdm(wp.imap_unordered(process_entry_mp, entries, ),
-                                                leave=False, desc='Entries', total=idx + 1):
-                        preprocessed_data.append(json.dumps(processed_entry))
+                    with Pool(processes=cpu_count() - 1) as wp:
+                        for processed_entry in tqdm(wp.imap_unordered(process_entry_mp, entries, ),
+                                                    leave=False,
+                                                    desc='Entries, L:%s, F:%s, FN:%d' % (language, fold, i),
+                                                    total=idx + 1):
+                            preprocessed_data.append(json.dumps(processed_entry))
 
-                with gzip.open(location[:-len('.jsonl.gz')] + '_parsed.jsonl.gz', 'wb') as f:
-                    f.write('\n'.join(preprocessed_data).encode('utf8'))
+                    with gzip.open(location[:-len('.jsonl.gz')] + '_parsed.jsonl.gz', 'wb') as f:
+                        f.write('\n'.join(preprocessed_data).encode('utf8'))
 
 
 def main_single_threaded():
