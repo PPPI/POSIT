@@ -222,7 +222,7 @@ def parse_docstring(entry, language, code_context):
                 tag = 'email'
 
                 tag_built = ('email', {l: tag_ if l == 'English' else UNDEF
-                                     for l in languages + natural_languages + formal_languages})
+                                       for l in languages + natural_languages + formal_languages})
                 tag_built[-1]['email'] = tag
 
                 result.append(tag_built)
@@ -235,7 +235,7 @@ def parse_docstring(entry, language, code_context):
                     tag = 'path_line'
 
                 tag_built = ('diff', {l: tag_ if l == 'English' else UNDEF
-                                     for l in languages + natural_languages + formal_languages})
+                                      for l in languages + natural_languages + formal_languages})
                 tag_built[-1]['diff'] = tag
 
                 result.append(tag_built)
@@ -265,7 +265,9 @@ def preprocess_corpus_file(location, language):
     preprocessed_data = ''
     with jl.open(location) as f:
         for entry in tqdm(f, leave=False, desc="Entries"):
+            sys.setrecursionlimit(5000)
             entry = process_entry(entry, language)
+            sys.setrecursionlimit(1000)
             preprocessed_data += json.dumps(entry) + '\n'
 
     with gzip.open(location[:-len('.jsonl.gz')] + '_parsed.jsonl.gz', 'wb') as f:
@@ -277,7 +279,10 @@ class ProcessEntryWrapper(object):
         self.language = language
 
     def __call__(self, entry):
-        return process_entry(entry, self.language)
+        sys.setrecursionlimit(5000)
+        result = process_entry(entry, self.language)
+        sys.setrecursionlimit(1000)
+        return result
 
 
 def main():
