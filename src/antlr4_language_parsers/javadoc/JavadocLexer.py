@@ -1,8 +1,9 @@
 # Generated from /mnt/d/antlrv4/grammars-v4/javadoc/JavadocLexer.g4 by ANTLR 4.7.1
-from antlr4 import *
-from io import StringIO
-from typing.io import TextIO
 import sys
+from io import StringIO
+
+from antlr4 import *
+from typing.io import TextIO
 
 
 def serializedATN():
@@ -110,15 +111,15 @@ class JavadocLexer(Lexer):
 
     def NEWLINE_sempred(self, localctx:RuleContext, predIndex:int):
             if predIndex == 0:
-                return _input.LA(1) != '/'
+                return self._input.LA(1) != '/'
          
 
             if predIndex == 1:
-                return _input.LA(1) != '/'
+                return self._input.LA(1) != '/'
          
 
             if predIndex == 2:
-                return _input.LA(1) != '/'
+                return self._input.LA(1) != '/'
          
 
 
