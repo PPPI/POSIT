@@ -169,7 +169,7 @@ def java_doc_string_to_nltk(tagged_list):
                 output = output[:-1]
             output += text + ' '
         elif tag == 'BlockTagTextElement' or tag == 'BlockTagContent':
-            if tag == 'BlockTagContent' and output[-1] != '.':
+            if len(output) > 0 and tag == 'BlockTagContent' and output[-1] != '.':
                 output += '.'
             output += text
             if tag == 'BlockTagTextElement' and add_be_after_next:
