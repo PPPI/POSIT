@@ -37,11 +37,11 @@ from src.preprocessor.formal_lang_heuristics import is_diff_header, is_email, is
 # Configuration
 languages = [
     'go',
-    'java',
     'javascript',
     'php',
     'python',
     'ruby',
+    'java',
 ]
 
 natural_languages = [

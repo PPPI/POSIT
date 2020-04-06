@@ -118,7 +118,7 @@ class PhpBaseLexer(Lexer):
     def PopModeOnCurlyBracketClose(self):
         if self._insideString:
             self._insideString = False
-            self.channel(SkipChannel)
+            self._channel = self.SkipChannel
             self.popMode()
 
     def ShouldPushHereDocMode(self, pos):
