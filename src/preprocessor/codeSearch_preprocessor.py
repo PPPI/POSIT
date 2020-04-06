@@ -75,18 +75,18 @@ UNDEF = 'UNDEF'
 
 def parse_java(entry):
     code = entry['code']
-    lexer = javal(antlr4.InputStream(code))
+    lexer = javal(antlr4.InputStream(code), output=sys.stderr)
     stream = antlr4.CommonTokenStream(lexer)
-    parser = javap(stream)
+    parser = javap(stream, output=sys.stderr)
     tree = parser.methodDeclaration()
     return tree
 
 
 def parse_javadoc(entry):
     docstring = entry['docstring']
-    lexer = javadocl(antlr4.InputStream(docstring))
+    lexer = javadocl(antlr4.InputStream(docstring), output=sys.stderr)
     stream = antlr4.CommonTokenStream(lexer)
-    parser = javadocp(stream)
+    parser = javadocp(stream, output=sys.stderr)
     tree = parser.documentation()
     return tree
 
@@ -96,7 +96,7 @@ def parse_go(entry):
     lexer_output = io.StringIO()
     lexer = gol(antlr4.InputStream(code), output=lexer_output)
     stream = antlr4.CommonTokenStream(lexer)
-    parser = gop(stream)
+    parser = gop(stream, output=sys.stderr)
     tree = parser.methodDecl()
     if len(lexer_output.read()) > 0:
         tree = parser.functionDecl()
@@ -105,36 +105,36 @@ def parse_go(entry):
 
 def parse_javascript(entry):
     code = entry['code']
-    lexer = jsl(antlr4.InputStream(code))
+    lexer = jsl(antlr4.InputStream(code), output=sys.stderr)
     stream = antlr4.CommonTokenStream(lexer)
-    parser = jsp(stream)
+    parser = jsp(stream, output=sys.stderr)
     tree = parser.program()
     return tree
 
 
 def parse_php(entry):
     code = entry['code']
-    lexer = phpl(antlr4.InputStream(code))
+    lexer = phpl(antlr4.InputStream(code), output=sys.stderr)
     stream = antlr4.CommonTokenStream(lexer)
-    parser = phpp(stream)
+    parser = phpp(stream, output=sys.stderr)
     tree = parser.phpBlock()
     return tree
 
 
 def parse_python(entry):
     code = entry['code']
-    lexer = pyl(antlr4.InputStream(code))
+    lexer = pyl(antlr4.InputStream(code), output=sys.stderr)
     stream = antlr4.CommonTokenStream(lexer)
-    parser = pyp(stream)
+    parser = pyp(stream, output=sys.stderr)
     tree = parser.file_input()
     return tree
 
 
 def parse_ruby(entry):
     code = entry['code']
-    lexer = rubyl(antlr4.InputStream(code))
+    lexer = rubyl(antlr4.InputStream(code), output=sys.stderr)
     stream = antlr4.CommonTokenStream(lexer)
-    parser = rubyp(stream)
+    parser = rubyp(stream, output=sys.stderr)
     tree = parser.prog()
     return tree
 
