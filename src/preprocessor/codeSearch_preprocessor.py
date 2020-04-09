@@ -311,20 +311,20 @@ def main():
                         for idx, entry in enumerate(f):
                             pass
 
+                    processed_data = list()
                     with jl.open(location) as json_generator:
                         with open(location[:-len('.jsonl.gz')] + '_temp.jsonl', 'a') as f:
-                            with Pool(processes=cpu_count() - 1) as wp:
-                                for processed_entry in tqdm(wp.imap_unordered(process_entry_mp, json_generator),
+                            with Pool(processes=cpu_count() - 1, maxtasksperchild=32) as wp:
+                                for processed_entry in tqdm(wp.imap_unordered(process_entry_mp, json_generator,
+                                                                              chunksize=64),
                                                             leave=False,
                                                             desc='Entries, L:%s, F:%s, FN:%d' % (language, fold, i),
                                                             total=idx + 1):
-                                    f.write(json.dumps(processed_entry) + '\n')
+                                    processed_data.append(json.dumps(processed_entry))
 
-                    with open(location[:-len('.jsonl.gz')] + '_temp.jsonl', 'rb') as f_in:
-                        with gzip.open(location[:-len('.jsonl.gz')] + '_parsed.jsonl.gz', 'wb') as f:
-                            f.write(str(f_in.read()).encode('utf8'))
+                    with gzip.open(location[:-len('.jsonl.gz')] + '_parsed.jsonl.gz', 'wb') as f:
+                        f.write('\n'.join(processed_data).encode('utf8'))
 
-                    os.remove(location[:-len('.jsonl.gz')] + '_temp.jsonl')
 
 def main_single_threaded():
     """
