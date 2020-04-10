@@ -313,14 +313,13 @@ def main():
 
                     processed_data = list()
                     with jl.open(location) as json_generator:
-                        with open(location[:-len('.jsonl.gz')] + '_temp.jsonl', 'a') as f:
-                            with Pool(processes=cpu_count() - 1, maxtasksperchild=8) as wp:
-                                for processed_entry in tqdm(wp.imap_unordered(process_entry_mp, json_generator,
-                                                                              chunksize=16),
-                                                            leave=False,
-                                                            desc='Entries, L:%s, F:%s, FN:%d' % (language, fold, i),
-                                                            total=idx + 1):
-                                    processed_data.append(json.dumps(processed_entry))
+                        with Pool(processes=cpu_count() - 1, maxtasksperchild=8) as wp:
+                            for processed_entry in tqdm(wp.imap_unordered(process_entry_mp, json_generator,
+                                                                          chunksize=16),
+                                                        leave=False,
+                                                        desc='Entries, L:%s, F:%s, FN:%d' % (language, fold, i),
+                                                        total=idx + 1):
+                                processed_data.append(json.dumps(processed_entry))
 
                     with gzip.open(location[:-len('.jsonl.gz')] + '_parsed.jsonl.gz', 'wb') as f:
                         f.write('\n'.join(processed_data).encode('utf8'))
