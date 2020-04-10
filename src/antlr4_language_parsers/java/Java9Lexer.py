@@ -1,8 +1,11 @@
 # Generated from /mnt/d/antlrv4/grammars-v4/java/java9/Java9.g4 by ANTLR 4.7.1
-from antlr4 import *
-from io import StringIO
-from typing.io import TextIO
+import string
 import sys
+from io import StringIO
+
+import unicodedata
+from antlr4 import *
+from typing.io import TextIO
 
 
 def serializedATN():
@@ -557,11 +560,15 @@ def serializedATN():
         return buf.getvalue()
 
 
-class Java9Lexer(Lexer):
+MIN_SUPPLEMENTARY_CODE_POINT = 0x010000
+MIN_HIGH_SURROGATE = '\uD800'
+MIN_LOW_SURROGATE = '\uDC00'
 
+
+class Java9Lexer(Lexer):
     atn = ATNDeserializer().deserialize(serializedATN())
 
-    decisionsToDFA = [ DFA(ds, i) for i, ds in enumerate(atn.decisionToState) ]
+    decisionsToDFA = [DFA(ds, i) for i, ds in enumerate(atn.decisionToState)]
 
     T__0 = 1
     T__1 = 2
@@ -682,96 +689,95 @@ class Java9Lexer(Lexer):
     COMMENT = 117
     LINE_COMMENT = 118
 
-    channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN" ]
+    channelNames = [u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN"]
 
-    modeNames = [ "DEFAULT_MODE" ]
+    modeNames = ["DEFAULT_MODE"]
 
-    literalNames = [ "<INVALID>",
-            "'open'", "'module'", "'requires'", "'exports'", "'to'", "'opens'", 
-            "'uses'", "'provides'", "'with'", "'transitive'", "'abstract'", 
-            "'assert'", "'boolean'", "'break'", "'byte'", "'case'", "'catch'", 
-            "'char'", "'class'", "'const'", "'continue'", "'default'", "'do'", 
-            "'double'", "'else'", "'enum'", "'extends'", "'final'", "'finally'", 
-            "'float'", "'for'", "'if'", "'goto'", "'implements'", "'import'", 
-            "'instanceof'", "'int'", "'interface'", "'long'", "'native'", 
-            "'new'", "'package'", "'private'", "'protected'", "'public'", 
-            "'return'", "'short'", "'static'", "'strictfp'", "'super'", 
-            "'switch'", "'synchronized'", "'this'", "'throw'", "'throws'", 
-            "'transient'", "'try'", "'void'", "'volatile'", "'while'", "'_'", 
-            "'null'", "'('", "')'", "'{'", "'}'", "'['", "']'", "';'", "','", 
-            "'.'", "'...'", "'@'", "'::'", "'='", "'>'", "'<'", "'!'", "'~'", 
-            "'?'", "':'", "'->'", "'=='", "'<='", "'>='", "'!='", "'&&'", 
-            "'||'", "'++'", "'--'", "'+'", "'-'", "'*'", "'/'", "'&'", "'|'", 
-            "'^'", "'%'", "'+='", "'-='", "'*='", "'/='", "'&='", "'|='", 
-            "'^='", "'%='", "'<<='", "'>>='", "'>>>='" ]
+    literalNames = ["<INVALID>",
+                    "'open'", "'module'", "'requires'", "'exports'", "'to'", "'opens'",
+                    "'uses'", "'provides'", "'with'", "'transitive'", "'abstract'",
+                    "'assert'", "'boolean'", "'break'", "'byte'", "'case'", "'catch'",
+                    "'char'", "'class'", "'const'", "'continue'", "'default'", "'do'",
+                    "'double'", "'else'", "'enum'", "'extends'", "'final'", "'finally'",
+                    "'float'", "'for'", "'if'", "'goto'", "'implements'", "'import'",
+                    "'instanceof'", "'int'", "'interface'", "'long'", "'native'",
+                    "'new'", "'package'", "'private'", "'protected'", "'public'",
+                    "'return'", "'short'", "'static'", "'strictfp'", "'super'",
+                    "'switch'", "'synchronized'", "'this'", "'throw'", "'throws'",
+                    "'transient'", "'try'", "'void'", "'volatile'", "'while'", "'_'",
+                    "'null'", "'('", "')'", "'{'", "'}'", "'['", "']'", "';'", "','",
+                    "'.'", "'...'", "'@'", "'::'", "'='", "'>'", "'<'", "'!'", "'~'",
+                    "'?'", "':'", "'->'", "'=='", "'<='", "'>='", "'!='", "'&&'",
+                    "'||'", "'++'", "'--'", "'+'", "'-'", "'*'", "'/'", "'&'", "'|'",
+                    "'^'", "'%'", "'+='", "'-='", "'*='", "'/='", "'&='", "'|='",
+                    "'^='", "'%='", "'<<='", "'>>='", "'>>>='"]
 
-    symbolicNames = [ "<INVALID>",
-            "ABSTRACT", "ASSERT", "BOOLEAN", "BREAK", "BYTE", "CASE", "CATCH", 
-            "CHAR", "CLASS", "CONST", "CONTINUE", "DEFAULT", "DO", "DOUBLE", 
-            "ELSE", "ENUM", "EXTENDS", "FINAL", "FINALLY", "FLOAT", "FOR", 
-            "IF", "GOTO", "IMPLEMENTS", "IMPORT", "INSTANCEOF", "INT", "INTERFACE", 
-            "LONG", "NATIVE", "NEW", "PACKAGE", "PRIVATE", "PROTECTED", 
-            "PUBLIC", "RETURN", "SHORT", "STATIC", "STRICTFP", "SUPER", 
-            "SWITCH", "SYNCHRONIZED", "THIS", "THROW", "THROWS", "TRANSIENT", 
-            "TRY", "VOID", "VOLATILE", "WHILE", "UNDER_SCORE", "IntegerLiteral", 
-            "FloatingPointLiteral", "BooleanLiteral", "CharacterLiteral", 
-            "StringLiteral", "NullLiteral", "LPAREN", "RPAREN", "LBRACE", 
-            "RBRACE", "LBRACK", "RBRACK", "SEMI", "COMMA", "DOT", "ELLIPSIS", 
-            "AT", "COLONCOLON", "ASSIGN", "GT", "LT", "BANG", "TILDE", "QUESTION", 
-            "COLON", "ARROW", "EQUAL", "LE", "GE", "NOTEQUAL", "AND", "OR", 
-            "INC", "DEC", "ADD", "SUB", "MUL", "DIV", "BITAND", "BITOR", 
-            "CARET", "MOD", "ADD_ASSIGN", "SUB_ASSIGN", "MUL_ASSIGN", "DIV_ASSIGN", 
-            "AND_ASSIGN", "OR_ASSIGN", "XOR_ASSIGN", "MOD_ASSIGN", "LSHIFT_ASSIGN", 
-            "RSHIFT_ASSIGN", "URSHIFT_ASSIGN", "Identifier", "WS", "COMMENT", 
-            "LINE_COMMENT" ]
+    symbolicNames = ["<INVALID>",
+                     "ABSTRACT", "ASSERT", "BOOLEAN", "BREAK", "BYTE", "CASE", "CATCH",
+                     "CHAR", "CLASS", "CONST", "CONTINUE", "DEFAULT", "DO", "DOUBLE",
+                     "ELSE", "ENUM", "EXTENDS", "FINAL", "FINALLY", "FLOAT", "FOR",
+                     "IF", "GOTO", "IMPLEMENTS", "IMPORT", "INSTANCEOF", "INT", "INTERFACE",
+                     "LONG", "NATIVE", "NEW", "PACKAGE", "PRIVATE", "PROTECTED",
+                     "PUBLIC", "RETURN", "SHORT", "STATIC", "STRICTFP", "SUPER",
+                     "SWITCH", "SYNCHRONIZED", "THIS", "THROW", "THROWS", "TRANSIENT",
+                     "TRY", "VOID", "VOLATILE", "WHILE", "UNDER_SCORE", "IntegerLiteral",
+                     "FloatingPointLiteral", "BooleanLiteral", "CharacterLiteral",
+                     "StringLiteral", "NullLiteral", "LPAREN", "RPAREN", "LBRACE",
+                     "RBRACE", "LBRACK", "RBRACK", "SEMI", "COMMA", "DOT", "ELLIPSIS",
+                     "AT", "COLONCOLON", "ASSIGN", "GT", "LT", "BANG", "TILDE", "QUESTION",
+                     "COLON", "ARROW", "EQUAL", "LE", "GE", "NOTEQUAL", "AND", "OR",
+                     "INC", "DEC", "ADD", "SUB", "MUL", "DIV", "BITAND", "BITOR",
+                     "CARET", "MOD", "ADD_ASSIGN", "SUB_ASSIGN", "MUL_ASSIGN", "DIV_ASSIGN",
+                     "AND_ASSIGN", "OR_ASSIGN", "XOR_ASSIGN", "MOD_ASSIGN", "LSHIFT_ASSIGN",
+                     "RSHIFT_ASSIGN", "URSHIFT_ASSIGN", "Identifier", "WS", "COMMENT",
+                     "LINE_COMMENT"]
 
-    ruleNames = [ "T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", 
-                  "T__7", "T__8", "T__9", "ABSTRACT", "ASSERT", "BOOLEAN", 
-                  "BREAK", "BYTE", "CASE", "CATCH", "CHAR", "CLASS", "CONST", 
-                  "CONTINUE", "DEFAULT", "DO", "DOUBLE", "ELSE", "ENUM", 
-                  "EXTENDS", "FINAL", "FINALLY", "FLOAT", "FOR", "IF", "GOTO", 
-                  "IMPLEMENTS", "IMPORT", "INSTANCEOF", "INT", "INTERFACE", 
-                  "LONG", "NATIVE", "NEW", "PACKAGE", "PRIVATE", "PROTECTED", 
-                  "PUBLIC", "RETURN", "SHORT", "STATIC", "STRICTFP", "SUPER", 
-                  "SWITCH", "SYNCHRONIZED", "THIS", "THROW", "THROWS", "TRANSIENT", 
-                  "TRY", "VOID", "VOLATILE", "WHILE", "UNDER_SCORE", "IntegerLiteral", 
-                  "DecimalIntegerLiteral", "HexIntegerLiteral", "OctalIntegerLiteral", 
-                  "BinaryIntegerLiteral", "IntegerTypeSuffix", "DecimalNumeral", 
-                  "Digits", "Digit", "NonZeroDigit", "DigitsAndUnderscores", 
-                  "DigitOrUnderscore", "Underscores", "HexNumeral", "HexDigits", 
-                  "HexDigit", "HexDigitsAndUnderscores", "HexDigitOrUnderscore", 
-                  "OctalNumeral", "OctalDigits", "OctalDigit", "OctalDigitsAndUnderscores", 
-                  "OctalDigitOrUnderscore", "BinaryNumeral", "BinaryDigits", 
-                  "BinaryDigit", "BinaryDigitsAndUnderscores", "BinaryDigitOrUnderscore", 
-                  "FloatingPointLiteral", "DecimalFloatingPointLiteral", 
-                  "ExponentPart", "ExponentIndicator", "SignedInteger", 
-                  "Sign", "FloatTypeSuffix", "HexadecimalFloatingPointLiteral", 
-                  "HexSignificand", "BinaryExponent", "BinaryExponentIndicator", 
-                  "BooleanLiteral", "CharacterLiteral", "SingleCharacter", 
-                  "StringLiteral", "StringCharacters", "StringCharacter", 
-                  "EscapeSequence", "OctalEscape", "ZeroToThree", "UnicodeEscape", 
-                  "NullLiteral", "LPAREN", "RPAREN", "LBRACE", "RBRACE", 
-                  "LBRACK", "RBRACK", "SEMI", "COMMA", "DOT", "ELLIPSIS", 
-                  "AT", "COLONCOLON", "ASSIGN", "GT", "LT", "BANG", "TILDE", 
-                  "QUESTION", "COLON", "ARROW", "EQUAL", "LE", "GE", "NOTEQUAL", 
-                  "AND", "OR", "INC", "DEC", "ADD", "SUB", "MUL", "DIV", 
-                  "BITAND", "BITOR", "CARET", "MOD", "ADD_ASSIGN", "SUB_ASSIGN", 
-                  "MUL_ASSIGN", "DIV_ASSIGN", "AND_ASSIGN", "OR_ASSIGN", 
-                  "XOR_ASSIGN", "MOD_ASSIGN", "LSHIFT_ASSIGN", "RSHIFT_ASSIGN", 
-                  "URSHIFT_ASSIGN", "Identifier", "JavaLetter", "JavaLetterOrDigit", 
-                  "WS", "COMMENT", "LINE_COMMENT" ]
+    ruleNames = ["T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6",
+                 "T__7", "T__8", "T__9", "ABSTRACT", "ASSERT", "BOOLEAN",
+                 "BREAK", "BYTE", "CASE", "CATCH", "CHAR", "CLASS", "CONST",
+                 "CONTINUE", "DEFAULT", "DO", "DOUBLE", "ELSE", "ENUM",
+                 "EXTENDS", "FINAL", "FINALLY", "FLOAT", "FOR", "IF", "GOTO",
+                 "IMPLEMENTS", "IMPORT", "INSTANCEOF", "INT", "INTERFACE",
+                 "LONG", "NATIVE", "NEW", "PACKAGE", "PRIVATE", "PROTECTED",
+                 "PUBLIC", "RETURN", "SHORT", "STATIC", "STRICTFP", "SUPER",
+                 "SWITCH", "SYNCHRONIZED", "THIS", "THROW", "THROWS", "TRANSIENT",
+                 "TRY", "VOID", "VOLATILE", "WHILE", "UNDER_SCORE", "IntegerLiteral",
+                 "DecimalIntegerLiteral", "HexIntegerLiteral", "OctalIntegerLiteral",
+                 "BinaryIntegerLiteral", "IntegerTypeSuffix", "DecimalNumeral",
+                 "Digits", "Digit", "NonZeroDigit", "DigitsAndUnderscores",
+                 "DigitOrUnderscore", "Underscores", "HexNumeral", "HexDigits",
+                 "HexDigit", "HexDigitsAndUnderscores", "HexDigitOrUnderscore",
+                 "OctalNumeral", "OctalDigits", "OctalDigit", "OctalDigitsAndUnderscores",
+                 "OctalDigitOrUnderscore", "BinaryNumeral", "BinaryDigits",
+                 "BinaryDigit", "BinaryDigitsAndUnderscores", "BinaryDigitOrUnderscore",
+                 "FloatingPointLiteral", "DecimalFloatingPointLiteral",
+                 "ExponentPart", "ExponentIndicator", "SignedInteger",
+                 "Sign", "FloatTypeSuffix", "HexadecimalFloatingPointLiteral",
+                 "HexSignificand", "BinaryExponent", "BinaryExponentIndicator",
+                 "BooleanLiteral", "CharacterLiteral", "SingleCharacter",
+                 "StringLiteral", "StringCharacters", "StringCharacter",
+                 "EscapeSequence", "OctalEscape", "ZeroToThree", "UnicodeEscape",
+                 "NullLiteral", "LPAREN", "RPAREN", "LBRACE", "RBRACE",
+                 "LBRACK", "RBRACK", "SEMI", "COMMA", "DOT", "ELLIPSIS",
+                 "AT", "COLONCOLON", "ASSIGN", "GT", "LT", "BANG", "TILDE",
+                 "QUESTION", "COLON", "ARROW", "EQUAL", "LE", "GE", "NOTEQUAL",
+                 "AND", "OR", "INC", "DEC", "ADD", "SUB", "MUL", "DIV",
+                 "BITAND", "BITOR", "CARET", "MOD", "ADD_ASSIGN", "SUB_ASSIGN",
+                 "MUL_ASSIGN", "DIV_ASSIGN", "AND_ASSIGN", "OR_ASSIGN",
+                 "XOR_ASSIGN", "MOD_ASSIGN", "LSHIFT_ASSIGN", "RSHIFT_ASSIGN",
+                 "URSHIFT_ASSIGN", "Identifier", "JavaLetter", "JavaLetterOrDigit",
+                 "WS", "COMMENT", "LINE_COMMENT"]
 
     grammarFileName = "Java9.g4"
 
-    def __init__(self, input=None, output:TextIO = sys.stdout):
+    def __init__(self, input=None, output: TextIO = sys.stdout):
         super().__init__(input, output)
         self.checkVersion("4.7.1")
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
         self._predicates = None
 
-
-    def sempred(self, localctx:RuleContext, ruleIndex:int, predIndex:int):
+    def sempred(self, localctx: RuleContext, ruleIndex: int, predIndex: int):
         if self._predicates is None:
             preds = dict()
             preds[159] = self.JavaLetter_sempred
@@ -783,22 +789,44 @@ class Java9Lexer(Lexer):
         else:
             raise Exception("No registered predicate for:" + str(ruleIndex))
 
-    def JavaLetter_sempred(self, localctx:RuleContext, predIndex:int):
-            if predIndex == 0:
-                return Character.isJavaIdentifierStart(_input.LA(-1))
-         
+    @staticmethod
+    def isJavaIdentifierStart(code_point: int):
+        # str is unicode by default in Python 3
+        char = str(code_point)
+        # Per Java an identifier can start with any of the following:
+        # {@link #isLetter(char) isLetter(ch)} returns {@code true}
+        # {@link #getType(char) getType(ch)} returns {@code LETTER_NUMBER}
+        # {@code ch} is a currency symbol (such as {@code '$'})
+        # {@code ch} is a connecting punctuation character (such as {@code '_'}).
+        return char.isalpha() or char in string.punctuation or unicodedata.category(char) == 'Sc'
 
-            if predIndex == 1:
-                return Character.isJavaIdentifierStart(Character.toCodePoint(char(_input.LA(-2)), char(_input.LA(-1))))
-         
+    @staticmethod
+    def isJavaIdentifierPart(code_point: int):
+        # str is unicode by default in Python 3
+        char = str(code_point)
+        # Per Java an identifier can start with any of the following:
+        # {@link #isLetter(char) isLetter(ch)} returns {@code true}
+        # {@link #getType(char) getType(ch)} returns {@code LETTER_NUMBER}
+        # {@code ch} is a currency symbol (such as {@code '$'})
+        # {@code ch} is a connecting punctuation character (such as {@code '_'}).
+        return char.isalpha() or char.isnumeric() or char in string.punctuation or unicodedata.category(char) == 'Sc'
 
-    def JavaLetterOrDigit_sempred(self, localctx:RuleContext, predIndex:int):
-            if predIndex == 2:
-                return Character.isJavaIdentifierPart(_input.LA(-1))
-         
+    @staticmethod
+    def toCodePoint(low: int, high: int):
+        return ((high << 10) + low) + (MIN_SUPPLEMENTARY_CODE_POINT
+                                       - (ord(MIN_HIGH_SURROGATE) << 10)
+                                       - ord(MIN_LOW_SURROGATE))
 
-            if predIndex == 3:
-                return Character.isJavaIdentifierPart(Character.toCodePoint(char(_input.LA(-2)), char(_input.LA(-1))))
-         
+    def JavaLetter_sempred(self, localctx: RuleContext, predIndex: int):
+        if predIndex == 0:
+            return Java9Lexer.isJavaIdentifierStart(self._input.LA(-1))
 
+        if predIndex == 1:
+            return Java9Lexer.isJavaIdentifierStart(Java9Lexer.toCodePoint(self._input.LA(-2), self._input.LA(-1)))
 
+    def JavaLetterOrDigit_sempred(self, localctx: RuleContext, predIndex: int):
+        if predIndex == 2:
+            return Java9Lexer.isJavaIdentifierPart(self._input.LA(-1))
+
+        if predIndex == 3:
+            return Java9Lexer.isJavaIdentifierPart(Java9Lexer.toCodePoint(self._input.LA(-2), self._input.LA(-1)))

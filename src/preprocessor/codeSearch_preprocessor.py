@@ -314,9 +314,9 @@ def main():
                     processed_data = list()
                     with jl.open(location) as json_generator:
                         with open(location[:-len('.jsonl.gz')] + '_temp.jsonl', 'a') as f:
-                            with Pool(processes=cpu_count() - 1, maxtasksperchild=32) as wp:
+                            with Pool(processes=cpu_count() - 1, maxtasksperchild=8) as wp:
                                 for processed_entry in tqdm(wp.imap_unordered(process_entry_mp, json_generator,
-                                                                              chunksize=64),
+                                                                              chunksize=16),
                                                             leave=False,
                                                             desc='Entries, L:%s, F:%s, FN:%d' % (language, fold, i),
                                                             total=idx + 1):
