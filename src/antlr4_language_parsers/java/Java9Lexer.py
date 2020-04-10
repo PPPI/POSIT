@@ -1,6 +1,7 @@
 # Generated from /mnt/d/antlrv4/grammars-v4/java/java9/Java9.g4 by ANTLR 4.7.1
 import string
 import sys
+from encodings.utf_8 import decode
 from io import StringIO
 
 import unicodedata
@@ -791,8 +792,8 @@ class Java9Lexer(Lexer):
 
     @staticmethod
     def isJavaIdentifierStart(code_point: int):
-        # str is unicode by default in Python 3
-        char = str(code_point)
+        # chr is unicode by default in Python 3
+        char = chr(code_point)
         # Per Java an identifier can start with any of the following:
         # {@link #isLetter(char) isLetter(ch)} returns {@code true}
         # {@link #getType(char) getType(ch)} returns {@code LETTER_NUMBER}
@@ -802,8 +803,8 @@ class Java9Lexer(Lexer):
 
     @staticmethod
     def isJavaIdentifierPart(code_point: int):
-        # str is unicode by default in Python 3
-        char = str(code_point)
+        # chr is unicode by default in Python 3
+        char = chr(code_point)
         # Per Java an identifier can start with any of the following:
         # {@link #isLetter(char) isLetter(ch)} returns {@code true}
         # {@link #getType(char) getType(ch)} returns {@code LETTER_NUMBER}
