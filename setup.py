@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(name='POSIT',
-      version='0.3.0',
+      version='0.3.5',
       description='Part-of-Speech tagger for English and Source-code',
       author='Profir-Petru Partachi',
       author_email='p.partachi@cs.ucl.ac.uk',
@@ -15,7 +15,7 @@ setup(name='POSIT',
             'StORMeD': 'src/baseline/StORMeD',
             },
       package_data={'tagger': ['data/*.pkl']}, 
-      requires=[
+      setup_requires=[
             'tensorflow', 
             'numpy', 
             'gensim', 
@@ -23,9 +23,10 @@ setup(name='POSIT',
             'xmltodict',
             'beautifulsoup4', 
             'html5lib', 
-            'sklearn',
+            'scikit-learn',
             'tqdm',
             'json_lines',
-            'antlr4'
+            'antlr4',
+            'psutil',
       ]
       )
