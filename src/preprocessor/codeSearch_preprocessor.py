@@ -6,7 +6,6 @@ import re
 import sys
 from collections import deque
 from multiprocessing.pool import Pool
-from os import cpu_count
 
 # Used to parse code to ASTs
 import antlr4
@@ -63,9 +62,9 @@ pickles = [
 ]
 
 folds = [
-    'train',
     'test',
     'valid',
+    'train',
 ]
 # (language, fold, language, fold, fold number)
 jsonl_location_format = '%s\\final\\jsonl\\%s\\%s_%s_%d.jsonl.gz'
@@ -313,7 +312,8 @@ def main():
 
                     processed_data = list()
                     with jl.open(location) as json_generator:
-                        with Pool(processes=cpu_count() - 1, maxtasksperchild=8) as wp:
+                        # Using len(os.sched_getaffinity(0)) allows us to only get the number of affinity CPUs
+                        with Pool(processes=len(os.sched_getaffinity(0)), maxtasksperchild=8) as wp:
                             for processed_entry in tqdm(wp.imap_unordered(process_entry_mp, json_generator,
                                                                           chunksize=16),
                                                         leave=False,
