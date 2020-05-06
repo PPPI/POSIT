@@ -217,7 +217,7 @@ def parse_docstring(entry, language, code_context):
                                      for l in languages + natural_languages + formal_languages})
                 tag_built[-1]['uri'] = tag
 
-                result.append(tag_built)
+                result.append((tag, tag_built))
             elif is_email(tok):
                 tag = 'email'
 
@@ -225,7 +225,7 @@ def parse_docstring(entry, language, code_context):
                                        for l in languages + natural_languages + formal_languages})
                 tag_built[-1]['email'] = tag
 
-                result.append(tag_built)
+                result.append((tag, tag_built))
             elif is_diff_header(tok):
                 if tok.startswith('diff'):
                     tag = 'diff_line'
@@ -238,7 +238,7 @@ def parse_docstring(entry, language, code_context):
                                       for l in languages + natural_languages + formal_languages})
                 tag_built[-1]['diff'] = tag
 
-                result.append(tag_built)
+                result.append((tag, tag_built))
 
             else:
                 result.append(

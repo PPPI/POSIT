@@ -14,7 +14,7 @@ setup(name='POSIT',
             'baseline': 'src/baseline',
             'StORMeD': 'src/baseline/StORMeD',
             },
-      package_data={'tagger': ['data/*.pkl']}, 
+      package_data={'tagger': ['data/*.pkl']},
       setup_requires=[
             'tensorflow', 
             'numpy', 
@@ -28,5 +28,5 @@ setup(name='POSIT',
             'json_lines',
             'antlr4',
             'psutil',
-      ]
+      ], install_requires=['snorkel']
       )
