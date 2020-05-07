@@ -1,5 +1,6 @@
 import gzip
 import itertools
+import json
 
 import json_lines as jl
 from nltk import sent_tokenize, casual_tokenize, pos_tag
@@ -71,7 +72,7 @@ if __name__ == '__main__':
                             else:
                                 fixed_docstring.append((tok, tag_map))
                         json_line['docstring_parsed'] = fixed_docstring
-                        processed_data.append(json_line)
+                        processed_data.append(json.dumps(json_line))
 
                 with gzip.open(location, 'wb') as f:
                     f.write('\n'.join(processed_data).encode('utf8'))
