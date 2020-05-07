@@ -62,9 +62,13 @@ if __name__ == '__main__':
                     for json_line in json_generator:
                         for parsed in [json_line['code_parsed'], json_line['docstring_parsed']]:
                             try:
-                                for tok, (source_language, tag_map) in eval(parsed):
+                                for tok, (source_language, tag_map) \
+                                        in (eval(parsed) if isinstance(parsed, str) else parsed):
                                     for l in languages + natural_languages + formal_languages:
-                                        freq_map[l][tok].append(tag_map[l])
+                                        try:
+                                            freq_map[l][tok].append(tag_map[l])
+                                        except KeyError:
+                                            pass
                             except ValueError:
                                 pass
 
