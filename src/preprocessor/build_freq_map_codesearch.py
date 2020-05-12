@@ -1,5 +1,6 @@
 import gzip as gz
 import json
+import os
 from collections import defaultdict, Counter
 
 import json_lines as jl
@@ -72,13 +73,14 @@ if __name__ == '__main__':
                             except ValueError:
                                 pass
 
-    for l in languages + natural_languages + formal_languages:
-        freq_map[l] = dict(freq_map[l])
+        for l in languages + natural_languages + formal_languages:
+            freq_map[l] = dict(freq_map[l])
 
-    freq_normed = dict()
-    for l in languages + natural_languages + formal_languages:
-        for word, tags in freq_map[l].items():
-            freq_normed[l][word] = dict(Counter(freq_map[word]))
+        freq_normed = dict()
+        for l in languages + natural_languages + formal_languages:
+            for word, tags in freq_map[l].items():
+                freq_normed[l][word] = dict(Counter(freq_map[word]))
 
-    with gz.open('./data/frequency_data.json.gz', 'w') as f:
-        f.write(json.dumps(freq_normed))
+        os.makedirs('./data/frequency_data/%s' % language, exist_ok=True)
+        with gz.open('./data/frequency_data/%s/frequency_data.json.gz' % language, 'w') as f:
+            f.write(json.dumps(freq_normed))
