@@ -4,6 +4,7 @@ import os
 from collections import defaultdict, Counter
 
 import json_lines as jl
+from tqdm import tqdm
 
 languages = [
     'go',
@@ -44,8 +45,8 @@ UNDEF = 'UNDEF'
 
 if __name__ == '__main__':
     freq_map = {l: defaultdict(list) for l in languages + natural_languages + formal_languages}
-    for language in languages:
-        for fold in folds:
+    for language in tqdm(languages):
+        for fold in tqdm(folds, leave=False):
             n_files = 0
             while True:
                 try:
@@ -57,21 +58,27 @@ if __name__ == '__main__':
                     break
                 finally:
                     n_files += 1
-            for i in range(n_files - 1):
+            for i in tqdm(range(n_files - 1), leave=False):
                 location = (location_format + jsonl_location_format) % (language, language, fold, language, fold, i)
-                with jl.open(location) as json_generator:
-                    for json_line in json_generator:
-                        for parsed in [json_line['code_parsed'], json_line['docstring_parsed']]:
-                            try:
-                                for tok, (source_language, tag_map) \
-                                        in (eval(parsed) if isinstance(parsed, str) else parsed):
-                                    for l in languages + natural_languages + formal_languages:
-                                        try:
-                                            freq_map[l][tok].append(tag_map[l])
-                                        except KeyError:
-                                            pass
-                            except ValueError:
-                                pass
+                idx = 0
+                with jl.open(location) as f:
+                    for idx, entry in enumerate(f):
+                        pass
+
+                if idx > 0:
+                    with jl.open(location) as json_generator:
+                        for json_line in tqdm(json_generator, leave=False, total=idx + 1):
+                            for parsed in [json_line['code_parsed'], json_line['docstring_parsed']]:
+                                try:
+                                    for tok, (source_language, tag_map) \
+                                            in (eval(parsed) if isinstance(parsed, str) else parsed):
+                                        for l in languages + natural_languages + formal_languages:
+                                            try:
+                                                freq_map[l][tok].append(tag_map[l])
+                                            except KeyError:
+                                                pass
+                                except ValueError:
+                                    pass
 
         for l in languages + natural_languages + formal_languages:
             freq_map[l] = dict(freq_map[l])
