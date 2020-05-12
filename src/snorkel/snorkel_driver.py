@@ -1,6 +1,5 @@
 import sys
 
-import pandas as pd
 from snorkel.labeling import LabelModel
 from snorkel.labeling import PandasLFApplier
 

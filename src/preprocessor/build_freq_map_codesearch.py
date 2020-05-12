@@ -93,4 +93,4 @@ if __name__ == '__main__':
 
         os.makedirs('./data/frequency_data/%s' % language, exist_ok=True)
         with gz.open('./data/frequency_data/%s/frequency_data.json.gz' % language, 'wb') as f:
-            f.write(json.dumps(freq_normed))
+            f.write(json.dumps(freq_normed).encode(encoding='utf8'))
