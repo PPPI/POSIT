@@ -86,8 +86,11 @@ if __name__ == '__main__':
         freq_normed = dict()
         for l in languages + natural_languages + formal_languages:
             for word, tags in freq_map[l].items():
-                freq_normed[l][word] = dict(Counter(freq_map[word]))
+                try:
+                    freq_normed[l][word] = dict(Counter(freq_map[word]))
+                except KeyError:
+                    pass
 
         os.makedirs('./data/frequency_data/%s' % language, exist_ok=True)
-        with gz.open('./data/frequency_data/%s/frequency_data.json.gz' % language, 'w') as f:
+        with gz.open('./data/frequency_data/%s/frequency_data.json.gz' % language, 'wb') as f:
             f.write(json.dumps(freq_normed))
