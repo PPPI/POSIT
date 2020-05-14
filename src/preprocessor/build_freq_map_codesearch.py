@@ -1,4 +1,3 @@
-import gc
 import gzip as gz
 import json
 import os
@@ -75,7 +74,7 @@ if __name__ == '__main__':
                                             in (eval(parsed) if isinstance(parsed, str) else parsed):
                                         for l in languages + natural_languages + formal_languages:
                                             try:
-                                                freq_map[l][tok].append(tag_map[l])
+                                                freq_map[l][str(tok)].append(tag_map[l])
                                             except KeyError:
                                                 pass
                                 except ValueError:
@@ -88,9 +87,14 @@ if __name__ == '__main__':
         for l in languages + natural_languages + formal_languages:
             for word, tags in freq_map[l].items():
                 try:
-                    freq_normed[l][word] = dict(Counter(freq_map[word]))
+                    new_repr = dict(Counter(freq_map[l][word]))
                 except KeyError:
-                    freq_normed[l] = {word: dict(Counter(freq_map[word]))}
+                    new_repr = None
+                if new_repr is not None:
+                    try:
+                        freq_normed[l][word] = new_repr
+                    except KeyError:
+                        freq_normed[l] = {word: new_repr}
 
         os.makedirs('./data/frequency_data/%s' % language, exist_ok=True)
         with gz.open('./data/frequency_data/%s/frequency_data.json.gz' % language, 'wb') as f:
