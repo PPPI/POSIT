@@ -1,3 +1,4 @@
+import gc
 import gzip as gz
 import json
 import os
@@ -44,8 +45,8 @@ jsonl_location_format = '%s\\final\\jsonl\\%s\\%s_%s_%d_parsed.jsonl.gz'
 UNDEF = 'UNDEF'
 
 if __name__ == '__main__':
-    freq_map = {l: defaultdict(list) for l in languages + natural_languages + formal_languages}
     for language in tqdm(languages):
+        freq_map = {l: defaultdict(list) for l in languages + natural_languages + formal_languages}
         for fold in tqdm(folds, leave=False):
             n_files = 0
             while True:
@@ -89,7 +90,7 @@ if __name__ == '__main__':
                 try:
                     freq_normed[l][word] = dict(Counter(freq_map[word]))
                 except KeyError:
-                    pass
+                    freq_normed[l] = {word: dict(Counter(freq_map[word]))}
 
         os.makedirs('./data/frequency_data/%s' % language, exist_ok=True)
         with gz.open('./data/frequency_data/%s/frequency_data.json.gz' % language, 'wb') as f:
