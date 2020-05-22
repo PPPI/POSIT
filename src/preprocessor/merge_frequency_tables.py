@@ -1,5 +1,8 @@
+import gc
 import gzip
 import json
+
+from tqdm import tqdm
 
 from src.preprocessor.codeSearch_preprocessor import UNDEF
 
@@ -12,20 +15,24 @@ if __name__ == '__main__':
     merged_frequency = {l: dict() for l in languages + ['English', 'url', 'email', 'diff']}
     language_frequency = dict()
 
-    for language in languages:
+    for language in tqdm(languages):
+        # Force collection of l_table between loop iterations
+        l_table = None
+        gc.collect()
         with gzip.open(location % language, 'rb') as f:
+            # noinspection PyRedeclaration
             l_table = json.loads(f.read())
 
-        for cp_lang in l_table.keys():
+        for cp_lang in tqdm(l_table.keys(), leave=False):
             inner_table = l_table[cp_lang]
-            for tok in inner_table.keys():
+            for tok in tqdm(inner_table.keys(), leave=False):
                 tok_table = inner_table[tok]
 
                 # Language look-up
                 try:
                     language_frequency[tok][cp_lang] += 1
                 except KeyError:
-                    language_frequency[tok] = {l: 0 for l in languages + ['English', 'url', 'email', 'diff']}
+                    language_frequency[tok] = {lang: 0 for lang in languages + ['English', 'url', 'email', 'diff']}
                     language_frequency[tok][cp_lang] += 1
 
                 # Tag merger

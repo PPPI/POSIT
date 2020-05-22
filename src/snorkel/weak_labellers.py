@@ -7,7 +7,7 @@ ABSTAIN = -1
 
 
 def frequency_labelling_function_factory(language):
-    location = './data/frequency_data/%s/frequency_data.json.gz' % language
+    location = './data/frequency_data/frequency_data.json.gz' % language
     with gzip.open(location, 'rb') as f:
         frequency_table = json.loads(f.read())[language]
 
