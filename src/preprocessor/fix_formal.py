@@ -41,8 +41,6 @@ folds = [
 # (language, fold, language, fold, fold number)
 jsonl_location_format = '%s\\final\\jsonl\\%s\\%s_%s_%d_parsed.jsonl.gz'
 
-UNDEF = 'UNDEF'
-
 if __name__ == '__main__':
     for language in tqdm(languages):
         for fold in tqdm(folds, leave=False):
