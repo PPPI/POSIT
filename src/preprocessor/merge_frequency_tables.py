@@ -12,7 +12,7 @@ if __name__ == '__main__':
     out_lang_location = './data/frequency_data/frequency_language_data.json.gz'
 
     languages = ['go', 'java', 'javascript', 'php', 'python', 'ruby']
-    merged_frequency = {l: dict() for l in languages + ['English', 'url', 'email', 'diff']}
+    merged_frequency = {l: dict() for l in languages + ['English', 'uri', 'email', 'diff']}
     language_frequency = dict()
 
     for language in tqdm(languages):
@@ -32,7 +32,7 @@ if __name__ == '__main__':
                 try:
                     language_frequency[tok][cp_lang] += 1
                 except KeyError:
-                    language_frequency[tok] = {lang: 0 for lang in languages + ['English', 'url', 'email', 'diff']}
+                    language_frequency[tok] = {lang: 0 for lang in languages + ['English', 'uri', 'email', 'diff']}
                     language_frequency[tok][cp_lang] += 1
 
                 # Tag merger
@@ -41,6 +41,7 @@ if __name__ == '__main__':
                         try:
                             merged_frequency[cp_lang][tok][tag] += count
                         except KeyError:
+                            merged_frequency[cp_lang][tok] = dict()
                             merged_frequency[cp_lang][tok][tag] = count
 
     with gzip.open(out_location, 'wb') as f:
