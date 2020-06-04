@@ -1,5 +1,6 @@
 import fileinput
 import re
+import sys
 
 import bs4
 import pandas as pd
@@ -65,3 +66,8 @@ def SO_to_pandas(location):
         result_df = result_df.append(temp_df, ignore_index=True, sort=False)
 
     return result_df
+
+
+if __name__ == '__main__':
+    location = sys.argv[1]
+    df = SO_to_pandas(location)

@@ -47,6 +47,14 @@ class Configuration:
     project = "SO_Freq"
     project += '_Id' if with_l_id else ''
     # project += '5'
+
+    # corpus specific hints
+    multilang = True
+    nlangs = 10  # The number of Natural and Formal (including Programming) languages
+    if multilang:
+        id_to_lang = dict(
+            enumerate(['English', 'go', 'java', 'javascript', 'php', 'python', 'ruby', 'uri', 'email', 'diff']))
+
     # embeddings
     dim_word = 100
     dim_char = 50

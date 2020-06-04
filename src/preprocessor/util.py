@@ -21,3 +21,7 @@ CODE_TOKENISATION_REGEX = r"<tt>.*</tt>|" \
                           r"\"(?:\\\"|" \
                           r"[^\"])*\"|" \
                           r"'(?:\\'|[^'])*'"
+
+# Mapping used to conver language to id for the model training
+lang_to_id = {lang: id_ for id_, lang in
+              enumerate(['English', 'go', 'java', 'javascript', 'php', 'python', 'ruby', 'uri', 'email', 'diff'])}

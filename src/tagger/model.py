@@ -41,9 +41,14 @@ class CodePoSModel(BaseModel):
         self.feature_sizes = tf.placeholder(tf.int32, shape=[None, None],
                                             name="feature_sizes")
 
-        # shape = (batch size, max length of sentence in batch)
-        self.labels = tf.placeholder(tf.int32, shape=[None, None],
-                                     name="labels")
+        if self.config.multilang:
+            # shape = (batch size, max length of sentence in batch, number of languages)
+            self.labels = tf.placeholder(tf.int32, shape=[None, None, None],
+                                         name="labels")
+        else:
+            # shape = (batch size, max length of sentence in batch)
+            self.labels = tf.placeholder(tf.int32, shape=[None, None],
+                                         name="labels")
 
         if self.config.with_l_id:
             # shape = (batch size, max length of sentence in batch)
@@ -264,7 +269,11 @@ class CodePoSModel(BaseModel):
             self.nsteps = tf.shape(output)[1]
             output = tf.reshape(output, [-1, 2 * self.config.hidden_size_lstm])
             pred = tf.matmul(output, W) + b
-            self.logits = tf.reshape(pred, [-1, self.nsteps, self.config.ntags])
+            # This should be [batch, steps, nlangs,  ntags] and propagate back from here!
+            if self.config.multilang:
+                self.logits = tf.reshape(pred, [-1, self.nsteps, self.config.nlangs, self.config.ntags])
+            else:
+                self.logits = tf.reshape(pred, [-1, self.nsteps, self.config.ntags])
 
             if self.config.with_l_id:
                 # Store layers weight & bias
@@ -521,6 +530,11 @@ class CodePoSModel(BaseModel):
 
         if self.config.with_l_id:
             pred_lid = pred[1][0]
+            if self.config.multilang:
+                resulting_lids = list()
+                for lid in pred_lid:
+                    resulting_lids.append(self.config.id_to_lang[lid])
+                pred_lid = resulting_lids
             return preds, pred_lid
         else:
             return preds
