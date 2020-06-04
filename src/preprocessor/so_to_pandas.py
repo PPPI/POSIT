@@ -6,16 +6,19 @@ import bs4
 import pandas as pd
 import xmltodict
 from bs4 import BeautifulSoup
-from nltk import casual_tokenize, sent_tokenize
+from nltk import sent_tokenize
+from nltk.tokenize import TreebankWordTokenizer as twt
 
 from src.preprocessor.util import HTML_PARSER, CODE_TOKENISATION_REGEX
+
+tokenizer = twt()
 
 
 def parse_stackoverflow_posts(file_location):
     with fileinput.input(file_location, openhook=fileinput.hook_encoded("utf-8")) as f_:
         for line in f_:
             line = line.strip()
-            if line.startswith("<row_"):
+            if line.startswith("<row"):
                 row_ = xmltodict.parse(line)['row']
                 if '@Tags' in row_.keys():
                     if '<java>' in row_['@Tags']:
@@ -43,26 +46,30 @@ def tokenize_SO_row(row_, language, tag_name='body'):
               for tag in row_.childGenerator() if isinstance(tag, bs4.element.Tag)]
     text___ = list()
     for (body_, kind_) in text__:
-        if kind_ == 'NL':
-            toks_ = [(t, 'English', idx, body_)
-                     for idx, t in enumerate(casual_tokenize(s)) for s in sent_tokenize(body_)]
-        elif kind_ == 'Code':
-            toks_ = [
-                (l.strip(), language, idx, body_)
-                for idx, l in enumerate(re.findall(CODE_TOKENISATION_REGEX,
-                                                   line.strip()))
-                if len(l.strip()) > 0
-                for line in body_.split('\n')
-            ]
-        text___ += toks_
+        try:
+            if kind_ == 'NL':
+                toks_ = [(s[start:end], 'English', (start, end), body_)
+                         for s in sent_tokenize(body_) for (start, end) in tokenizer.span_tokenize(s)]
+            elif kind_ == 'Code':
+                toks_ = [
+                    (l.group(), language, l.span(), body_)
+                    for line in body_.split('\n')
+                    for l in re.finditer(CODE_TOKENISATION_REGEX,
+                                         line.strip())
+                    if len(l.group().strip()) > 0
+                ]
+            text___ += toks_
+        except (ValueError, IndexError):
+            # Some sentences are malformed, we drop them from training
+            pass
     return text___
 
 
 def SO_to_pandas(location):
-    result_df = pd.DataFrame(columns=['Token', 'Language', 'Index', 'Context'])
+    result_df = pd.DataFrame(columns=['Token', 'Language', 'Span', 'Context'])
     for row, language in parse_stackoverflow_posts(location):
         toks = tokenize_SO_row(row, language)
-        temp_df = pd.DataFrame(toks, columns=['Token', 'Language', 'Index', 'Context'])
+        temp_df = pd.DataFrame(toks, columns=['Token', 'Language', 'Span', 'Context'])
         result_df = result_df.append(temp_df, ignore_index=True, sort=False)
 
     return result_df
