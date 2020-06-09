@@ -24,7 +24,7 @@ def parse_stackoverflow_posts(file_location):
                     if '<java>' in row_['@Tags']:
                         language = 'java'
                     elif '<golang>' in row_['@Tags'] or '<go>' in row_['@Tags']:
-                        language = 'go'
+                        language = 'golang'
                     elif '<javascript>' in row_['@Tags']:
                         language = 'javascript'
                     elif '<php>' in row_['@Tags']:

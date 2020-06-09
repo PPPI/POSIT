@@ -1,10 +1,10 @@
 import gzip
-import itertools
 import json
 
 import json_lines as jl
-from nltk import sent_tokenize, casual_tokenize, pos_tag
 from tqdm import tqdm
+
+from src.preprocessor.codeSearch_preprocessor import parse_docstring
 
 languages = [
     'go',
@@ -60,16 +60,9 @@ if __name__ == '__main__':
                 processed_data = list()
                 with jl.open(location) as json_generator:
                     for json_line in tqdm(json_generator, leave=False):
-                        parsed = json_line['docstring_parsed']
-                        tagged_sents = [pos_tag(casual_tokenize(s)) for s in sent_tokenize(json_line['docstring'])]
-                        flat_tagged = list(itertools.chain(*tagged_sents))
-                        fixed_docstring = list()
-                        for i, (tok, tag_map) in enumerate(eval(parsed)):
-                            if tok in ['uri', 'email', 'diff']:
-                                fixed_docstring.append((flat_tagged[i][0], tag_map))
-                            else:
-                                fixed_docstring.append((tok, tag_map))
-                        json_line['docstring_parsed'] = fixed_docstring
+                        tagged_code_list = json.loads(json_line['code_parsed'])
+                        tagged_docstring_list = parse_docstring(json_line, language, dict(tagged_code_list))
+                        json_line['docstring_parsed'] = json.dumps(tagged_docstring_list)
                         processed_data.append(json.dumps(json_line))
 
                 with gzip.open(location, 'wb') as f:
