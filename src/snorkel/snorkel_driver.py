@@ -1,3 +1,4 @@
+import os
 import sys
 
 from gensim.corpora import Dictionary
@@ -51,7 +52,20 @@ def main(argv):
     label_model.fit(L_train, n_epochs=2000, log_freq=200, seed=42)
     df_train["label"] = label_model.predict(L=L_train, tie_break_policy="abstain")
 
-    # TODO: Persist result to disk
+    max_post_id = df_train.iloc[-1]['PostIdx']
+    valid_index = int(0.6 * max_post_id)
+    test_index = int(0.8 * max_post_id)
+    for index, row in df_train.iterrows():
+        if row['PostIdx'] > test_index:
+            filename = 'valid.txt'
+        elif row['PostIdx'] > valid_index:
+            filename = 'dev.txt'
+        else:
+            filename = 'train.txt'
+
+        os.makedirs('./data/corpora/multilingual/so', exist_ok=True)
+        with open('./data/corpora/multilingual/so/%s' % filename, 'a') as f:
+            f.write('%s %s %s\n' % (row['Token'], row['label'], row['lang_label']))
 
 
 if __name__ == '__main__':

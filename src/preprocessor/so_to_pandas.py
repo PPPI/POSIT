@@ -66,10 +66,11 @@ def tokenize_SO_row(row_, language, tag_name='body'):
 
 
 def SO_to_pandas(location):
-    result_df = pd.DataFrame(columns=['Token', 'Language', 'Span', 'Context'])
-    for row, language in parse_stackoverflow_posts(location):
+    result_df = pd.DataFrame(columns=['PostIdx', 'Token', 'Language', 'Span', 'Context'])
+    for pidx, (row, language) in enumerate(parse_stackoverflow_posts(location)):
         toks = tokenize_SO_row(row, language)
         temp_df = pd.DataFrame(toks, columns=['Token', 'Language', 'Span', 'Context'])
+        temp_df['PostIdx'] = pd.Series([pidx] * len(temp_df.index))
         result_df = result_df.append(temp_df, ignore_index=True, sort=False)
 
     return result_df
