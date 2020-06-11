@@ -8,6 +8,7 @@ import xmltodict
 from bs4 import BeautifulSoup
 from nltk import sent_tokenize
 from nltk.tokenize import TreebankWordTokenizer as twt
+from tqdm import tqdm
 
 from src.preprocessor.util import HTML_PARSER, CODE_TOKENISATION_REGEX
 
@@ -70,7 +71,7 @@ def SO_to_pandas(location):
         result_df = pd.read_csv(location[:-len('xml')] + 'csv')
     except FileNotFoundError:
         result_df = pd.DataFrame(columns=['PostIdx', 'Token', 'Language', 'Span', 'Context'])
-        for pidx, (row, language) in enumerate(parse_stackoverflow_posts(location)):
+        for pidx, (row, language) in tqdm(enumerate(parse_stackoverflow_posts(location))):
             toks = tokenize_SO_row(row, language)
             temp_df = pd.DataFrame(toks, columns=['Token', 'Language', 'Span', 'Context'])
             temp_df['PostIdx'] = pd.Series([pidx] * len(temp_df.index))
