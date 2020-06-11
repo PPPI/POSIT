@@ -1,6 +1,8 @@
 import fileinput
+import os
 import re
 import sys
+from multiprocessing import Pool
 
 import bs4
 import pandas as pd
@@ -70,12 +72,15 @@ def SO_to_pandas(location):
     try:
         result_df = pd.read_csv(location[:-len('xml')] + 'csv')
     except FileNotFoundError:
+        for idx, _ in enumerate(parse_stackoverflow_posts(location)):
+            pass
         result_df = pd.DataFrame(columns=['PostIdx', 'Token', 'Language', 'Span', 'Context'])
-        for pidx, (row, language) in tqdm(enumerate(parse_stackoverflow_posts(location))):
-            toks = tokenize_SO_row(row, language)
-            temp_df = pd.DataFrame(toks, columns=['Token', 'Language', 'Span', 'Context'])
-            temp_df['PostIdx'] = pd.Series([pidx] * len(temp_df.index))
-            result_df = result_df.append(temp_df, ignore_index=True, sort=False)
+        with Pool(processes=len(os.sched_getaffinity(0))) as wp:
+            for pidx, toks in \
+                    tqdm(enumerate(wp.starmap(tokenize_SO_row, parse_stackoverflow_posts(location))), total=idx + 1):
+                temp_df = pd.DataFrame(toks, columns=['Token', 'Language', 'Span', 'Context'])
+                temp_df['PostIdx'] = pd.Series([pidx] * len(temp_df.index))
+                result_df = result_df.append(temp_df, ignore_index=True, sort=False)
         result_df.to_csv(location[:-len('xml')] + 'csv')
 
     return result_df
