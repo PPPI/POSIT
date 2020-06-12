@@ -75,7 +75,8 @@ def SO_to_pandas(location):
         for idx, _ in enumerate(parse_stackoverflow_posts(location)):
             pass
         result_df = pd.DataFrame(columns=['PostIdx', 'Token', 'Language', 'Span', 'Context'])
-        with Pool(processes=len(psutil.Process.cpu_affinity())) as wp:
+        proc = psutil.Process()
+        with Pool(processes=len(proc.cpu_affinity())) as wp:
             for pidx, toks in \
                     tqdm(enumerate(wp.starmap(tokenize_SO_row, parse_stackoverflow_posts(location))), total=idx + 1):
                 temp_df = pd.DataFrame(toks, columns=['Token', 'Language', 'Span', 'Context'])
