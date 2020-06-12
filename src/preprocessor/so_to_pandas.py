@@ -1,11 +1,11 @@
 import fileinput
-import os
 import re
 import sys
 from multiprocessing import Pool
 
 import bs4
 import pandas as pd
+import psutil
 import xmltodict
 from bs4 import BeautifulSoup
 from nltk import sent_tokenize
@@ -75,7 +75,7 @@ def SO_to_pandas(location):
         for idx, _ in enumerate(parse_stackoverflow_posts(location)):
             pass
         result_df = pd.DataFrame(columns=['PostIdx', 'Token', 'Language', 'Span', 'Context'])
-        with Pool(processes=len(os.sched_getaffinity(0))) as wp:
+        with Pool(processes=len(psutil.Process.cpu_affinity())) as wp:
             for pidx, toks in \
                     tqdm(enumerate(wp.starmap(tokenize_SO_row, parse_stackoverflow_posts(location))), total=idx + 1):
                 temp_df = pd.DataFrame(toks, columns=['Token', 'Language', 'Span', 'Context'])
