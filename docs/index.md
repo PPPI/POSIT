@@ -19,6 +19,9 @@ on top for the two tasks. We linearly combine the two objectives in the loss wit
 slightly smaller weight given to language IDs. We do not condition Tag output on 
 language IDs in this version of the model.
 
+This work was done under the supervision of [Earl Barr](http://earlbarr.com/) and 
+in collaboration with [Santanu Dash](http://santanu.uk/), and [Christoph Treude](ctreude.ca).
+
 ## Dependencies
 This project requires the following python libraries:
 ```
