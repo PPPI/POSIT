@@ -89,7 +89,7 @@ def SO_to_pandas(location, limit=None):
                          total=number_of_posts_after_filter):
                 for token, lang, span, context in toks:
                     with open(fn_out, 'a', encoding='utf-8') as f:
-                        f.write('"%s",%s,"%s","%s"' % (token.replace('"', '""'), lang, str(span), context))
+                        f.write('%d,"%s",%s,"%s","%s"' % (pidx, token.replace('"', '""'), lang, str(span), context))
                 if pidx == limit:
                     break
         result_df = pd.read_csv(location[:-len('xml')] + 'csv')

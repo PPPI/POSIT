@@ -10,19 +10,19 @@ ABSTAIN = -1
 
 
 def frequency_labeling_function_factory(language):
-    location = './data/frequency_data/frequency_data.json.gz' % language
+    location = './data/frequency_data/%s/frequency_data.json.gz' % language
     with gzip.open(location, 'rb') as f:
         frequency_table = json.loads(f.read())[language]
 
     @labeling_function()
-    def lf_frequency_guess(tok):
+    def lf_frequency_guess(row):
         """
-        Return the most frequent tag of `tok' in language `language'.
-        :param tok: The token we wish to tag
+        Return the most frequent tag of `row' in language `language'.
+        :param row: The rowen we wish to tag
         :return: The tag in the language
         """
         try:
-            return frequency_table[tok]
+            return frequency_table[row]
         except KeyError:
             return ABSTAIN
 
@@ -35,93 +35,95 @@ def frequency_language_factory():
         frequency_table = json.loads(f.read())
 
     @labeling_function()
-    def lf_frequency_lang_guess(tok):
+    def lf_frequency_lang_guess(row):
         """
-        Return the most frequent language of `tok'.
-        :param tok: The token we wish to identify the language of
+        Return the most frequent language of `row'.
+        :param row: The rowen we wish to identify the language of
         :return: The guessed language
         """
         try:
-            return frequency_table[tok]
+            return frequency_table[row['Token']]
         except KeyError:
             return ABSTAIN
 
+    return lf_frequency_lang_guess
+
 
 @labeling_function()
-def lf_builtin_language(tok):
-    if tok in javascript_builtins:
+def lf_builtin_language(row):
+    if row['Token'] in javascript_builtins:
         return 'javascript'
-    elif tok in golang_builtins:
+    elif row['Token'] in golang_builtins:
         return 'golang'
-    elif tok in php_builtins:
+    elif row['Token'] in php_builtins:
         return 'php'
-    elif tok in python_builtins:
+    elif row['Token'] in python_builtins:
         return 'python'
-    elif tok in ruby_builtins:
+    elif row['Token'] in ruby_builtins:
         return 'ruby'
     else:
         return ABSTAIN
 
 
 @labeling_function()
-def lf_builtin_tag(tok):
-    if tok in javascript_builtins:
+def lf_builtin_tag(row):
+    if row['Token'] in javascript_builtins:
         return 'Identifier'
-    elif tok in golang_builtins:
+    elif row['Token'] in golang_builtins:
         return 'IDENTIFIER'
-    elif tok in php_builtins:
+    elif row['Token'] in php_builtins:
         return 'identifier'
-    elif tok in python_builtins:
+    elif row['Token'] in python_builtins:
         return 'NAME'
-    elif tok in ruby_builtins:
+    elif row['Token'] in ruby_builtins:
         return 'function_name'
     else:
         return ABSTAIN
 
 
 @labeling_function()
-def lf_uri_lang(tok):
-    if is_URI(tok):
+def lf_uri_lang(row):
+    if is_URI(row['Token']):
         return 'uri'
     else:
         return ABSTAIN
 
 
 @labeling_function()
-def lf_uri_tok(tok):
-    if is_URI(tok):
+def lf_uri_row(row):
+    if is_URI(row['Token']):
         return 'uri'
     else:
         return ABSTAIN
 
 
 @labeling_function()
-def lf_diff_lang(tok):
-    if is_diff_header(tok):
+def lf_diff_lang(row):
+    if is_diff_header(row['Token']):
         return 'diff'
     else:
         return ABSTAIN
 
 
 @labeling_function()
-def lf_diff_tok(tok):
-    if is_diff_header(tok):
+def lf_diff_row(row):
+    if is_diff_header(row['Token']):
         return 'diff_header'
     else:
         return ABSTAIN
 
 
 @labeling_function()
-def lf_email_lang(tok):
-    if is_email(tok):
+def lf_email_lang(row):
+    if is_email(row['Token']):
         return 'email'
     else:
         return ABSTAIN
 
 
 @labeling_function()
-def lf_email_tok(tok):
-    if is_email(tok):
+def lf_email_row(row):
+    if is_email(row['Token']):
         return 'email'
     else:
         return ABSTAIN
