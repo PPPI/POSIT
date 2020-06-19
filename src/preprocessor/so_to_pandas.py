@@ -76,20 +76,23 @@ def SO_to_pandas(location, limit=None):
     try:
         result_df = pd.read_csv(location[:-len('xml')] + 'csv')
     except FileNotFoundError:
+        fn_out = location[:-len('xml')] + 'csv'
         number_of_posts_after_filter = 5748669  # Precomputed separately by iterating through the file once.
         if limit is not None:
             number_of_posts_after_filter = min(limit, number_of_posts_after_filter)
-        result_df = pd.DataFrame(columns=['PostIdx', 'Token', 'Language', 'Span', 'Context'])
+
+        with open(fn_out, 'w', encoding='utf-8') as f:
+            f.write(','.join(['PostIdx', 'Token', 'Language', 'Span', 'Context']) + '\n')
         with Pool(processes=len(psutil.Process().cpu_affinity()), maxtasksperchild=4) as wp:
             for pidx, toks in \
                     tqdm(enumerate(wp.imap(tokenize_SO_row_star, parse_stackoverflow_posts(location))),
                          total=number_of_posts_after_filter):
-                temp_df = pd.DataFrame(toks, columns=['Token', 'Language', 'Span', 'Context'])
-                temp_df['PostIdx'] = pd.Series([pidx] * len(temp_df.index))
-                result_df = result_df.append(temp_df, ignore_index=True, sort=False)
+                for token, lang, span, context in toks:
+                    with open(fn_out, 'a', encoding='utf-8') as f:
+                        f.write('"%s",%s,"%s","%s"' % (token.replace('"', '""'), lang, str(span), context))
                 if pidx == limit:
                     break
-        result_df.to_csv(location[:-len('xml')] + 'csv')
+        result_df = pd.read_csv(location[:-len('xml')] + 'csv')
 
     return result_df
 
