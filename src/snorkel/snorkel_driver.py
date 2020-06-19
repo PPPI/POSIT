@@ -26,7 +26,7 @@ def main(argv):
                    lf_diff_tok,
                    lf_email_tok,
                ] + [
-                   frequency_labelling_function_factory(language)
+                   frequency_labeling_function_factory(language)
                    for language in languages
                ]
     size_tag_voc = 0
