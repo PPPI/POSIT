@@ -29,11 +29,13 @@ if __name__ == '__main__':
                 tok_table = inner_table[tok]
 
                 # Language look-up
-                try:
-                    language_frequency[tok][cp_lang] += 1
-                except KeyError:
-                    language_frequency[tok] = {lang: 0 for lang in languages + ['English', 'uri', 'email', 'diff']}
-                    language_frequency[tok][cp_lang] += 1
+                actual_tags = len([tag for tag in tok_table.keys() if tag != UNDEF])
+                if actual_tags > 0:
+                    try:
+                        language_frequency[tok][cp_lang] += 1
+                    except KeyError:
+                        language_frequency[tok] = {lang: 0 for lang in languages + ['English', 'uri', 'email', 'diff']}
+                        language_frequency[tok][cp_lang] += 1
 
                 # Tag merger
                 for tag, count in tok_table.items():
@@ -41,8 +43,11 @@ if __name__ == '__main__':
                         try:
                             merged_frequency[cp_lang][tok][tag] += count
                         except KeyError:
-                            merged_frequency[cp_lang][tok] = dict()
-                            merged_frequency[cp_lang][tok][tag] = count
+                            try:
+                                merged_frequency[cp_lang][tok][tag] = count
+                            except KeyError:
+                                merged_frequency[cp_lang][tok] = dict()
+                                merged_frequency[cp_lang][tok][tag] = count
 
     with gzip.open(out_location, 'wb') as f:
         f.write(json.dumps(merged_frequency).encode('utf-8'))

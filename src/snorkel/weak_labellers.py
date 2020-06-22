@@ -6,6 +6,7 @@ from snorkel.labeling import labeling_function
 
 from .encoding import lang_encoding, tag_encoding_factory, uri_encoding
 from ..preprocessor.builtin_lists import *
+from ..preprocessor.codeSearch_preprocessor import UNDEF
 from ..preprocessor.formal_lang_heuristics import is_URI, is_diff_header, is_email
 
 ABSTAIN = -1
@@ -35,7 +36,9 @@ def frequency_labeling_function_factory(language):
         :return: The tag in the language
         """
         try:
-            return tag_encoders[language](frequency_table[str(row['Token'])])
+            tags = [(t, fq) for t, fq in frequency_table[str(row['Token'])].items() if t != UNDEF]
+            sorted(tags, key=lambda p: p[-1], reverse=True)
+            return tag_encoders[language](tags[0])
         except KeyError:
             return ABSTAIN
 
@@ -55,7 +58,10 @@ def frequency_language_factory():
         :return: The guessed language
         """
         try:
-            return lang_encoding(frequency_table[str(row['Token'])])
+            lang_list = list(frequency_table[str(row['Token'])].items())
+            sorted(lang_list, key=lambda p: p[-1], reverse=True)
+
+            return lang_encoding(lang_list[0])
         except KeyError:
             return ABSTAIN
 
