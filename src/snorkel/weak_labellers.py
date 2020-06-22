@@ -39,7 +39,7 @@ def frequency_labeling_function_factory(language):
             tags = [(t, fq) for t, fq in frequency_table[str(row['Token'])].items() if t != UNDEF]
             sorted(tags, key=lambda p: p[-1], reverse=True)
             return tag_encoders[language](tags[0])
-        except KeyError:
+        except (KeyError, IndexError):
             return ABSTAIN
 
     return lf_frequency_guess
@@ -61,7 +61,10 @@ def frequency_language_factory():
             lang_list = list(frequency_table[str(row['Token'])].items())
             sorted(lang_list, key=lambda p: p[-1], reverse=True)
 
-            return lang_encoding(lang_list[0])
+            if lang_list[0][-1] > 0:
+                return lang_encoding(lang_list[0][1])
+            else:
+                return ABSTAIN
         except KeyError:
             return ABSTAIN
 
