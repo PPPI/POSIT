@@ -4,14 +4,14 @@ import re
 
 from snorkel.labeling import labeling_function
 
-from .encoding import lang_encoding, tag_encoding_factory
+from .encoding import lang_encoding, tag_encoding_factory, uri_encoding
 from ..preprocessor.builtin_lists import *
 from ..preprocessor.formal_lang_heuristics import is_URI, is_diff_header, is_email
 
 ABSTAIN = -1
 
 tag_encoders = {
-    lang: tag_encoding_factory(lang) for lang in [
+    lang: tag_encoding_factory(lang)[0] for lang in [
         'go',
         'javascript',
         'php',
@@ -79,19 +79,45 @@ def lf_builtin_language(row):
 
 
 @labeling_function()
-def lf_builtin_tag(row):
-    if str(row['Token']) in javascript_builtins:
-        return tag_encoders['javascript']('Identifier')
-    elif str(row['Token']) in golang_builtins:
-        return tag_encoders['go']('IDENTIFIER')
-    elif str(row['Token']) in php_builtins:
-        return tag_encoders['php']('identifier')
-    elif str(row['Token']) in python_builtins:
-        return tag_encoders['python']('NAME')
-    elif str(row['Token']) in ruby_builtins:
-        return tag_encoders['ruby']('function_name')
+def lf_builtin_tag_factory(language):
+    if language == 'javascript':
+        def lf_builtin_tag(row):
+            if str(row['Token']) in javascript_builtins:
+                return tag_encoders['javascript']('Identifier')
+            else:
+                ABSTAIN
+    elif language == 'go':
+        def lf_builtin_tag(row):
+            if str(row['Token']) in golang_builtins:
+                return tag_encoders['go']('IDENTIFIER')
+            else:
+                return ABSTAIN
+
+    elif language == 'php':
+        def lf_builtin_tag(row):
+            if str(row['Token']) in php_builtins:
+                return tag_encoders['php']('identifier')
+            else:
+                return ABSTAIN
+
+    elif language == 'python':
+        def lf_builtin_tag(row):
+            if str(row['Token']) in python_builtins:
+                return tag_encoders['python']('NAME')
+            else:
+                return ABSTAIN
+
+    elif language == 'ruby':
+        def lf_builtin_tag(row):
+            if str(row['Token']) in ruby_builtins:
+                return tag_encoders['ruby']('function_name')
+            else:
+                return ABSTAIN
+
     else:
-        return ABSTAIN
+        lf_builtin_tag = None
+
+    return lf_builtin_tag
 
 
 @labeling_function()
@@ -104,21 +130,20 @@ def lf_uri_lang(row):
 
 @labeling_function()
 def lf_uri_tok(row):
-    # TODO: Encoding
     if is_URI(str(row['Token'])):
         tok = str(row['Token'])
         if tok.startswith('file'):
-            return 'file'
+            return uri_encoding['file']
         elif tok.startswith('http'):
-            return 'http'
+            return uri_encoding['http']
         elif tok.startswith('ftp'):
-            return 'ftp'
+            return uri_encoding['ftp']
         elif tok.startswith('localhost'):
-            return 'localhost'
+            return uri_encoding['localhost']
         elif re.match(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", tok) is not None:
-            return 'ipv4'
+            return uri_encoding['ipv4']
         else:
-            return 'uri'
+            return uri_encoding['uri']
     else:
         return ABSTAIN
 
@@ -133,9 +158,8 @@ def lf_diff_lang(row):
 
 @labeling_function()
 def lf_diff_tok(row):
-    # TODO: Encoding
     if is_diff_header(str(row['Token'])):
-        return 'diff_header'
+        return 1  # There is only a 'diff_header' option
     else:
         return ABSTAIN
 
@@ -150,8 +174,7 @@ def lf_email_lang(row):
 
 @labeling_function()
 def lf_email_tok(row):
-    # TODO: Encoding
     if is_email(str(row['Token'])):
-        return 'email'
+        return 1  # THere is only an 'email' option
     else:
         return ABSTAIN
