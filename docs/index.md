@@ -13,5 +13,4 @@ POSIT improves the state-of-the-art on language identification by 10.6% and PoS/
 This work was done under the supervision of [Earl T. Barr](http://earlbarr.com/) and 
 in collaboration with [Santanu K. Dash](http://santanu.uk/), and [Christoph Treude](ctreude.ca).
 
-![Example from Paper](sample_output.png)
-
+<img src="Posit_Network.png" alt="POSIT's Network Architecture]" style="width:1280px;"/>
