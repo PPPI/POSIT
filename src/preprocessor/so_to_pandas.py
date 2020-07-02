@@ -1,3 +1,4 @@
+import csv
 import fileinput
 import re
 import sys
@@ -89,14 +90,15 @@ def SO_to_pandas(location, limit=None):
                          total=number_of_posts_after_filter):
                 for token, lang, span, context in toks:
                     with open(fn_out, 'a', encoding='utf-8') as f:
-                        f.write('%d,"%s",%s,"%s","%s"\n' % (pidx,
-                                                            token.replace('"', '""'),
-                                                            lang,
-                                                            str(span),
-                                                            context.replace('\n', '\\n').replace('\r', '\\r')))
-                if pidx == limit:
-                    break
-        result_df = pd.read_csv(location[:-len('xml')] + 'csv')
+                        csvwriter = csv.writer(f)
+                        csvwriter.writerow([pidx,
+                                            token.replace('"', '""'),
+                                            lang,
+                                            str(span),
+                                            context])
+                    if pidx == limit:
+                        break
+            result_df = pd.read_csv(location[:-len('xml')] + 'csv')
 
     return result_df
 
