@@ -96,8 +96,8 @@ def SO_to_pandas(location, limit=None):
                                             lang,
                                             str(span),
                                             context])
-                    if pidx == limit:
-                        break
+                if pidx == limit:
+                    break
             result_df = pd.read_csv(location[:-len('xml')] + 'csv')
 
     return result_df

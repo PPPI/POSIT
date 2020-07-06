@@ -38,7 +38,7 @@ def main(argv):
 
     # Define the set of labeling functions (LFs)
     lfs_lang = [
-        # frequency_language_factory(),
+        frequency_language_factory(),
         lf_builtin_language,
         lf_uri_lang,
         lf_diff_lang,
@@ -99,7 +99,7 @@ def main(argv):
         with open('./data/corpora/multilingual/so/%s' % filename, 'a') as f:
             to_output = [row['Token'], eng_tag] \
                         + [tag_decoders[language](row['label_%s' % language])
-                           if row['label_%s' % language] != -1 else O
+                           if row['label_%s' % language] != -1 else row['Language']
                            for language in languages + formal_languages] \
                         + [lang_decoding(row['lang_label']) if row['lang_label'] != -1 else 'English']
             f.write(' '.join(to_output) + '\n')
