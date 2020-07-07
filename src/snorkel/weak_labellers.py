@@ -95,7 +95,7 @@ def lf_builtin_tag_factory(language):
             if str(row['Token']) in javascript_builtins:
                 return tag_encoders['javascript']('Identifier')
             else:
-                ABSTAIN
+                return ABSTAIN
     elif language == 'go':
         @labeling_function()
         def lf_builtin_tag(row):
