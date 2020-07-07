@@ -10,6 +10,12 @@ Our technique, POSIT, simultaneously provides abstract syntax tree tags for sour
 To realize POSIT, we trained a biLSTM network with a Conditional Random Field output layer using abstract syntax tree tags from the CLANG compiler and part-of-speech tags from the Standard Stanford part-of-speech tagger.
 POSIT improves the state-of-the-art on language identification by 10.6% and PoS/AST tagging by 23.7% in accuracy.
 
+Slides are available [here](https://github.com/PPPI/POSIT/blob/master/docs/slides_icse20_posit.pdf).
+
+The pre-recorded video from ICSE2020 is available below:
+
+[![POSIT ICSE2020 Talk](http://img.youtube.com/vi/5AGkCDj6zyE/0.jpg)](http://www.youtube.com/watch?v=5AGkCDj6zyE "POSIT")
+
 This work was done under the supervision of [Earl T. Barr](http://earlbarr.com/) and 
 in collaboration with [Santanu K. Dash](http://santanu.uk/), and [Christoph Treude](ctreude.ca).
 
