@@ -1,4 +1,11 @@
 # POSIT
+
+
+
+<img src="Posit_Network.png" alt="POSIT's Network Architecture]" style="width:1280px;"/>
+
+
+
 [![DOI](https://zenodo.org/badge/233908281.svg)](https://zenodo.org/badge/latestdoi/233908281)
 
 
@@ -18,5 +25,3 @@ The pre-recorded video from ICSE2020 is available below:
 
 This work was done under the supervision of [Earl T. Barr](http://earlbarr.com/) and 
 in collaboration with [Santanu K. Dash](http://santanu.uk/), and [Christoph Treude](ctreude.ca).
-
-<img src="Posit_Network.png" alt="POSIT's Network Architecture]" style="width:1280px;"/>
