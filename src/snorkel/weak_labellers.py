@@ -93,7 +93,7 @@ def lf_builtin_tag_factory(language):
         @labeling_function()
         def lf_builtin_tag(row):
             if str(row['Token']) in javascript_builtins:
-                return tag_encoders['javascript']('Identifier')
+                return tag_encoders['javascript']('IdentifierName')
             else:
                 return ABSTAIN
     elif language == 'go':
@@ -108,7 +108,7 @@ def lf_builtin_tag_factory(language):
         @labeling_function()
         def lf_builtin_tag(row):
             if str(row['Token']) in php_builtins:
-                return tag_encoders['php']('identifier')
+                return tag_encoders['php']('Identifier')
             else:
                 return ABSTAIN
 
@@ -116,7 +116,7 @@ def lf_builtin_tag_factory(language):
         @labeling_function()
         def lf_builtin_tag(row):
             if str(row['Token']) in python_builtins:
-                return tag_encoders['python']('NAME')
+                return tag_encoders['python']('Expr')
             else:
                 return ABSTAIN
 
@@ -124,7 +124,7 @@ def lf_builtin_tag_factory(language):
         @labeling_function()
         def lf_builtin_tag(row):
             if str(row['Token']) in ruby_builtins:
-                return tag_encoders['ruby']('function_name')
+                return tag_encoders['ruby']('Function_definition')
             else:
                 return ABSTAIN
 
