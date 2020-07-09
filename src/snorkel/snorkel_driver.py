@@ -65,9 +65,14 @@ def main(argv):
     lang_label_model.fit(L_lang_train, n_epochs=2000, log_freq=200, seed=42)
     df_train["lang_label"] = lang_label_model.predict(L=L_lang_train, tie_break_policy="abstain")
 
-    for language in languages:
-        tag_dict = Dictionary.load('./data/frequency_data/%s/tags.dct' % language)
-        size_tag_voc = len(tag_dict)
+    for language in languages + formal_languages:
+        if language in languages:
+            tag_dict = Dictionary.load('./data/frequency_data/%s/tags.dct' % language)
+            size_tag_voc = len(tag_dict)
+        elif language in ['diff', 'email']:
+            size_tag_voc = 1
+        else:  # language = 'uri
+            size_tag_voc = 6
         # Apply the LFs to the unlabeled training data
         tapplier = PandasLFApplier(lfs_tags_per_lang[language])
         L_train = tapplier.apply(df_train)
