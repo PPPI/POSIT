@@ -95,7 +95,6 @@ def main(argv):
             filename = 'train.txt'
 
         # We use the NLTK pos_tag function for POS tags rather than snorkeling.
-        # XXX: Bug here
         eng_tag = UNK
         for tok, tag in pos_tag(word_tokenize(row['Context'])):
             if tok == str(row['Token']):
