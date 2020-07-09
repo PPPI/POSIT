@@ -48,6 +48,6 @@ def tag_encoding_factory(language):
         return tag_dict.token2id[tag]
 
     def tag_decoding(idx):
-        return tag_dict.id2token[idx]
+        return tag_dict[idx]
 
     return tag_encoding, tag_decoding

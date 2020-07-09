@@ -2,7 +2,7 @@ import os
 import sys
 
 from gensim.corpora import Dictionary
-from nltk import pos_tag
+from nltk import pos_tag, word_tokenize
 from snorkel.labeling import LabelModel
 from snorkel.labeling import PandasLFApplier
 
@@ -95,18 +95,19 @@ def main(argv):
             filename = 'train.txt'
 
         # We use the NLTK pos_tag function for POS tags rather than snorkeling.
+        # XXX: Bug here
         eng_tag = UNK
-        for tok, tag in pos_tag(row['Context']):
-            if tok == row['Token']:
+        for tok, tag in pos_tag(word_tokenize(row['Context'])):
+            if tok == str(row['Token']):
                 eng_tag = tag
                 break
 
         with open('./data/corpora/multilingual/so/%s' % filename, 'a') as f:
-            to_output = [row['Token'], eng_tag] \
+            to_output = [str(row['Token']), eng_tag] \
                         + [tag_decoders[language](row['label_%s' % language])
-                           if row['label_%s' % language] != -1 else row['Language']
+                           if row['label_%s' % language] != -1 else O
                            for language in languages + formal_languages] \
-                        + [lang_decoding(row['lang_label']) if row['lang_label'] != -1 else 'English']
+                        + [lang_decoding(row['lang_label']) if row['lang_label'] != -1 else row['Language']]
             f.write(' '.join(to_output) + '\n')
 
 
