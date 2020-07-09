@@ -70,9 +70,9 @@ def main(argv):
             tag_dict = Dictionary.load('./data/frequency_data/%s/tags.dct' % language)
             size_tag_voc = len(tag_dict)
         elif language in ['diff', 'email']:
-            size_tag_voc = 1
+            size_tag_voc = 2
         else:  # language = 'uri
-            size_tag_voc = 6
+            size_tag_voc = 7
         # Apply the LFs to the unlabeled training data
         tapplier = PandasLFApplier(lfs_tags_per_lang[language])
         L_train = tapplier.apply(df_train)
