@@ -9,7 +9,7 @@ from ..preprocessor.builtin_lists import *
 from ..preprocessor.codeSearch_preprocessor import UNDEF
 from ..preprocessor.formal_lang_heuristics import is_URI, is_diff_header, is_email
 
-ABSTAIN = -1
+ABSTAIN = 0
 
 tag_encoders = {
     lang: tag_encoding_factory(lang)[0] for lang in [
