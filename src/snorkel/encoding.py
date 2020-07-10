@@ -1,5 +1,7 @@
 from gensim.corpora import Dictionary
 
+from src.tagger.data_utils import O
+
 lang_encoding_lookup = {
     'English': 1,
     'go': 2,
@@ -48,6 +50,9 @@ def tag_encoding_factory(language):
         return tag_dict.token2id[tag] + 1
 
     def tag_decoding(idx):
-        return tag_dict[idx - 1]
+        if idx == 0:
+            return O
+        else:
+            return tag_dict[idx - 1]
 
     return tag_encoding, tag_decoding

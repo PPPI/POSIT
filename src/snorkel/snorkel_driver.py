@@ -24,9 +24,9 @@ tag_decoders = {
         ]
     },
     **{
-        'uri': lambda x: uri_decoding[x],
-        'diff': lambda x: diff_decoding[x],
-        'email': lambda x: email_decoding[x],
+        'uri': lambda x: uri_decoding[x] if x > 0 else O,
+        'diff': lambda x: diff_decoding[x] if x > 0 else O,
+        'email': lambda x: email_decoding[x] if x > 0 else O,
     }
 }
 
