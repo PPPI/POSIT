@@ -101,7 +101,7 @@ def main(argv):
                 eng_tag = tag
                 break
 
-        with open('./data/corpora/multilingual/so/%s' % filename, 'a') as f:
+        with open('./data/corpora/multilingual/so/corpus/%s' % filename, 'a') as f:
             to_output = [str(row['Token']), eng_tag] \
                         + [tag_decoders[language](row['label_%s' % language])
                            if row['label_%s' % language] != 0 else O
