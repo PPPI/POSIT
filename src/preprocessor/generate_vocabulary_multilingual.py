@@ -21,7 +21,6 @@ if __name__ == '__main__':
                     parse = line.split(' ')
                     tags_ = parse[-11:]
                     word = ' '.join(parse[:-11])
-                    idx = line.rfind(' ')
                     words.append(word)
                     tags += tags_
                     for c in word:

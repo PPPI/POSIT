@@ -13,12 +13,15 @@ class CorpusIterator(object):
     to generate tags for English and a snippet compiler to generate code entity tags.
     """
 
-    def __init__(self, filename, processing_word, processing_tag, with_l_id, max_iter=None, offset_lid=0):
+    def __init__(self, filename, processing_word, processing_tag, with_l_id, multilingual=False,
+                 nlangs=2, max_iter=None, offset_lid=0):
         """
         :param filename: Location of the dataset file
         :param processing_word: A function that converts words to ids
         :param processing_tag: A function that converts tags to ids
         :param with_l_id: If language IDs exist in the data
+        :param multilingual: If there are multiple language tags
+        :param nlangs: The number of languages we model
         :param max_iter: (optional) maximum number of elements to yield
         """
         self.filename = filename
@@ -26,6 +29,8 @@ class CorpusIterator(object):
         self.processing_tag = processing_tag
         self.max_iter = max_iter
         self.with_l_id = with_l_id
+        self.multilingual = multilingual
+        self.nlangs = nlangs
         self.offset_lid = offset_lid
         self.length = None
 
@@ -51,38 +56,49 @@ class CorpusIterator(object):
                         yield words, tags, l_ids
                         words, tags, l_ids = [], [], []
                 else:
-                    idx = line.rfind(' ')
-                    if idx != -1:
-                        word, tag = line[:idx], line[idx + 1:]
-                        l_id = 0
-                        if self.with_l_id:
-                            idx2 = word.rfind(' ')
-                            if idx != -1:
-                                l_id = int(tag)
-                                word, tag = word[:idx2], word[idx2 + 1:]
-                                if tag.isdigit():
+                    if self.multilingual:
+                        line = line.strip()
+                        if len(line) > 0:
+                            parse = line.split(' ')
+                            # XXX: Hard coded for now, should be a param
+                            tags_ = parse[-(self.nlangs + 1):]
+                            word = ' '.join(parse[:-(self.nlangs + 1)])
+                    else:
+                        idx = line.rfind(' ')
+                        if idx != -1:
+                            word, tag = line[:idx], line[idx + 1:]
+                            l_id = 0
+                            if self.with_l_id:
+                                idx2 = word.rfind(' ')
+                                if idx != -1:
+                                    l_id = int(tag)
+                                    word, tag = word[:idx2], word[idx2 + 1:]
+                                    if tag.isdigit():
+                                        word = line
+                                        tag = UNK
+                                        l_id = 0
+                                else:
                                     word = line
                                     tag = UNK
                                     l_id = 0
                             else:
-                                word = line
-                                tag = UNK
-                                l_id = 0
+                                if tag.isdigit():
+                                    word = line
+                                    tag = UNK
+                                    l_id = 0
                         else:
-                            if tag.isdigit():
-                                word = line
-                                tag = UNK
-                                l_id = 0
-                    else:
-                        word = line
-                        tag = UNK
-                        l_id = 0
+                            word = line
+                            tag = UNK
+                            l_id = 0
                     if self.processing_word is not None:
                         word = self.processing_word(word)
                     if self.processing_tag is not None:
                         tag = self.processing_tag(tag)
                     words += [word]
-                    tags += [tag]
+                    if self.multilingual:
+                        tags += [tags_]
+                    else:
+                        tags += [tag]
                     l_ids += [l_id + self.offset_lid]
 
 

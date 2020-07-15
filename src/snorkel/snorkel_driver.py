@@ -86,6 +86,7 @@ def main(argv):
     valid_index = int(0.6 * max_post_id)
     test_index = int(0.8 * max_post_id)
     os.makedirs('./data/corpora/multilingual/so', exist_ok=True)
+    current_context = ''
     for index, row in df_train.iterrows():
         if row['PostIdx'] > test_index:
             filename = 'valid.txt'
@@ -93,6 +94,10 @@ def main(argv):
             filename = 'dev.txt'
         else:
             filename = 'train.txt'
+        if row['Context'] != current_context:
+            with open('./data/corpora/multilingual/so/corpus/%s' % filename, 'a') as f:
+                f.write('\n')
+            current_context = row['Context']
 
         # We use the NLTK pos_tag function for POS tags rather than snorkeling.
         eng_tag = UNK

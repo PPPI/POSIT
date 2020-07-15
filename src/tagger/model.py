@@ -110,7 +110,10 @@ class CodePoSModel(BaseModel):
             feed[self.feature_sizes] = feature_lengths
 
         if labels is not None:
-            labels, _ = pad_sequences(labels, 0)
+            if self.config.multilingual:
+                labels, _ = pad_sequences(labels, pad_tok=0, nlevels=2)
+            else:
+                labels, _ = pad_sequences(labels, 0)
             feed[self.labels] = labels
 
         if self.config.with_l_id:
