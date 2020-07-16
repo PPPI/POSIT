@@ -2,8 +2,8 @@ import numpy as np
 import tensorflow as tf
 
 from .base_model import BaseModel
-from .general_utils import Progbar
 from .data_utils import pad_sequences, minibatches
+from .general_utils import Progbar
 
 
 class CodePoSModel(BaseModel):
@@ -21,9 +21,14 @@ class CodePoSModel(BaseModel):
         self.word_ids = tf.placeholder(tf.int32, shape=[None, None],
                                        name="word_ids")
 
-        # shape = (batch size)
-        self.sequence_lengths = tf.placeholder(tf.int32, shape=[None],
-                                               name="sequence_lengths")
+        if self.config.multilang:
+            # shape = (batch size, number of languages)
+            self.sequence_lengths = tf.placeholder(tf.int32, shape=[None],
+                                                   name="sequence_lengths")
+        else:
+            # shape = (batch size)
+            self.sequence_lengths = tf.placeholder(tf.int32, shape=[None],
+                                                   name="sequence_lengths")
 
         # shape = (batch size, max length of sentence, max length of word)
         self.char_ids = tf.placeholder(tf.int32, shape=[None, None, None],
@@ -110,7 +115,7 @@ class CodePoSModel(BaseModel):
             feed[self.feature_sizes] = feature_lengths
 
         if labels is not None:
-            if self.config.multilingual:
+            if self.config.multilang:
                 labels, _ = pad_sequences(labels, pad_tok=0, nlevels=2)
             else:
                 labels, _ = pad_sequences(labels, 0)
@@ -327,7 +332,7 @@ class CodePoSModel(BaseModel):
             self.trans_params = trans_params  # need to evaluate it for decoding
             # mask = tf.not_equal(self.labels, self.config.vocab_tags.token2id[O])
             # log_likelihood = tf.boolean_mask(log_likelihood, mask)
-            if self.config.with_l_id:
+            if self.config.with_l_id and not self.config.multilang:
                 mask = tf.sequence_mask(self.sequence_lengths)
                 class_weight = tf.constant([self.config.class_weight, 1 - self.config.class_weight])
                 weight_per_label = tf.reshape(tf.gather(class_weight, tf.reshape(self.labels_l, shape=[-1])),

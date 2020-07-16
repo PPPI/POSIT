@@ -26,9 +26,11 @@ def main():
 
     # create datasets
     dev = CorpusIterator(config.filename_dev, config.processing_word,
-                         config.processing_tag, config.with_l_id, config.max_iter)
+                         config.processing_tag, with_l_id=config.with_l_id, max_iter=config.max_iter,
+                         multilingual=config.multilang, nlangs=config.nlangs)
     train = CorpusIterator(config.filename_train, config.processing_word,
-                           config.processing_tag, config.with_l_id, config.max_iter)
+                           config.processing_tag, with_l_id=config.with_l_id, max_iter=config.max_iter,
+                           multilingual=config.multilang, nlangs=config.nlangs)
 
     # train model
     model.train(train, dev)

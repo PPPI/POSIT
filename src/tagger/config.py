@@ -43,8 +43,8 @@ class Configuration:
                                                   lowercase=False, allow_unk=False)
 
     # general config
-    with_l_id = True
-    project = "SO_Freq"
+    with_l_id = False
+    project = "so"
     project += '_Id' if with_l_id else ''
     # project += '5'
 
@@ -61,16 +61,16 @@ class Configuration:
     embeddings = None
 
     # dataset
-    filename_dev = "data/corpora/%s/corpus/dev.txt" % project
-    filename_test = "data/corpora/%s/corpus/eval.txt" % project
-    filename_train = "data/corpora/%s/corpus/train.txt" % project
+    filename_dev = "data/corpora/%s/corpus/dev.txt" % ('multilingual/%s' % project if multilang else project)
+    filename_test = "data/corpora/%s/corpus/eval.txt" % ('multilingual/%s' % project if multilang else project)
+    filename_train = "data/corpora/%s/corpus/train.txt" % ('multilingual/%s' % project if multilang else project)
 
     max_iter = None  # if not None, max number of examples in dataset
 
     # vocab
-    filename_words = "data/corpora/%s/words.dct" % project
-    filename_tags = "data/corpora/%s/tags.dct" % project
-    filename_chars = "data/corpora/%s/chars.dct" % project
+    filename_words = "data/corpora/%s/words.dct" % ('multilingual/%s' % project if multilang else project)
+    filename_tags = "data/corpora/%s/tags.dct" % ('multilingual/%s' % project if multilang else project)
+    filename_chars = "data/corpora/%s/chars.dct" % ('multilingual/%s' % project if multilang else project)
 
     # training
     train_embeddings = True
@@ -89,7 +89,10 @@ class Configuration:
     hidden_size_features = 4  # lstm on feature vector
     hidden_size_lstm = 96  # lstm on word embeddings
     if with_l_id:
-        class_weight = 1 - 0.144  # For SO_Freq_Id it is: 740438 / (740438 + 4394836)
+        if project == 'SO_Freq_Id':
+            class_weight = 1 - 0.144  # For SO_Freq_Id it is: 740438 / (740438 + 4394836)
+        else:
+            class_weight = 0.5
         l_id_weight = 0.9
         # Hyper-params for MLP going from state to bi-LSTM output to L_ID
         n_hidden_1 = 64  # 1st layer number of neurons
@@ -98,7 +101,7 @@ class Configuration:
 
     use_cpu = False
     # NOTE: if both chars and crf, only 1.6x slower on GPU
-    use_crf = True  # if crf, training is 1.7x slower on CPU
+    use_crf = False  # if crf, training is 1.7x slower on CPU
     use_chars = True  # if char embedding, training is 3.5x slower on CPU
     use_features = True
 
@@ -122,6 +125,7 @@ class Configuration:
         config_str += '_without_features'
     config_str += '_epochs_%d_dropout_%2.3f_batch_%d_opt_%s_lr_%2.4f_lrdecay_%2.4f' \
                   % (nr_epochs, dropout, batch_size, lr_method, lr, lr_decay)
-    dir_output = "results/test/%s/%s/" % (project, str(uuid.uuid4()) + config_str)
+    dir_output = "results/test/%s/%s/" % (('multilingual/%s' % project if multilang else project),
+                                          str(uuid.uuid4()) + config_str)
     dir_model = dir_output + "model.weights/"
     path_log = dir_output + "log.txt"
