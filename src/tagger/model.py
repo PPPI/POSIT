@@ -546,7 +546,10 @@ class CodePoSModel(BaseModel):
             words = list(zip(*words))
         pred = self.predict_batch([words])
         pred_ids = pred[0]
-        preds = [self.idx_to_tag[idx] for idx in list(pred_ids[0])]
+        if self.config.multilang:
+            preds = [self.idx_to_tag[idx] for idx in list(pred_ids[0])]
+        else:
+            preds = [[self.idx_to_tag[idx] for idx in list(pred_ids[0].T[n])] for n in range(self.config.nlangs)]
 
         if self.config.with_l_id:
             pred_lid = pred[1][0]

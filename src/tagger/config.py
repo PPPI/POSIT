@@ -42,12 +42,6 @@ class Configuration:
         self.processing_tag = get_processing_word(self.vocab_tags,
                                                   lowercase=False, allow_unk=False)
 
-    # general config
-    with_l_id = False
-    project = "so"
-    project += '_Id' if with_l_id else ''
-    # project += '5'
-
     # corpus specific hints
     multilang = True
     nlangs = 10  # The number of Natural and Formal (including Programming) languages
@@ -56,6 +50,12 @@ class Configuration:
                       enumerate(
                           ['English', 'go', 'java', 'javascript', 'php', 'python', 'ruby', 'uri', 'email', 'diff'])}
         lang_to_id = {v: k for k, v in id_to_lang.items()}
+
+    # general config
+    with_l_id = True
+    project = "so"
+    project += '_Id' if with_l_id and not multilang else ''
+    # project += '5'
 
     # embeddings
     dim_word = 100

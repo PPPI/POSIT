@@ -41,7 +41,11 @@ def interactive_shell(model, casual=False):
         if isinstance(preds, tuple):
             preds = preds[0]
 
-        print(' '.join(['%s_%s' % (w, t) for w, t in zip(words_raw, preds)]))
+        if isinstance(preds[0], list):
+            for tags in preds:
+                print(' '.join(['%s_%s' % (w, t) for w, t in zip(words_raw, tags)]))
+        else:
+            print(' '.join(['%s_%s' % (w, t) for w, t in zip(words_raw, preds)]))
 
 
 def restore_model(config):
