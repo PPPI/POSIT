@@ -14,7 +14,7 @@ class CorpusIterator(object):
     """
 
     def __init__(self, filename, processing_word, processing_tag, with_l_id, multilingual=False,
-                 nlangs=2, max_iter=None, offset_lid=0):
+                 nlangs=2, max_iter=None, offset_lid=0, processing_lid=None):
         """
         :param filename: Location of the dataset file
         :param processing_word: A function that converts words to ids
@@ -27,6 +27,7 @@ class CorpusIterator(object):
         self.filename = filename
         self.processing_word = processing_word
         self.processing_tag = processing_tag
+        self.processing_lid = processing_lid
         self.max_iter = max_iter
         self.with_l_id = with_l_id
         self.multilingual = multilingual
@@ -93,13 +94,19 @@ class CorpusIterator(object):
                     if self.processing_word is not None:
                         word = self.processing_word(word)
                     if self.processing_tag is not None:
-                        tag = self.processing_tag(tag)
+                        if self.multilingual:
+                            tags__ = [self.processing_tag(tag) for tag in tags_[:-1]]
+                        else:
+                            tag = self.processing_tag(tag)
                     words += [word]
                     if self.multilingual:
-                        tags += [tags_]
+                        tags += [tags__]
                     else:
                         tags += [tag]
-                    l_ids += [l_id + self.offset_lid]
+                    if self.multilingual:
+                        l_ids += [self.processing_lid[tags_[-1]] + self.offset_lid]
+                    else:
+                        l_ids += [l_id + self.offset_lid]
 
 
 def get_vocabs(datasets):

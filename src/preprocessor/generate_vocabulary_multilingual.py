@@ -19,7 +19,7 @@ if __name__ == '__main__':
                 line = line.strip()
                 if len(line) > 0:
                     parse = line.split(' ')
-                    tags_ = parse[-11:]
+                    tags_ = parse[-11:-1]
                     word = ' '.join(parse[:-11])
                     words.append(word)
                     tags += tags_

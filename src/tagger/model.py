@@ -268,11 +268,18 @@ class CodePoSModel(BaseModel):
             output = tf.nn.dropout(output, rate=1 - self.dropout)
 
         with tf.variable_scope("proj"):
-            W = tf.get_variable("W", dtype=tf.float32,
-                                shape=[2 * self.config.hidden_size_lstm, self.config.ntags])
+            if self.config.multilang:
+                W = tf.get_variable("W", dtype=tf.float32,
+                                    shape=[2 * self.config.hidden_size_lstm, self.config.nlangs * self.config.ntags])
 
-            b = tf.get_variable("b", shape=[self.config.ntags],
-                                dtype=tf.float32, initializer=tf.zeros_initializer())
+                b = tf.get_variable("b", shape=[self.config.nlangs * self.config.ntags],
+                                    dtype=tf.float32, initializer=tf.zeros_initializer())
+            else:
+                W = tf.get_variable("W", dtype=tf.float32,
+                                    shape=[2 * self.config.hidden_size_lstm, self.config.ntags])
+
+                b = tf.get_variable("b", shape=[self.config.ntags],
+                                    dtype=tf.float32, initializer=tf.zeros_initializer())
 
             self.nsteps = tf.shape(output)[1]
             output = tf.reshape(output, [-1, 2 * self.config.hidden_size_lstm])

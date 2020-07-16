@@ -52,8 +52,10 @@ class Configuration:
     multilang = True
     nlangs = 10  # The number of Natural and Formal (including Programming) languages
     if multilang:
-        id_to_lang = dict(
-            enumerate(['English', 'go', 'java', 'javascript', 'php', 'python', 'ruby', 'uri', 'email', 'diff']))
+        id_to_lang = {n: l for n, l in
+                      enumerate(
+                          ['English', 'go', 'java', 'javascript', 'php', 'python', 'ruby', 'uri', 'email', 'diff'])}
+        lang_to_id = {v: k for k, v in id_to_lang.items()}
 
     # embeddings
     dim_word = 100
