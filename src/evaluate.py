@@ -66,7 +66,8 @@ def main():
 
     # create dataset
     test = CorpusIterator(config.filename_test, config.processing_word,
-                          config.processing_tag, config.with_l_id, config.max_iter)
+                          config.processing_tag, with_l_id=config.with_l_id, max_iter=config.max_iter,
+                          multilingual=config.multilang, nlangs=config.nlangs, processing_lid=config.lang_to_id)
 
     # evaluate and interact
     model.evaluate(test)
