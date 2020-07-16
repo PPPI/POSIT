@@ -88,8 +88,11 @@ def main(argv):
     os.makedirs('./data/corpora/multilingual/so', exist_ok=True)
     current_context = ''
     for index, row in df_train.iterrows():
+        if row['PostIdx'] > max_post_id:
+            break
+
         if row['PostIdx'] > test_index:
-            filename = 'valid.txt'
+            filename = 'eval.txt'
         elif row['PostIdx'] > valid_index:
             filename = 'dev.txt'
         else:
