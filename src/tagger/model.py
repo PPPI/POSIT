@@ -334,6 +334,7 @@ class CodePoSModel(BaseModel):
         # Note from a future Profir: Balancing code was written with this comment, use git blame if needed
         # to do the same for per label in the multiclass prediction case.
         if self.config.use_crf:
+            # TODO: This API cannot be generalised to the multi-label case trivially, do we go one dim at a time?
             log_likelihood, trans_params = tf.contrib.crf.crf_log_likelihood(
                 self.logits, self.labels, self.sequence_lengths)
             self.trans_params = trans_params  # need to evaluate it for decoding
@@ -503,8 +504,12 @@ class CodePoSModel(BaseModel):
                 lab = lab[:length]
                 lab_pred = lab_pred[:length]
                 # accs += [a == b for (a, b) in zip(lab, lab_pred) if a != self.config.vocab_tags.token2id[O]]
-                accs += [a == b for (a, b) in zip(lab, lab_pred)]
-                saccs.append(all([a == b for (a, b) in zip(lab, lab_pred)]))
+                if self.config.multilang:
+                    accs += [t1 == t2 for (a, b) in zip(lab, lab_pred) for (t1, t2) in zip(a, b)]
+                    saccs.append(all([t1 == t2 for (a, b) in zip(lab, lab_pred) for (t1, t2) in zip(a, b)]))
+                else:
+                    accs += [a == b for (a, b) in zip(lab, lab_pred)]
+                    saccs.append(all([a == b for (a, b) in zip(lab, lab_pred)]))
             if self.config.with_l_id:
                 for lab, lab_pred, length in zip(l_id, labels_pred_l, sequence_lengths):
                     lab = lab[:length]

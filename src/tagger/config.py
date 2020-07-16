@@ -78,7 +78,7 @@ class Configuration:
     train_embeddings = True
     nr_epochs = 30
     dropout = 0.5
-    batch_size = 16
+    batch_size = 8
     lr_method = "rmsprop"
     lr = 0.01
     lr_decay = 0.95
