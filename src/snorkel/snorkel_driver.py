@@ -8,6 +8,7 @@ from snorkel.labeling import PandasLFApplier
 
 from src.preprocessor.codeSearch_preprocessor import languages, natural_languages, formal_languages
 from src.preprocessor.so_to_pandas import SO_to_pandas
+from src.snorkel.classification_based_weak_labelling import classify_labeler_factory
 from src.snorkel.encoding import lang_decoding, uri_decoding, diff_decoding, email_decoding
 from src.snorkel.weak_labellers import *
 from src.tagger.data_utils import O, UNK
@@ -30,6 +31,8 @@ tag_decoders = {
     }
 }
 
+clf_labeling_factories = {lang: classify_labeler_factory(lang) for lang in languages}
+
 
 def main(argv):
     location = argv[0]
@@ -46,7 +49,9 @@ def main(argv):
     ]
     # Not all lf-s exist for all langs, we filter None to avoid issues.
     lfs_tags_per_lang = {**{lang: [x for x in [frequency_labeling_function_factory(lang),
-                                               lf_builtin_tag_factory(lang)] if x is not None] for lang in languages},
+                                               lf_builtin_tag_factory(lang)] +
+                                   [clf_labeling_factories[lang][n] for n in range(10)]
+                                   if x is not None] for lang in languages},
                          **{
                              'uri': [lf_uri_tok],
                              'diff': [lf_diff_tok],

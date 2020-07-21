@@ -28,5 +28,6 @@ setup(name='POSIT',
             'json_lines',
             'antlr4',
             'psutil',
+            'joblib',
       ], install_requires=['snorkel', 'pandas']
       )
