@@ -37,7 +37,7 @@ def train_and_store():
         GaussianNB(),
         QuadraticDiscriminantAnalysis()]
 
-    for language in languages[:1]:
+    for language in languages:
         # Load Dictionaries so it is consistent with snorkel calls
         tag_dict = Dictionary.load('./data/frequency_data/%s/tags.dct' % language)
         word_dict = Dictionary.load('./data/frequency_data/%s/words.dct' % language)

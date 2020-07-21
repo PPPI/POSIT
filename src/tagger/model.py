@@ -424,8 +424,8 @@ class CodePoSModel(BaseModel):
             viterbi_sequences = [] if not self.config.multilang else [list() for _ in range(self.config.nlangs)]
             if self.config.with_l_id:
                 viterbi_l_ids = []
-                logits, logits_l, trans_params, trans_params_l = self.sess.run(
-                    [self.logits, self.logits_l, self.trans_params, self.trans_params_l],
+                logits, logits_l, trans_params, trans_params_l, nsteps = self.sess.run(
+                    [self.logits, self.logits_l, self.trans_params, self.trans_params_l, self.nsteps],
                     feed_dict=fd)
                 for logit, sequence_length in zip(logits_l, sequence_lengths):
                     logit = logit[:sequence_length]  # keep only the valid steps
@@ -433,16 +433,14 @@ class CodePoSModel(BaseModel):
                         logit, trans_params_l)
                     viterbi_l_ids += [viterbi_seq]
             else:
-                logits, trans_params = self.sess.run(
-                    [self.logits, self.trans_params], feed_dict=fd)
+                logits, trans_params, nsteps = self.sess.run(
+                    [self.logits, self.trans_params, self.nsteps], feed_dict=fd)
 
             # iterate over the sentences because no batching in vitervi_decode
             if self.config.multilang:
-                for dim in range(self.config.nlangs + 1):  # One prediction per language + 1 language prediction
-                    current_logits = tf.reshape(
-                        tf.slice(self.logits, [0, 0, dim, 0], [-1, -1, 1, -1]),
-                        shape=[-1, self.nsteps, self.config.ntags],
-                    )
+                for dim in range(self.config.nlangs):
+                    current_logits = np.reshape(logits[:, :, dim:dim + 1, :],
+                                                newshape=[-1, nsteps, self.config.ntags])
                     for logit, sequence_length in zip(current_logits, sequence_lengths):
                         logit = logit[:sequence_length]  # keep only the valid steps
                         viterbi_seq, viterbi_score = tf.contrib.crf.viterbi_decode(

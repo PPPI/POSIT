@@ -58,8 +58,8 @@ class Configuration:
     # project += '5'
 
     # embeddings
-    dim_word = 100
-    dim_char = 50
+    dim_word = 50
+    dim_char = 25
     embeddings = None
 
     # dataset
@@ -78,8 +78,8 @@ class Configuration:
     train_embeddings = True
     nr_epochs = 30
     dropout = 0.5
-    batch_size = 8
-    lr_method = "rmsprop"
+    batch_size = 2
+    lr_method = "adam"
     lr = 0.01
     lr_decay = 0.95
     clip = None  # if None, no clipping
@@ -87,9 +87,9 @@ class Configuration:
 
     # model hyperparameters
     n_features = 8  # This is predefined by design, should be the size of our feature vector
-    hidden_size_char = 48  # lstm on chars
+    hidden_size_char = 12  # lstm on chars
     hidden_size_features = 4  # lstm on feature vector
-    hidden_size_lstm = 96  # lstm on word embeddings
+    hidden_size_lstm = 24  # lstm on word embeddings
     if with_l_id:
         if project == 'SO_Freq_Id':
             class_weight = 1 - 0.144  # For SO_Freq_Id it is: 740438 / (740438 + 4394836)
