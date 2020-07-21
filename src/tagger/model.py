@@ -444,7 +444,7 @@ class CodePoSModel(BaseModel):
                     for logit, sequence_length in zip(current_logits, sequence_lengths):
                         logit = logit[:sequence_length]  # keep only the valid steps
                         viterbi_seq, viterbi_score = tf.contrib.crf.viterbi_decode(
-                            logit, trans_params)
+                            logit, trans_params[dim])
                         viterbi_sequences[dim] += [viterbi_seq]
             else:
                 for logit, sequence_length in zip(logits, sequence_lengths):
