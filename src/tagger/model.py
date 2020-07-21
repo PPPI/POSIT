@@ -21,14 +21,9 @@ class CodePoSModel(BaseModel):
         self.word_ids = tf.placeholder(tf.int32, shape=[None, None],
                                        name="word_ids")
 
-        if self.config.multilang:
-            # shape = (batch size, number of languages)
-            self.sequence_lengths = tf.placeholder(tf.int32, shape=[None],
-                                                   name="sequence_lengths")
-        else:
-            # shape = (batch size)
-            self.sequence_lengths = tf.placeholder(tf.int32, shape=[None],
-                                                   name="sequence_lengths")
+        # shape = (batch size)
+        self.sequence_lengths = tf.placeholder(tf.int32, shape=[None],
+                                               name="sequence_lengths")
 
         # shape = (batch size, max length of sentence, max length of word)
         self.char_ids = tf.placeholder(tf.int32, shape=[None, None, None],
@@ -334,10 +329,25 @@ class CodePoSModel(BaseModel):
         # Note from a future Profir: Balancing code was written with this comment, use git blame if needed
         # to do the same for per label in the multiclass prediction case.
         if self.config.use_crf:
-            # TODO: This API cannot be generalised to the multi-label case trivially, do we go one dim at a time?
-            log_likelihood, trans_params = tf.contrib.crf.crf_log_likelihood(
-                self.logits, self.labels, self.sequence_lengths)
-            self.trans_params = trans_params  # need to evaluate it for decoding
+            if self.config.multilang:
+                log_likelihood = 0
+                self.trans_params = list()
+                for dim in range(self.config.nlangs):  # One prediction per language + language prediction stays in l_id
+                    self.current_logits = tf.reshape(self.logits[:, :, dim:dim + 1, :],
+                                                     shape=[-1, self.nsteps, self.config.ntags],
+                                                     )
+                    self.current_labels = tf.reshape(self.labels[:, :, dim:dim + 1],
+                                                     shape=[-1, self.nsteps],
+                                                     )
+                    with tf.variable_scope("Language_%d" % dim):
+                        current_log_likelihood, trans_params = tf.contrib.crf.crf_log_likelihood(
+                            self.current_logits, self.current_labels, self.sequence_lengths)
+                        self.trans_params.append(trans_params)
+                        log_likelihood += current_log_likelihood
+            else:
+                log_likelihood, trans_params = tf.contrib.crf.crf_log_likelihood(
+                    self.logits, self.labels, self.sequence_lengths)
+                self.trans_params = trans_params  # need to evaluate it for decoding
             # mask = tf.not_equal(self.labels, self.config.vocab_tags.token2id[O])
             # log_likelihood = tf.boolean_mask(log_likelihood, mask)
             if self.config.with_l_id and not self.config.multilang:
@@ -356,8 +366,11 @@ class CodePoSModel(BaseModel):
                     log_likelihood_l, trans_params_l = tf.contrib.crf.crf_log_likelihood(
                         self.logits_l, self.labels_l, self.sequence_lengths)
                     self.trans_params_l = trans_params_l  # need to evaluate it for decoding
-                    self.loss += self.config.l_id_weight * tf.reduce_mean(-tf.multiply(log_likelihood_l,
-                                                                                       weight_per_label))
+                    if not self.config.multilang:
+                        self.loss += self.config.l_id_weight * tf.reduce_mean(-tf.multiply(log_likelihood_l,
+                                                                                           weight_per_label))
+                    else:
+                        self.loss += tf.reduce_mean(-log_likelihood_l)
         else:
             losses = tf.nn.sparse_softmax_cross_entropy_with_logits(
                 logits=self.logits, labels=self.labels)
@@ -408,7 +421,7 @@ class CodePoSModel(BaseModel):
 
         if self.config.use_crf:
             # get tag scores and transition params of CRF
-            viterbi_sequences = []
+            viterbi_sequences = [] if not self.config.multilang else [list() for _ in range(self.config.nlangs)]
             if self.config.with_l_id:
                 viterbi_l_ids = []
                 logits, logits_l, trans_params, trans_params_l = self.sess.run(
@@ -424,11 +437,23 @@ class CodePoSModel(BaseModel):
                     [self.logits, self.trans_params], feed_dict=fd)
 
             # iterate over the sentences because no batching in vitervi_decode
-            for logit, sequence_length in zip(logits, sequence_lengths):
-                logit = logit[:sequence_length]  # keep only the valid steps
-                viterbi_seq, viterbi_score = tf.contrib.crf.viterbi_decode(
-                    logit, trans_params)
-                viterbi_sequences += [viterbi_seq]
+            if self.config.multilang:
+                for dim in range(self.config.nlangs + 1):  # One prediction per language + 1 language prediction
+                    current_logits = tf.reshape(
+                        tf.slice(self.logits, [0, 0, dim, 0], [-1, -1, 1, -1]),
+                        shape=[-1, self.nsteps, self.config.ntags],
+                    )
+                    for logit, sequence_length in zip(current_logits, sequence_lengths):
+                        logit = logit[:sequence_length]  # keep only the valid steps
+                        viterbi_seq, viterbi_score = tf.contrib.crf.viterbi_decode(
+                            logit, trans_params)
+                        viterbi_sequences[dim] += [viterbi_seq]
+            else:
+                for logit, sequence_length in zip(logits, sequence_lengths):
+                    logit = logit[:sequence_length]  # keep only the valid steps
+                    viterbi_seq, viterbi_score = tf.contrib.crf.viterbi_decode(
+                        logit, trans_params)
+                    viterbi_sequences += [viterbi_seq]
 
             if self.config.with_l_id:
                 return viterbi_sequences, viterbi_l_ids, sequence_lengths
@@ -545,7 +570,7 @@ class CodePoSModel(BaseModel):
         if type(words[0]) == tuple:
             words = list(zip(*words))
         pred = self.predict_batch([words])
-        pred_ids = pred[0]
+        pred_ids = np.asarray(pred[0])
         if self.config.multilang:
             preds = [self.idx_to_tag[idx] for idx in list(pred_ids[0])]
         else:
