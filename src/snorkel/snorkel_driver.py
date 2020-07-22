@@ -71,7 +71,7 @@ def main(argv):
     lang_label_model.fit(L_lang_train, n_epochs=20000, log_freq=200, seed=42)
     df_train["lang_label"] = lang_label_model.predict(L=L_lang_train, tie_break_policy="random")
 
-    for language in languages + formal_languages:
+    for language in ['go']: #languages + formal_languages:
         if language in languages:
             tag_dict = Dictionary.load('./data/frequency_data/%s/tags.dct' % language)
             size_tag_voc = len(tag_dict)
