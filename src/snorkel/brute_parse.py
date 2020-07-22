@@ -17,26 +17,31 @@ from src.antlr4_language_parsers.ruby.CorundumParser import CorundumParser as ru
 from src.preprocessor.formal_lang_heuristics import is_diff_header, is_email, is_URI
 
 class BruteParse:
-    lang = ['go',
-            'javascript',
-            'php',
-            'python',
-            'ruby',
-            'java', ]
+    langinfo = {
+        'go': {'lexer' : gol, 'parser' : gop},
+        'javascript': {'lexer' : javal, 'parser' : javap},
+        'php': {'lexer' : phpl, 'parser' : phpp},
+        'python': {'lexer' : pyl, 'parser' : pyp},
+        'ruby': {'lexer' : rubyl, 'parser' : rubyp},
+        'java': {'lexer' : javal, 'parser' : javap}
+    }
 
     def __init__(self):
         None
 
-    def bruteParse(self, context="def foo():\n\tNone"):
-        for l in self.lang:
-            lexer = pyl(antlr4.InputStream(context), output=sys.stderr)
-            stream = antlr4.CommonTokenStream(lexer)
-            parser = pyp(stream, output=sys.stderr)
-            tree = parser.funcdef()
-            print(tree.toStringTree(None, None))
+    def parse(self, lang, input):
+        l = self.langinfo[lang]['lexer'](antlr4.InputStream(input), output=sys.stderr)
+        stream = antlr4.CommonTokenStream(l)
+        p = self.langinfo[lang]['parser'](stream, output=sys.stderr)
+        tree = p.funcdef()
+        print(tree.toStringTree(None, None))
+
+    def driver(self, context="blah def foo():\n\tNone bar"):
+        self.parse('python', context)
+
 
 if __name__ == "__main__":
     p = BruteParse()
-    p.bruteParse()
+    p.driver()
 
 
