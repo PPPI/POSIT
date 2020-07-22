@@ -41,14 +41,14 @@ def main(argv):
 
     # Define the set of labeling functions (LFs)
     lfs_lang = [
-        frequency_language_factory(),
+        #frequency_language_factory(),
         lf_builtin_language,
         lf_uri_lang,
         lf_diff_lang,
         lf_email_lang,
     ]
     # Not all lf-s exist for all langs, we filter None to avoid issues.
-    lfs_tags_per_lang = {**{lang: [x for x in [frequency_labeling_function_factory(lang),
+    lfs_tags_per_lang = {**{lang: [x for x in [#frequency_labeling_function_factory(lang),
                                                lf_builtin_tag_factory(lang)] +
                                    [clf_labeling_factories[lang][n] for n in range(10)]
                                    if x is not None] for lang in languages},
