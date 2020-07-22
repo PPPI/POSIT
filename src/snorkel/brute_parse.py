@@ -33,8 +33,15 @@ class BruteParse:
         l = self.langinfo[lang]['lexer'](antlr4.InputStream(input), output=sys.stderr)
         stream = antlr4.CommonTokenStream(l)
         p = self.langinfo[lang]['parser'](stream, output=sys.stderr)
-        tree = p.funcdef()
-        print(tree.toStringTree(None, None))
+        #TODO: p.addErrorListener(...)
+        for r in p.ruleNames:
+            p.getParseListeners()
+            try:
+                tree = getattr(p, r)()
+            except Exception as e:
+                print(e)
+            #tree = p.r()
+            #print(tree.toStringTree(None, None))
 
     def driver(self, context="blah def foo():\n\tNone bar"):
         self.parse('python', context)
