@@ -31,8 +31,7 @@ tag_decoders = {
     }
 }
 
-clf_labeling_factories = {lang: classify_labeler_factory(lang) for lang in languages}
-
+#clf_labeling_factories = {lang: classify_labeler_factory(lang) for lang in languages}
 
 def main(argv):
     location = argv[0]
@@ -49,9 +48,11 @@ def main(argv):
     ]
     # Not all lf-s exist for all langs, we filter None to avoid issues.
     lfs_tags_per_lang = {**{lang: [x for x in [#frequency_labeling_function_factory(lang),
-                                               lf_builtin_tag_factory(lang)] +
-                                   [clf_labeling_factories[lang][n] for n in range(10)]
-                                   if x is not None] for lang in languages},
+                                               lf_builtin_tag_factory(lang)] #+
+                                   #[clf_labeling_factories[lang][n] for n in range(10)]
+                                   #if x is not None
+                                  ] for lang in languages
+                            },
                          **{
                              'uri': [lf_uri_tok],
                              'diff': [lf_diff_tok],
