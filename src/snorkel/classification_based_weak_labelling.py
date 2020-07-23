@@ -4,10 +4,8 @@ import json
 import joblib
 import numpy as np
 from gensim.corpora import Dictionary
-from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from gensim.models import KeyedVectors
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.gaussian_process.kernels import RBF
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
@@ -17,30 +15,41 @@ from sklearn.tree import DecisionTreeClassifier
 from snorkel.labeling import labeling_function
 
 from src.preprocessor.codeSearch_preprocessor import languages
-from src.tagger.data_utils import camel, snake
 
-names = ["Nearest Neighbors", "Linear SVM", "RBF SVM", "Gaussian Process",
-         "Decision Tree", "Random Forest", "Neural Net", "AdaBoost",
-         "Naive Bayes", "QDA"]
+names = [
+    "Nearest Neighbors",
+    # "Gaussian Process",
+    "Decision Tree",
+    "Random Forest",
+    "Neural Net",
+    "AdaBoost",
+    "Naive Bayes",
+    "Linear SVM",
+    "RBF SVM",
+]
+
+word2vec_location = 'F:\\wiki_w2v\\wiki-news-300d-1M.vec'  # Update this or move to cli arg
+
+np.random.seed(42)
 
 
 def train_and_store():
     classifiers = [
-        KNeighborsClassifier(3),
-        SVC(kernel="linear", C=0.025),
-        SVC(gamma=2, C=1),
-        GaussianProcessClassifier(1.0 * RBF(1.0)),
-        DecisionTreeClassifier(max_depth=5),
-        RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
+        KNeighborsClassifier(5),
+        # GaussianProcessClassifier(1.0 * RBF(1.0)),  # Not enough RAM to run this locally
+        DecisionTreeClassifier(max_depth=15),
+        RandomForestClassifier(max_depth=15, n_estimators=100),
         MLPClassifier(alpha=1, max_iter=1000),
         AdaBoostClassifier(),
         GaussianNB(),
-        QuadraticDiscriminantAnalysis()]
+        SVC(kernel="linear", C=0.025),
+        SVC(gamma=2, C=1),
+    ]
 
+    word2vec_keyedvectors = KeyedVectors.load_word2vec_format(word2vec_location)
     for language in languages:
         # Load Dictionaries so it is consistent with snorkel calls
         tag_dict = Dictionary.load('./data/frequency_data/%s/tags.dct' % language)
-        word_dict = Dictionary.load('./data/frequency_data/%s/words.dct' % language)
         # Load Training data
         with open('./data/frequency_data/%s/tag_lookup.json' % language, encoding='utf8') as f:
             tag_lookup = json.loads(f.read())
@@ -48,17 +57,14 @@ def train_and_store():
         # Transform data for training
         X, y = list(), list()
         for tag, examples in tag_lookup.items():
+            np.random.shuffle(examples)
+            examples = examples[:]
             X += [
-                (1 if word[0].isupper() else 0,
-                 1 if word[0].istitle() else 0,
-                 1 if word[0].islower() else 0,
-                 1 if camel(word[0]) else 0,
-                 1 if snake(word[0]) else 0,
-                 1 if any(char.isupper() for char in word[0][1:]) else 0,
-                 1 if any(char.isdigit() for char in word[0]) else 0,
-                 1 if set('[~!@#$%^&*()_+{}":;\']+$').intersection(word) else 0,
-                 word_dict.token2id[word[0]])
-                for word in examples]
+                word2vec_keyedvectors[word[0]]
+                if word[0] in word2vec_keyedvectors.vocab.keys()
+                else np.zeros_like(word2vec_keyedvectors[word2vec_keyedvectors.index2word[0]])
+                for word in examples
+            ]
             y += [tag_dict.token2id[tag]] * len(examples)
 
         X = np.asarray(X)
