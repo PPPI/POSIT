@@ -8,6 +8,7 @@ from .encoding import lang_encoding, tag_encoding_factory, uri_encoding
 from ..preprocessor.builtin_lists import *
 from ..preprocessor.codeSearch_preprocessor import UNDEF
 from ..preprocessor.formal_lang_heuristics import is_URI, is_diff_header, is_email
+from .brute_parse import BruteParse
 
 ABSTAIN = 0
 
@@ -115,6 +116,8 @@ def lf_builtin_tag_factory(language):
     elif language == 'python':
         @labeling_function()
         def lf_builtin_tag(row):
+            bp = BruteParse()
+            bp.parse('python', row['Context'])
             if str(row['Token']) in python_builtins:
                 return tag_encoders['python']('Expr')
             else:

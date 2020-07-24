@@ -61,6 +61,9 @@ def main(argv):
     size_lang_voc = len(all_languages)  # 6 (PL) + 1 (NL) + 3 (FL) = 10
 
     df_train = SO_to_pandas(location)
+    df_train = df_train[df_train['Span'].str.startswith("(0,")]
+    df_train = df_train[df_train['Language'] == 'python']
+    print(df_train.to_string())
 
     # Apply the LFs to the unlabeled training data
     applier = PandasLFApplier(lfs_lang)
@@ -71,7 +74,7 @@ def main(argv):
     lang_label_model.fit(L_lang_train, n_epochs=20000, log_freq=200, seed=42)
     df_train["lang_label"] = lang_label_model.predict(L=L_lang_train, tie_break_policy="random")
 
-    for language in ['go']: #languages + formal_languages:
+    for language in ['python']: #languages + formal_languages:
         if language in languages:
             tag_dict = Dictionary.load('./data/frequency_data/%s/tags.dct' % language)
             size_tag_voc = len(tag_dict)

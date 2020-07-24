@@ -1,5 +1,7 @@
 import antlr4, sys
 # Individual languages that we want to parse
+from antlr4.error.Errors import ParseCancellationException
+
 from src.antlr4_language_parsers.golang.GoLexer import GoLexer as gol
 from src.antlr4_language_parsers.golang.GoParser import GoParser as gop
 from src.antlr4_language_parsers.java.Java9Lexer import Java9Lexer as javal
@@ -33,22 +35,29 @@ class BruteParse:
         l = self.langinfo[lang]['lexer'](antlr4.InputStream(input), output=sys.stderr)
         stream = antlr4.CommonTokenStream(l)
         p = self.langinfo[lang]['parser'](stream, output=sys.stderr)
+
         #TODO: p.addErrorListener(...)
+        p._errHandler = antlr4.error.ErrorStrategy.BailErrorStrategy()
+
         for r in p.ruleNames:
-            p.getParseListeners()
             try:
                 tree = getattr(p, r)()
-            except Exception as e:
-                print(e)
+                print(input)
+                print(tree.toStringTree(None, None))
+                #print(r)
+                #print('Can Parse')
+            except ParseCancellationException:
+                continue
+
             #tree = p.r()
             #print(tree.toStringTree(None, None))
 
     def driver(self, context="blah def foo():\n\tNone bar"):
         self.parse('python', context)
 
-
+'''
 if __name__ == "__main__":
     p = BruteParse()
     p.driver()
-
+'''
 
