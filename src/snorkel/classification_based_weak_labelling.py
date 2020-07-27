@@ -28,7 +28,7 @@ names = [
     "RBF SVM",
 ]
 
-word2vec_location = 'F:\\wiki_w2v\\wiki-news-300d-1M.vec'  # Update this or move to cli arg
+word2vec_location = 'G:\\wiki_w2v_models\\wiki-news-300d-1M.vec'  # Update this or move to cli arg
 
 np.random.seed(42)
 
@@ -55,18 +55,16 @@ def train_and_store():
             tag_lookup = json.loads(f.read())
 
         # Transform data for training
-        X, y = list(), list()
+        Xy = list()
         for tag, examples in tag_lookup.items():
             np.random.shuffle(examples)
             examples = examples[:]
-            X += [
-                word2vec_keyedvectors[word[0]]
-                if word[0] in word2vec_keyedvectors.vocab.keys()
-                else np.zeros_like(word2vec_keyedvectors[word2vec_keyedvectors.index2word[0]])
-                for word in examples
+            Xy += [
+                (word2vec_keyedvectors[word[0]], tag_dict.token2id[tag])
+                for word in examples if word[0] in word2vec_keyedvectors.vocab.keys()
             ]
-            y += [tag_dict.token2id[tag]] * len(examples)
 
+        X, y = list(zip(*Xy))
         X = np.asarray(X)
         y = np.asarray(y)
 
@@ -84,18 +82,18 @@ def train_and_store():
 def classify_labeler_factory(language):
     classifiers = [joblib.load('./data/frequency_data/%s/%s_clf.pkl' % (language, name)) for name in names]
 
-    word_dict = Dictionary.load('./data/frequency_data/%s/words.dct' % language)
+    word2vec_keyedvectors = KeyedVectors.load_word2vec_format(word2vec_location)
 
     def classify_using_nth(n):
 
         @labeling_function()
         def clf_labeler(token):
             try:
-                token_id = word_dict[token]
+                feature_vector = word2vec_keyedvectors[token]
             except KeyError:
-                return 0
+                feature_vector = np.zeros_like(word2vec_keyedvectors[word2vec_keyedvectors.index2word[0]])
 
-            return classifiers[n].predict([token_id])[0]
+            return classifiers[n].predict([feature_vector])[0]
 
         return clf_labeler
 
