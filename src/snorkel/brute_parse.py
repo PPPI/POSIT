@@ -28,12 +28,12 @@ class Mylistener(ParseTreeListener):
 
 class BruteParse:
     langinfo = {
-        'go': {'lexer' : gol, 'parser' : gop},
-        'javascript': {'lexer' : javal, 'parser' : javap},
-        'php': {'lexer' : phpl, 'parser' : phpp},
-        'python': {'lexer' : pyl, 'parser' : pyp},
-        'ruby': {'lexer' : rubyl, 'parser' : rubyp},
-        'java': {'lexer' : javal, 'parser' : javap}
+        'go': {'lexer': gol, 'parser': gop, 'toprules' : ['sourceFile']},
+        'javascript': {'lexer': jsl, 'parser': jsp, 'toprules': ['program']},
+        'php': {'lexer': phpl, 'parser': phpp, 'toprules': ['htmlDocument']},
+        'python': {'lexer': pyl, 'parser': pyp, 'toprules': ['file_input', 'single_input', 'eval_input']},
+        'ruby': {'lexer': rubyl, 'parser': rubyp, 'toprules': ['prog']},
+        'java': {'lexer': javal, 'parser': javap, 'toprules': ['compilationUnit']}
     }
 
     def __init__(self):
@@ -48,12 +48,18 @@ class BruteParse:
         p._errHandler = antlr4.error.ErrorStrategy.BailErrorStrategy()
         listener = Mylistener()
         walker = ParseTreeWalker()
-        try:
-            tree = p.single_input()
-            #walker.walk(listener, tree)
-        except ParseCancellationException:
-            print(input)
-            pass
+        parsable = False
+        for r in self.langinfo[lang]['toprules']:
+            try:
+                tree = getattr(p, r)()
+                parsable = True
+                break
+                #walker.walk(listener, tree)
+            except ParseCancellationException:
+                pass
+        if not parsable:
+            print(lang)
+
         '''
         for r in p.ruleNames:
             try:

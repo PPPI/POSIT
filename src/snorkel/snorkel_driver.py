@@ -62,7 +62,7 @@ def main(argv):
 
     df_train = SO_to_pandas(location)
     df_train = df_train[df_train['Span'].str.startswith("(0,")]
-    df_train = df_train[df_train['Language'] == 'python']
+    df_train = df_train[df_train['Language'] != 'English']
     print(df_train.to_string())
 
     # Apply the LFs to the unlabeled training data
