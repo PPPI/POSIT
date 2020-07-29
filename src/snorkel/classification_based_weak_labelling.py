@@ -1,4 +1,3 @@
-# Collection of classifiers for consideration
 import json
 
 import joblib
@@ -25,7 +24,7 @@ names = [
     "AdaBoost",
     "Naive Bayes",
     "Linear SVM",
-    "RBF SVM",
+    # "RBF SVM",
 ]
 
 word2vec_location = 'G:\\wiki_w2v_models\\wiki-news-300d-1M.vec'  # Update this or move to cli arg
@@ -43,11 +42,12 @@ def train_and_store():
         AdaBoostClassifier(),
         GaussianNB(),
         SVC(kernel="linear", C=0.025),
-        SVC(gamma=2, C=1),
+        # SVC(gamma=2, C=1),  # Time out on 5h waiting
     ]
 
     word2vec_keyedvectors = KeyedVectors.load_word2vec_format(word2vec_location)
     for language in languages:
+        print('Working on %s' % language)
         # Load Dictionaries so it is consistent with snorkel calls
         tag_dict = Dictionary.load('./data/frequency_data/%s/tags.dct' % language)
         # Load Training data
