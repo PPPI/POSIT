@@ -46,6 +46,7 @@ def main(argv):
         lf_uri_lang,
         lf_diff_lang,
         lf_email_lang,
+        lang_encoding,
     ]
     # Not all lf-s exist for all langs, we filter None to avoid issues.
     lfs_tags_per_lang = {**{lang: [x for x in [frequency_labeling_function_factory(lang),

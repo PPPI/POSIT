@@ -88,6 +88,12 @@ def lf_builtin_language(row):
 
 
 @labeling_function()
+def lf_user_language(row):
+    language = row['Language'].lower() if row['Language'] != 'English' else 'English'
+    return lang_encoding(language)
+
+
+@labeling_function()
 def lf_builtin_tag_factory(language):
     if language == 'javascript':
         @labeling_function()
