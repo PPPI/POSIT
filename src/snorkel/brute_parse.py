@@ -1,6 +1,6 @@
 import antlr4, sys
 # Individual languages that we want to parse
-from antlr4 import ParseTreeListener, ParserRuleContext, ParseTreeWalker
+from antlr4 import ParseTreeListener, ParserRuleContext, ParseTreeWalker, TerminalNode
 from antlr4.error.Errors import ParseCancellationException
 
 from src.antlr4_language_parsers.golang.GoLexer import GoLexer as gol
@@ -15,16 +15,28 @@ from src.antlr4_language_parsers.php.PhpLexer import PhpLexer as phpl
 from src.antlr4_language_parsers.php.PhpParser import PhpParser as phpp
 from src.antlr4_language_parsers.python.Python3Lexer import Python3Lexer as pyl
 from src.antlr4_language_parsers.python.Python3Parser import Python3Parser as pyp
+from src.antlr4_language_parsers.python.Python3Listener import Python3Listener as pylis
 from src.antlr4_language_parsers.ruby.CorundumLexer import CorundumLexer as rubyl
 from src.antlr4_language_parsers.ruby.CorundumParser import CorundumParser as rubyp
 from src.preprocessor.formal_lang_heuristics import is_diff_header, is_email, is_URI
+
+from src.preprocessor.codeSearch_preprocessor import ast_to_tagged_list
 
 class Mylistener(ParseTreeListener):
     def __init__(self):
         super()
 
-    def exitEveryRule(self, ctx:ParserRuleContext):
-        print("rule entered: " + ctx.getText(), type(ctx));
+    #def exitEveryRule(self, ctx:ParserRuleContext):
+    #    print("rule entered: " + ctx.getText(), type(ctx));
+
+    def visitTerminal(self, node:TerminalNode):
+        print(node)
+
+class MyPythonListener(pylis):
+    def __init__(self):
+        super()
+    def visitTerminal(self, node:TerminalNode):
+        print(node)
 
 class BruteParse:
     langinfo = {
@@ -46,15 +58,17 @@ class BruteParse:
 
         #TODO: p.addErrorListener(...)
         p._errHandler = antlr4.error.ErrorStrategy.BailErrorStrategy()
-        listener = Mylistener()
         walker = ParseTreeWalker()
         parsable = False
         for r in self.langinfo[lang]['toprules']:
             try:
                 tree = getattr(p, r)()
                 parsable = True
+                print(ast_to_tagged_list(tree))
+                #if lang == 'python':
+                #    listener = MyPythonListener()
+                #    walker.walk(listener, tree)
                 break
-                #walker.walk(listener, tree)
             except ParseCancellationException:
                 pass
         if not parsable:

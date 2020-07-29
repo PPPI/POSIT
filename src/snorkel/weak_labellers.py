@@ -23,6 +23,7 @@ tag_encoders = {
     ]
 }
 
+bp = BruteParse()
 
 def frequency_labeling_function_factory(language):
     location = './data/frequency_data/%s/frequency_data.json.gz' % language
@@ -93,7 +94,6 @@ def lf_builtin_tag_factory(language):
     if language == 'javascript':
         @labeling_function()
         def lf_builtin_tag(row):
-            bp = BruteParse()
             bp.parse('javascript', row['Context'])
             if str(row['Token']) in javascript_builtins:
                 return tag_encoders['javascript']('IdentifierName')
@@ -102,7 +102,6 @@ def lf_builtin_tag_factory(language):
     elif language == 'go':
         @labeling_function()
         def lf_builtin_tag(row):
-            bp = BruteParse()
             bp.parse('go', row['Context'])
             if str(row['Token']) in golang_builtins:
                 return tag_encoders['go']('IdentifierList')
@@ -112,7 +111,6 @@ def lf_builtin_tag_factory(language):
     elif language == 'php':
         @labeling_function()
         def lf_builtin_tag(row):
-            bp = BruteParse()
             bp.parse('php', row['Context'])
             if str(row['Token']) in php_builtins:
                 return tag_encoders['php']('Identifier')
@@ -122,7 +120,6 @@ def lf_builtin_tag_factory(language):
     elif language == 'python':
         @labeling_function()
         def lf_builtin_tag(row):
-            bp = BruteParse()
             bp.parse('python', row['Context'])
             if str(row['Token']) in python_builtins:
                 return tag_encoders['python']('Expr')
@@ -132,7 +129,6 @@ def lf_builtin_tag_factory(language):
     elif language == 'ruby':
         @labeling_function()
         def lf_builtin_tag(row):
-            bp = BruteParse()
             bp.parse('ruby', row['Context'])
             if str(row['Token']) in ruby_builtins:
                 return tag_encoders['ruby']('Function_definition')
