@@ -32,6 +32,9 @@ tag_decoders = {
 }
 
 clf_labeling_factories = {lang: classify_labeler_factory(lang) for lang in languages}
+# XXX: Commented out for now as Levenshtein is slow
+# lang_factory = frequency_language_levenshtein_factory()
+# frequency_labeling_factories = {lang: frequency_labeling_function_levenshtein_factory(lang) for lang in languages}
 
 
 def main(argv):
@@ -42,16 +45,17 @@ def main(argv):
     # Define the set of labeling functions (LFs)
     lfs_lang = [
         frequency_language_factory(),
+        # lang_factory(levenshtein_distance=3),
         lf_builtin_language,
         lf_uri_lang,
         lf_diff_lang,
         lf_email_lang,
-        lang_encoding,
     ]
     # Not all lf-s exist for all langs, we filter None to avoid issues.
     lfs_tags_per_lang = {**{lang: [x for x in [frequency_labeling_function_factory(lang),
+                                               # frequency_labeling_factories[lang](levenshtein_distance=3),
                                                lf_builtin_tag_factory(lang)] +
-                                   [clf_labeling_factories[lang][n] for n in range(10)]
+                                   [clf_labeling_factories[lang](n) for n in range(10)]
                                    if x is not None] for lang in languages},
                          **{
                              'uri': [lf_uri_tok],

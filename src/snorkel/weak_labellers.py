@@ -1,7 +1,9 @@
 import gzip
 import json
 import re
+from collections import defaultdict
 
+from Levenshtein import distance as levenshtein
 from snorkel.labeling import labeling_function
 
 from .encoding import lang_encoding, tag_encoding_factory, uri_encoding
@@ -70,6 +72,77 @@ def frequency_language_factory():
 
     return lf_frequency_lang_guess
 
+
+def frequency_labeling_function_levenshtein_factory(language):
+    location = './data/frequency_data/%s/frequency_data.json.gz' % language
+    with gzip.open(location, 'rb') as f:
+        frequency_table = json.loads(f.read())[language]
+
+    frequency_keys = list(frequency_table.keys())
+
+    def levenstein_warpper(levenshtein_distance=0):
+        @labeling_function(name='lf_frequency_lang_guess_%d' % levenshtein_distance)
+        def lf_frequency_guess(row):
+            """
+            Return the most frequent tag of `row' in language `language'.
+            :param row: The rowen we wish to tag
+            :return: The tag in the language
+            """
+            candidate_keys = [k for k in frequency_keys if levenshtein(k, row['Token']) <= levenshtein_distance]
+            try:
+                if len(candidate_keys) > 0:
+                    tags = defaultdict(int)
+                    for candidate in candidate_keys:
+                        for t, fq in frequency_table[candidate].items():
+                            if t != UNDEF:
+                                tags[t] += fq
+                    tags = list(tags.items())
+                    tags = sorted(tags, key=lambda p: p[-1], reverse=True)
+                    return tag_encoders[language](tags[0])
+                else:
+                    return ABSTAIN
+            except IndexError:
+                return ABSTAIN
+
+        return lf_frequency_guess
+
+    return levenstein_warpper
+
+
+def frequency_language_levenshtein_factory():
+    location = './data/frequency_data/frequency_language_data.json.gz'
+    with gzip.open(location, 'rb') as f:
+        frequency_table = json.loads(f.read())
+
+    frequency_keys = list(frequency_table.keys())
+
+    def levenshtein_wrapper(levenshtein_distance=0):
+        @labeling_function(name='lf_frequency_lang_guess_%d' % levenshtein_distance)
+        def lf_frequency_lang_guess(row):
+            """
+            Return the most frequent language of `row'.
+            :param row: The rowen we wish to identify the language of
+            :return: The guessed language
+            """
+            candidate_keys = [k for k in frequency_keys if levenshtein(k, row['Token']) <= levenshtein_distance]
+            if len(candidate_keys) > 0:
+                lang_list = defaultdict(int)
+                for candidate in candidate_keys:
+                    for l, fq in frequency_table[candidate].items():
+                        lang_list[l] += fq
+                lang_list = list(lang_list.items())
+                lang_list = sorted(lang_list, key=lambda p: p[-1], reverse=True)
+
+                if lang_list[0][-1] > 0:
+                    return lang_encoding(lang_list[0][0])
+                else:
+                    return ABSTAIN
+            else:
+                return ABSTAIN
+
+        return lf_frequency_lang_guess
+
+    return levenshtein_wrapper
 
 @labeling_function()
 def lf_builtin_language(row):
