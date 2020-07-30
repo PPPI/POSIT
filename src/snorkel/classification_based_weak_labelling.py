@@ -86,7 +86,7 @@ def classify_labeler_factory(language):
 
     def classify_using_nth(n):
 
-        @labeling_function()
+        @labeling_function(name='clf_labeler_%d' % n)
         def clf_labeler(token):
             try:
                 feature_vector = word2vec_keyedvectors[token]
