@@ -75,7 +75,7 @@ class BruteParse:
                 return ast_to_tagged_list(tree)
             except ParseCancellationException:
                 pass
-        return ['ABSTAIN']
+        return []
 
         '''
         for r in p.ruleNames:
@@ -109,12 +109,26 @@ class RowLabeller:
 
     def __init__(self):
         self.tagsForPost = {}
+        self.bp = BruteParse()
+        self.abstain = 0
+        self.parsable = 0
 
     def lookUpToken(self, language, row):
         if row['PostIdx'] not in self.tagsForPost.keys():
-            bp = BruteParse()
-            self.tagsForPost[row['PostIdx']] = bp.parse(language, row['Context'])
-            #for k, v in self.tagsForPost.items():
-            #    print(k, v)
-            #sys.stdout.flush()
+            ip = str(row['Context'])
+            while len(ip.split()) > 1:
+                res = self.bp.parse(language, ip)
+                if res:
+                    self.tagsForPost[row['PostIdx']] = res
+                    self.parsable += 1
+                    break
+                else:
+                    ip = ip.partition(' ')[2]
+        if row['PostIdx'] not in self.tagsForPost.keys():
+            self.tagsForPost[row['PostIdx']] = ['ABSTAIN']
+            self.abstain += 1
+        # for k, v in self.tagsForPost.items():
+        #    print(k, v)
+        #    sys.stdout.flush()
+        #print(self.abstain, self.parsable)
         return 0
