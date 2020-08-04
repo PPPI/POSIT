@@ -1,6 +1,7 @@
 import antlr4, sys
 # Individual languages that we want to parse
-from antlr4 import ParseTreeListener, ParserRuleContext, ParseTreeWalker, TerminalNode
+from antlr4 import ParseTreeListener, ParserRuleContext, ParseTreeWalker, TerminalNode, ErrorNode, NoViableAltException
+from antlr4.error.ErrorListener import ErrorListener
 from antlr4.error.Errors import ParseCancellationException
 
 from src.antlr4_language_parsers.golang.GoLexer import GoLexer as gol
@@ -21,26 +22,32 @@ from src.antlr4_language_parsers.ruby.CorundumParser import CorundumParser as ru
 from src.preprocessor.formal_lang_heuristics import is_diff_header, is_email, is_URI
 
 from src.preprocessor.codeSearch_preprocessor import ast_to_tagged_list
+import traceback
 
 
-class Mylistener(ParseTreeListener):
+class Mylistener(ErrorListener):
     def __init__(self):
         super()
 
     # def exitEveryRule(self, ctx:ParserRuleContext):
     #    print("rule entered: " + ctx.getText(), type(ctx));
 
-    def visitTerminal(self, node: TerminalNode):
-        print(node)
+    #def visitTerminal(self, node: TerminalNode):
+    #    print(node)
+
+    def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
+        #print(line)
+        None
 
 
+"""
 class MyPythonListener(pylis):
     def __init__(self):
         super()
 
     def visitTerminal(self, node: TerminalNode):
         print(node)
-
+"""
 
 class BruteParse:
     langinfo = {
@@ -61,6 +68,8 @@ class BruteParse:
         p = self.langinfo[lang]['parser'](stream, output=sys.stderr)
 
         # TODO: p.addErrorListener(...)
+        p.removeErrorListeners()
+        p.addErrorListener(Mylistener())
         p._errHandler = antlr4.error.ErrorStrategy.BailErrorStrategy()
         walker = ParseTreeWalker()
         parsable = False
@@ -74,7 +83,7 @@ class BruteParse:
                 #    walker.walk(listener, tree)
                 return ast_to_tagged_list(tree)
             except ParseCancellationException:
-                pass
+                None
         return []
 
         '''
@@ -131,5 +140,5 @@ class RowLabeller:
         # for k, v in self.tagsForPost.items():
         #    print(k, v)
         #    sys.stdout.flush()
-        print(self.abstain, self.parsable)
+        #print(self.abstain, self.parsable)
         return 0
