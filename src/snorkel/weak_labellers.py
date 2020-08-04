@@ -8,7 +8,7 @@ from .encoding import lang_encoding, tag_encoding_factory, uri_encoding
 from ..preprocessor.builtin_lists import *
 from ..preprocessor.codeSearch_preprocessor import UNDEF
 from ..preprocessor.formal_lang_heuristics import is_URI, is_diff_header, is_email
-from .brute_parse import BruteParse
+from .brute_parse import RowLabeller
 
 ABSTAIN = 0
 
@@ -23,7 +23,6 @@ tag_encoders = {
     ]
 }
 
-bp = BruteParse()
 
 def frequency_labeling_function_factory(language):
     location = './data/frequency_data/%s/frequency_data.json.gz' % language
@@ -94,7 +93,6 @@ def lf_builtin_tag_factory(language):
     if language == 'javascript':
         @labeling_function()
         def lf_builtin_tag(row):
-            bp.parse('javascript', row['Context'])
             if str(row['Token']) in javascript_builtins:
                 return tag_encoders['javascript']('IdentifierName')
             else:
@@ -102,7 +100,6 @@ def lf_builtin_tag_factory(language):
     elif language == 'go':
         @labeling_function()
         def lf_builtin_tag(row):
-            bp.parse('go', row['Context'])
             if str(row['Token']) in golang_builtins:
                 return tag_encoders['go']('IdentifierList')
             else:
@@ -111,7 +108,6 @@ def lf_builtin_tag_factory(language):
     elif language == 'php':
         @labeling_function()
         def lf_builtin_tag(row):
-            bp.parse('php', row['Context'])
             if str(row['Token']) in php_builtins:
                 return tag_encoders['php']('Identifier')
             else:
@@ -120,7 +116,6 @@ def lf_builtin_tag_factory(language):
     elif language == 'python':
         @labeling_function()
         def lf_builtin_tag(row):
-            bp.parse('python', row['Context'])
             if str(row['Token']) in python_builtins:
                 return tag_encoders['python']('Expr')
             else:
@@ -129,7 +124,6 @@ def lf_builtin_tag_factory(language):
     elif language == 'ruby':
         @labeling_function()
         def lf_builtin_tag(row):
-            bp.parse('ruby', row['Context'])
             if str(row['Token']) in ruby_builtins:
                 return tag_encoders['ruby']('Function_definition')
             else:
@@ -139,6 +133,34 @@ def lf_builtin_tag_factory(language):
         lf_builtin_tag = None
 
     return lf_builtin_tag
+
+
+def lf_bruteforce_tag_factory(language):
+    rl = RowLabeller()
+    if language == 'javascript':
+        @labeling_function()
+        def lf_bruteforce_tag(row):
+            return rl.lookUpToken('javascript', row)
+    elif language == 'go':
+        @labeling_function()
+        def lf_bruteforce_tag(row):
+            return rl.lookUpToken('go', row)
+    elif language == 'php':
+        @labeling_function()
+        def lf_bruteforce_tag(row):
+            return rl.lookUpToken('php', row)
+    elif language == 'python':
+        @labeling_function()
+        def lf_bruteforce_tag(row):
+            return rl.lookUpToken('python', row)
+    elif language == 'ruby':
+        @labeling_function()
+        def lf_bruteforce_tag(row):
+            return rl.lookUpToken('ruby', row)
+    else:
+        lf_bruteforce_tag = None
+
+    return lf_bruteforce_tag
 
 
 @labeling_function()

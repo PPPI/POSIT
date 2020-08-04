@@ -22,25 +22,29 @@ from src.preprocessor.formal_lang_heuristics import is_diff_header, is_email, is
 
 from src.preprocessor.codeSearch_preprocessor import ast_to_tagged_list
 
+
 class Mylistener(ParseTreeListener):
     def __init__(self):
         super()
 
-    #def exitEveryRule(self, ctx:ParserRuleContext):
+    # def exitEveryRule(self, ctx:ParserRuleContext):
     #    print("rule entered: " + ctx.getText(), type(ctx));
 
-    def visitTerminal(self, node:TerminalNode):
+    def visitTerminal(self, node: TerminalNode):
         print(node)
+
 
 class MyPythonListener(pylis):
     def __init__(self):
         super()
-    def visitTerminal(self, node:TerminalNode):
+
+    def visitTerminal(self, node: TerminalNode):
         print(node)
+
 
 class BruteParse:
     langinfo = {
-        'go': {'lexer': gol, 'parser': gop, 'toprules' : ['sourceFile']},
+        'go': {'lexer': gol, 'parser': gop, 'toprules': ['sourceFile']},
         'javascript': {'lexer': jsl, 'parser': jsp, 'toprules': ['program']},
         'php': {'lexer': phpl, 'parser': phpp, 'toprules': ['htmlDocument']},
         'python': {'lexer': pyl, 'parser': pyp, 'toprules': ['file_input', 'single_input', 'eval_input']},
@@ -56,7 +60,7 @@ class BruteParse:
         stream = antlr4.CommonTokenStream(l)
         p = self.langinfo[lang]['parser'](stream, output=sys.stderr)
 
-        #TODO: p.addErrorListener(...)
+        # TODO: p.addErrorListener(...)
         p._errHandler = antlr4.error.ErrorStrategy.BailErrorStrategy()
         walker = ParseTreeWalker()
         parsable = False
@@ -64,15 +68,14 @@ class BruteParse:
             try:
                 tree = getattr(p, r)()
                 parsable = True
-                print(ast_to_tagged_list(tree))
-                #if lang == 'python':
+                # print(ast_to_tagged_list(tree))
+                # if lang == 'python':
                 #    listener = MyPythonListener()
                 #    walker.walk(listener, tree)
-                break
+                return ast_to_tagged_list(tree)
             except ParseCancellationException:
                 pass
-        if not parsable:
-            print(lang)
+        return ['ABSTAIN']
 
         '''
         for r in p.ruleNames:
@@ -94,9 +97,24 @@ class BruteParse:
     def driver(self, context="blah def foo():\n\tNone bar"):
         self.parse('python', context)
 
+
 '''
 if __name__ == "__main__":
     p = BruteParse()
     p.driver()
 '''
 
+
+class RowLabeller:
+
+    def __init__(self):
+        self.tagsForPost = {}
+
+    def lookUpToken(self, language, row):
+        if row['PostIdx'] not in self.tagsForPost.keys():
+            bp = BruteParse()
+            self.tagsForPost[row['PostIdx']] = bp.parse(language, row['Context'])
+            #for k, v in self.tagsForPost.items():
+            #    print(k, v)
+            #sys.stdout.flush()
+        return 0
