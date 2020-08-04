@@ -114,21 +114,22 @@ class RowLabeller:
         self.parsable = 0
 
     def lookUpToken(self, language, row):
-        if row['PostIdx'] not in self.tagsForPost.keys():
+        key = str(row['PostIdx']) + str(row['Context'])
+        if key not in self.tagsForPost.keys():
             ip = str(row['Context'])
             while len(ip.split()) > 1:
                 res = self.bp.parse(language, ip)
                 if res:
-                    self.tagsForPost[row['PostIdx']] = res
+                    self.tagsForPost[key] = res
                     self.parsable += 1
                     break
                 else:
                     ip = ip.partition(' ')[2]
-        if row['PostIdx'] not in self.tagsForPost.keys():
-            self.tagsForPost[row['PostIdx']] = ['ABSTAIN']
+        if key not in self.tagsForPost.keys():
+            self.tagsForPost[key] = ['ABSTAIN']
             self.abstain += 1
         # for k, v in self.tagsForPost.items():
         #    print(k, v)
         #    sys.stdout.flush()
-        #print(self.abstain, self.parsable)
+        print(self.abstain, self.parsable)
         return 0
