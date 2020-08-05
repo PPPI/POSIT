@@ -33,7 +33,6 @@ tag_decoders = {
 }
 
 word2vec_location = 'G:\\wiki_w2v_models\\wiki-news-300d-1M.vec'  # Update this or move to cli arg
-clf_labeling_factories = {lang: classify_labeler_factory(lang, word2vec_location) for lang in languages}
 
 
 # XXX: Commented out for now as Levenshtein is slow
@@ -60,7 +59,7 @@ def main(argv):
     try:
         with h5py.File('./data/data_votes.h5', 'r') as h5f:
             L_lang_train = h5f['language_votes'][:]
-    except (FileNotFoundError, KeyError):
+    except (OSError, FileNotFoundError, KeyError):
         # Define the set of labeling functions (LFs)
         lfs_lang = [
             frequency_language_factory(),
@@ -91,12 +90,13 @@ def main(argv):
         try:
             with h5py.File('./data/data_votes.h5', 'r') as h5f:
                 L_lang_train = h5f['%s_votes' % language][:]
-        except (FileNotFoundError, KeyError):
+        except (OSError, FileNotFoundError, KeyError):
             if language in languages:
+                clf_labeling_factory = classify_labeler_factory(language, word2vec_location)
                 lfs_tags = [x for x in [frequency_labeling_function_factory(language),
                                         # frequency_labeling_factories[lang](levenshtein_distance=3),
                                         lf_builtin_tag_factory(language)] +
-                            [clf_labeling_factories[language](n) for n in range(7)]
+                            [clf_labeling_factory(n) for n in range(7)]
                             if x is not None]
             else:
                 lfs_tags = lfs_tags_per_lang_formal[language]
