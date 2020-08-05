@@ -144,6 +144,7 @@ def frequency_language_levenshtein_factory():
 
     return levenshtein_wrapper
 
+
 @labeling_function()
 def lf_builtin_language(row):
     if str(row['Token']) in javascript_builtins:
@@ -214,9 +215,13 @@ def lf_builtin_tag_factory(language):
 
 
 @labeling_function()
-def lf_uri_lang(row):
+def lf_formal_lang(row):
     if is_URI(str(row['Token'])):
         return lang_encoding('uri')
+    elif is_diff_header(str(row['Token'])):
+        return lang_encoding('diff')
+    elif is_email(str(row['Token'])):
+        return lang_encoding('email')
     else:
         return ABSTAIN
 
@@ -242,25 +247,9 @@ def lf_uri_tok(row):
 
 
 @labeling_function()
-def lf_diff_lang(row):
-    if is_diff_header(str(row['Token'])):
-        return lang_encoding('diff')
-    else:
-        return ABSTAIN
-
-
-@labeling_function()
 def lf_diff_tok(row):
     if is_diff_header(str(row['Token'])):
         return 1  # There is only a 'diff_header' option
-    else:
-        return ABSTAIN
-
-
-@labeling_function()
-def lf_email_lang(row):
-    if is_email(str(row['Token'])):
-        return lang_encoding('email')
     else:
         return ABSTAIN
 

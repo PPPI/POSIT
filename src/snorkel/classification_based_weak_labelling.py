@@ -27,12 +27,10 @@ names = [
     # "RBF SVM",
 ]
 
-word2vec_location = 'G:\\wiki_w2v_models\\wiki-news-300d-1M.vec'  # Update this or move to cli arg
-
 np.random.seed(42)
 
 
-def train_and_store():
+def train_and_store(word2vec_location):
     classifiers = [
         KNeighborsClassifier(5),
         # GaussianProcessClassifier(1.0 * RBF(1.0)),  # Not enough RAM to run this locally
@@ -79,7 +77,7 @@ def train_and_store():
             _ = joblib.dump(clf, clf_fname, compress=9)
 
 
-def classify_labeler_factory(language):
+def classify_labeler_factory(language, word2vec_location):
     classifiers = [joblib.load('./data/frequency_data/%s/%s_clf.pkl' % (language, name)) for name in names]
 
     word2vec_keyedvectors = KeyedVectors.load_word2vec_format(word2vec_location)
@@ -101,4 +99,5 @@ def classify_labeler_factory(language):
 
 
 if __name__ == '__main__':
-    train_and_store()
+    word2vec_location = 'G:\\wiki_w2v_models\\wiki-news-300d-1M.vec'  # Update this or move to cli arg
+    train_and_store(word2vec_location)
