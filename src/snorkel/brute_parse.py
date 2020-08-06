@@ -22,7 +22,6 @@ from src.antlr4_language_parsers.ruby.CorundumParser import CorundumParser as ru
 from src.preprocessor.formal_lang_heuristics import is_diff_header, is_email, is_URI
 
 from src.preprocessor.codeSearch_preprocessor import ast_to_tagged_list
-import traceback
 
 
 class Mylistener(ErrorListener):
@@ -121,24 +120,39 @@ class RowLabeller:
         self.bp = BruteParse()
         self.abstain = 0
         self.parsable = 0
+        self.tokenIndex = 0
 
     def lookUpToken(self, language, row):
-        key = str(row['PostIdx']) + str(row['Context'])
-        if key not in self.tagsForPost.keys():
+        postIdx = str(row['PostIdx'])
+        context = str(row['Context'])
+        parsable = False
+        if postIdx not in self.tagsForPost.keys():
+            self.tagsForPost[postIdx]={}
+        if context not in self.tagsForPost[postIdx].keys():
+            # everytime we have a new context, we reset the token index.
+            self.tokenIndex = 0
             ip = str(row['Context'])
             while len(ip.split()) > 1:
                 res = self.bp.parse(language, ip)
                 if res:
-                    self.tagsForPost[key] = res
+                    self.tagsForPost[postIdx][context] = res
                     self.parsable += 1
+                    parsable = True
                     break
                 else:
                     ip = ip.partition(' ')[2]
-        if key not in self.tagsForPost.keys():
-            self.tagsForPost[key] = ['ABSTAIN']
-            self.abstain += 1
-        # for k, v in self.tagsForPost.items():
+            if not parsable:
+                self.tagsForPost[postIdx][context] = []
+                self.abstain += 1
+
+        #for k, v in self.tagsForPost.items():
         #    print(k, v)
         #    sys.stdout.flush()
         #print(self.abstain, self.parsable)
-        return 0
+
+        if self.tagsForPost[postIdx][context]:
+            self.tokenIndex += 1
+            return self.tagsForPost[postIdx][context][self.tokenIndex-1]
+        else:
+            #could not import ABSTAIN due to a circular dependency!
+            return 0
