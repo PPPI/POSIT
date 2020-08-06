@@ -98,7 +98,7 @@ def main(argv):
 
         try:
             try:
-                h5f = h5py.File('./data/data_votes.h5', 'r')
+                h5f = h5py.File('./data/frequency_data/%s/data_votes.h5' % language, 'r')
                 L_lang_train = h5f['%s_votes' % language][:]
             finally:
                 if 'h5f' in locals().keys():
@@ -117,7 +117,7 @@ def main(argv):
             tapplier = PandasLFApplier(lfs_tags)
             L_train = tapplier.apply(df_train)
             try:
-                h5f = h5py.File('./data/data_votes.h5', 'w')
+                h5f = h5py.File('./data/frequency_data/%s/data_votes.h5' % language, 'w')
                 h5f.create_dataset('%s_votes' % language, data=L_lang_train)
             finally:
                 if 'h5f' in locals().keys():
