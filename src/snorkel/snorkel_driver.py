@@ -57,8 +57,12 @@ def main(argv):
 
     # Apply the LFs to the unlabeled training data
     try:
-        with h5py.File('./data/data_votes.h5', 'r') as h5f:
+        try:
+            h5f = h5py.File('./data/data_votes.h5', 'r')
             L_lang_train = h5f['language_votes'][:]
+        finally:
+            if 'h5f' in locals().keys():
+                h5f.close()
     except (OSError, FileNotFoundError, KeyError):
         # Define the set of labeling functions (LFs)
         lfs_lang = [
@@ -70,8 +74,13 @@ def main(argv):
         ]
         applier = PandasLFApplier(lfs_lang)
         L_lang_train = applier.apply(df_train)
-        with h5py.File('./data/data_votes.h5', 'w') as h5f:
+        try:
+            h5f = h5py.File('./data/data_votes.h5', 'w')
             h5f.create_dataset('language_votes', data=L_lang_train)
+        finally:
+            if 'h5f' in locals().keys():
+                h5f.close()
+
 
     # Train the label model and compute the training labels
     lang_label_model = LabelModel(cardinality=size_lang_voc, verbose=True)
@@ -88,8 +97,12 @@ def main(argv):
             size_tag_voc = 7
 
         try:
-            with h5py.File('./data/data_votes.h5', 'r') as h5f:
+            try:
+                h5f = h5py.File('./data/data_votes.h5', 'r')
                 L_lang_train = h5f['%s_votes' % language][:]
+            finally:
+                if 'h5f' in locals().keys():
+                    h5f.close()
         except (OSError, FileNotFoundError, KeyError):
             if language in languages:
                 clf_labeling_factory = classify_labeler_factory(language, word2vec_location)
@@ -103,8 +116,12 @@ def main(argv):
             # Apply the LFs to the unlabeled training data
             tapplier = PandasLFApplier(lfs_tags)
             L_train = tapplier.apply(df_train)
-            with h5py.File('./data/data_votes.h5', 'w') as h5f:
+            try:
+                h5f = h5py.File('./data/data_votes.h5', 'w')
                 h5f.create_dataset('%s_votes' % language, data=L_lang_train)
+            finally:
+                if 'h5f' in locals().keys():
+                    h5f.close()
 
         # Train the label model and compute the training labels
         label_model = LabelModel(cardinality=size_tag_voc, verbose=True)
