@@ -62,8 +62,8 @@ def main(argv):
     size_lang_voc = len(all_languages)  # 6 (PL) + 1 (NL) + 3 (FL) = 10
 
     df_train = SO_to_pandas(location)
-    df_train = df_train[df_train['Span'].str.startswith("(0,")]
-    df_train = df_train[df_train['Language'] != 'English']
+    #df_train = df_train[df_train['Span'].str.startswith("(0,")]
+    #df_train = df_train[df_train['Language'] != 'English']
 
     # Apply the LFs to the unlabeled training data
     applier = PandasLFApplier(lfs_lang)

@@ -28,25 +28,9 @@ class Mylistener(ErrorListener):
     def __init__(self):
         super()
 
-    # def exitEveryRule(self, ctx:ParserRuleContext):
-    #    print("rule entered: " + ctx.getText(), type(ctx));
-
-    #def visitTerminal(self, node: TerminalNode):
-    #    print(node)
-
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
-        #print(line)
         None
 
-
-"""
-class MyPythonListener(pylis):
-    def __init__(self):
-        super()
-
-    def visitTerminal(self, node: TerminalNode):
-        print(node)
-"""
 
 class BruteParse:
     langinfo = {
@@ -65,53 +49,19 @@ class BruteParse:
         l = self.langinfo[lang]['lexer'](antlr4.InputStream(input), output=sys.stderr)
         stream = antlr4.CommonTokenStream(l)
         p = self.langinfo[lang]['parser'](stream, output=sys.stderr)
-
-        # TODO: p.addErrorListener(...)
         p.removeErrorListeners()
         p.addErrorListener(Mylistener())
         p._errHandler = antlr4.error.ErrorStrategy.BailErrorStrategy()
-        walker = ParseTreeWalker()
-        parsable = False
         for r in self.langinfo[lang]['toprules']:
             try:
                 tree = getattr(p, r)()
-                parsable = True
-                # print(ast_to_tagged_list(tree))
-                # if lang == 'python':
-                #    listener = MyPythonListener()
-                #    walker.walk(listener, tree)
                 return ast_to_tagged_list(tree)
             except ParseCancellationException:
                 None
         return []
 
-        '''
-        for r in p.ruleNames:
-            try:
-                tree = getattr(p, r)()
-                walker = ParseTreeWalker()
-                #print(input)
-                #print(tree.toStringTree(None, None))
-                walker.walk(listener, tree)
-                print(r)
-                #print('Can Parse')
-            except ParseCancellationException:
-                continue
-
-            #tree = p.r()
-            #print(tree.toStringTree(None, None))
-        '''
-
     def driver(self, context="blah def foo():\n\tNone bar"):
         self.parse('python', context)
-
-
-'''
-if __name__ == "__main__":
-    p = BruteParse()
-    p.driver()
-'''
-
 
 class RowLabeller:
 
@@ -123,6 +73,9 @@ class RowLabeller:
         self.tokenIndex = 0
 
     def lookUpToken(self, language, row):
+        #print (row)
+        if language == 'English':
+            return 0
         postIdx = str(row['PostIdx'])
         context = str(row['Context'])
         parsable = False
@@ -152,7 +105,9 @@ class RowLabeller:
 
         if self.tagsForPost[postIdx][context]:
             self.tokenIndex += 1
-            return self.tagsForPost[postIdx][context][self.tokenIndex-1]
+            label = self.tagsForPost[postIdx][context][self.tokenIndex-1]
+            print(row['Token'], label)
+            return label
         else:
             #could not import ABSTAIN due to a circular dependency!
             return 0
