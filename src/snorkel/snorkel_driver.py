@@ -48,7 +48,7 @@ def main(argv):
     ]
     # Not all lf-s exist for all langs, we filter None to avoid issues.
     lfs_tags_per_lang = {**{lang: [x for x in [#frequency_labeling_function_factory(lang),
-                                               lf_bruteforce_tag_factory(lang),
+                                               lf_bruteforce_tag_factory(lang, tag_encoders),
                                                lf_builtin_tag_factory(lang)] #+
                                    #[clf_labeling_factories[lang][n] for n in range(10)]
                                    #if x is not None
@@ -85,6 +85,7 @@ def main(argv):
         # Apply the LFs to the unlabeled training data
         tapplier = PandasLFApplier(lfs_tags_per_lang[language])
         L_train = tapplier.apply(df_train)
+        continue
 
         # Train the label model and compute the training labels
         label_model = LabelModel(cardinality=size_tag_voc, verbose=True)

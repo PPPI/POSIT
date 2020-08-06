@@ -1,4 +1,4 @@
-import antlr4, sys
+import antlr4, sys, re
 # Individual languages that we want to parse
 from antlr4 import ParseTreeListener, ParserRuleContext, ParseTreeWalker, TerminalNode, ErrorNode, NoViableAltException
 from antlr4.error.ErrorListener import ErrorListener
@@ -72,12 +72,11 @@ class RowLabeller:
         self.parsable = 0
         self.tokenIndex = 0
 
-    def lookUpToken(self, language, row):
-        #print (row)
-        if language == 'English':
+    def lookUpToken(self, language, row, tag_encoders):
+        if row['Language'] == 'English':
             return 0
         postIdx = str(row['PostIdx'])
-        context = str(row['Context'])
+        context = re.escape(str(row['Context']))
         parsable = False
         if postIdx not in self.tagsForPost.keys():
             self.tagsForPost[postIdx]={}
@@ -102,12 +101,13 @@ class RowLabeller:
         #    print(k, v)
         #    sys.stdout.flush()
         #print(self.abstain, self.parsable)
-
         if self.tagsForPost[postIdx][context]:
             self.tokenIndex += 1
             label = self.tagsForPost[postIdx][context][self.tokenIndex-1]
+            print(row['Context'])
             print(row['Token'], label)
-            return label
+            sys.stdout.flush()
+            return tag_encoders[language](label[1])
         else:
             #could not import ABSTAIN due to a circular dependency!
             return 0

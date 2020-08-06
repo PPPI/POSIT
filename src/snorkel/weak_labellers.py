@@ -135,28 +135,28 @@ def lf_builtin_tag_factory(language):
     return lf_builtin_tag
 
 
-def lf_bruteforce_tag_factory(language):
+def lf_bruteforce_tag_factory(language, tag_encoders):
     rl = RowLabeller()
     if language == 'javascript':
         @labeling_function()
         def lf_bruteforce_tag(row):
-            return rl.lookUpToken('javascript', row)
+            return rl.lookUpToken('javascript', row, tag_encoders)
     elif language == 'go':
         @labeling_function()
         def lf_bruteforce_tag(row):
-            return rl.lookUpToken('go', row)
+            return rl.lookUpToken('go', row, tag_encoders)
     elif language == 'php':
         @labeling_function()
         def lf_bruteforce_tag(row):
-            return rl.lookUpToken('php', row)
+            return rl.lookUpToken('php', row, tag_encoders)
     elif language == 'python':
         @labeling_function()
         def lf_bruteforce_tag(row):
-            return rl.lookUpToken('python', row)
+            return rl.lookUpToken('python', row, tag_encoders)
     elif language == 'ruby':
         @labeling_function()
         def lf_bruteforce_tag(row):
-            return rl.lookUpToken('ruby', row)
+            return rl.lookUpToken('ruby', row, tag_encoders)
     else:
         lf_bruteforce_tag = None
 

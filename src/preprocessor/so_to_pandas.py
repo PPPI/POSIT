@@ -75,7 +75,7 @@ def tokenize_SO_row_star(args):
 
 def SO_to_pandas(location, limit=None):
     try:
-        result_df = pd.read_csv(location[:-len('xml')] + 'csv', nrows=100000)
+        result_df = pd.read_csv(location[:-len('xml')] + 'csv', nrows=1000)
     except FileNotFoundError:
         fn_out = location[:-len('xml')] + 'csv'
         number_of_posts_after_filter = 5748669  # Precomputed separately by iterating through the file once.
