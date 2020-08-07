@@ -153,11 +153,11 @@ def ast_to_tagged_list(tree):
             for child in current.children:
                 if isinstance(child, antlr4.tree.Tree.TerminalNodeImpl):
                     tag = extract_name_from_terminal(child)
-                    result.append((child.symbol.text, tag))
+                    result.append((child.symbol.text, tag, child.symbol.line, child.symbol.start))
                 else:
                     visit.append(child)
 
-    return [l for l in reversed(result)]
+    return [(text, tag) for text, tag, _, _ in sorted(sorted(result, key=lambda p: p[-1]), key=lambda p: p[-2])]
 
 
 def java_doc_string_to_nltk(tagged_list):
