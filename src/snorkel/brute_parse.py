@@ -71,10 +71,14 @@ class RowLabeller:
         self.abstain = 0
         self.parsable = 0
         self.tokenIndex = 0
+        self.total = 0
 
     def lookUpToken(self, language, row, tag_encoders):
+        #print(self.total, self.parsable, self.abstain)
+        #sys.stdout.flush()
         if row['Language'] == 'English':
             return 0
+        self.total += 1
         postIdx = str(row['PostIdx'])
         context = re.escape(str(row['Context']))
         parsable = False
@@ -88,26 +92,22 @@ class RowLabeller:
                 res = self.bp.parse(language, ip)
                 if res:
                     self.tagsForPost[postIdx][context] = res
-                    self.parsable += 1
                     parsable = True
                     break
                 else:
                     ip = ip.partition(' ')[2]
             if not parsable:
                 self.tagsForPost[postIdx][context] = []
-                self.abstain += 1
 
-        #for k, v in self.tagsForPost.items():
-        #    print(k, v)
-        #    sys.stdout.flush()
-        #print(self.abstain, self.parsable)
         if self.tagsForPost[postIdx][context]:
             self.tokenIndex += 1
-            label = self.tagsForPost[postIdx][context][self.tokenIndex-1]
-            print(row['Context'])
-            print(row['Token'], label)
-            sys.stdout.flush()
-            return tag_encoders[language](label[1])
-        else:
-            #could not import ABSTAIN due to a circular dependency!
-            return 0
+            if self.tokenIndex-1 < len(self.tagsForPost[postIdx][context]):
+                label = self.tagsForPost[postIdx][context][self.tokenIndex - 1]
+                if str(row['Token']) == label[0]:
+                    sys.stdout.flush()
+                    self.parsable += 1
+                    return tag_encoders[language](label[1])
+
+        #could not import ABSTAIN due to a circular dependency!
+        self.abstain += 1
+        return 0
