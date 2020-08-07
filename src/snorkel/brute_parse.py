@@ -51,7 +51,7 @@ class BruteParse:
         p = self.langinfo[lang]['parser'](stream, output=sys.stderr)
         p.removeErrorListeners()
         p.addErrorListener(Mylistener())
-        p._errHandler = antlr4.error.ErrorStrategy.BailErrorStrategy()
+        # p._errHandler = antlr4.error.ErrorStrategy.BailErrorStrategy()
         for r in self.langinfo[lang]['toprules']:
             try:
                 tree = getattr(p, r)()
@@ -63,6 +63,7 @@ class BruteParse:
     def driver(self, context="blah def foo():\n\tNone bar"):
         self.parse('python', context)
 
+
 class RowLabeller:
 
     def __init__(self):
@@ -71,19 +72,22 @@ class RowLabeller:
         self.abstain = 0
         self.parsable = 0
         self.tokenIndex = 0
+        self.foreignlang = 0
         self.total = 0
 
     def lookUpToken(self, language, row, tag_encoders):
-        #print(self.total, self.parsable, self.abstain)
-        #sys.stdout.flush()
         if row['Language'] == 'English':
             return 0
+        if (row['Language'] != language):
+            self.foreignlang += 1
+        # print(self.total, self.parsable, self.abstain, self.foreignlang)
+        sys.stdout.flush()
         self.total += 1
         postIdx = str(row['PostIdx'])
         context = re.escape(str(row['Context']))
         parsable = False
         if postIdx not in self.tagsForPost.keys():
-            self.tagsForPost[postIdx]={}
+            self.tagsForPost[postIdx] = {}
         if context not in self.tagsForPost[postIdx].keys():
             # everytime we have a new context, we reset the token index.
             self.tokenIndex = 0
@@ -101,13 +105,17 @@ class RowLabeller:
 
         if self.tagsForPost[postIdx][context]:
             self.tokenIndex += 1
-            if self.tokenIndex-1 < len(self.tagsForPost[postIdx][context]):
+            while self.tokenIndex - 1 < len(self.tagsForPost[postIdx][context]):
                 label = self.tagsForPost[postIdx][context][self.tokenIndex - 1]
-                if str(row['Token']) == label[0]:
-                    sys.stdout.flush()
+                if label[0] in str(row['Token']):
                     self.parsable += 1
+                    # print(row['Token'], label)
                     return tag_encoders[language](label[1])
+                else:
+                    None
+                    # print(row['Token'], label)
+                self.tokenIndex += 1
 
-        #could not import ABSTAIN due to a circular dependency!
+        # could not import ABSTAIN due to a circular dependency!
         self.abstain += 1
         return 0

@@ -22,7 +22,7 @@ def main(argv):
     else:  # language = 'uri
         size_tag_voc = 7
 
-    lfs_tags = [lf_bruteforce_tag_factory(language, tag_encoders[language])]
+    lfs_tags = [lf_bruteforce_tag_factory(language, tag_encoders)]
 
     tapplier = PandasLFApplier(lfs_tags)
     L_train = tapplier.apply(df_train)

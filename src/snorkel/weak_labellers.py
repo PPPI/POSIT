@@ -237,6 +237,10 @@ def lf_bruteforce_tag_factory(language, tag_encoders):
         @labeling_function()
         def lf_bruteforce_tag(row):
             return rl.lookUpToken('ruby', row, tag_encoders)
+    elif language == 'java':
+        @labeling_function()
+        def lf_bruteforce_tag(row):
+            return rl.lookUpToken('java', row, tag_encoders)
     else:
         lf_bruteforce_tag = None
 
