@@ -29,5 +29,6 @@ setup(name='POSIT',
             'antlr4',
             'psutil',
             'joblib',
+            'h5py',
       ], install_requires=['snorkel', 'pandas']
       )
