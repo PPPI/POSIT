@@ -10,6 +10,7 @@ from .encoding import lang_encoding, tag_encoding_factory, uri_encoding
 from ..preprocessor.builtin_lists import *
 from ..preprocessor.codeSearch_preprocessor import UNDEF
 from ..preprocessor.formal_lang_heuristics import is_URI, is_diff_header, is_email
+from .brute_parse import RowLabeller
 
 ABSTAIN = 0
 
@@ -212,6 +213,34 @@ def lf_builtin_tag_factory(language):
         lf_builtin_tag = None
 
     return lf_builtin_tag
+
+
+def lf_bruteforce_tag_factory(language, tag_encoders):
+    rl = RowLabeller()
+    if language == 'javascript':
+        @labeling_function()
+        def lf_bruteforce_tag(row):
+            return rl.lookUpToken('javascript', row, tag_encoders)
+    elif language == 'go':
+        @labeling_function()
+        def lf_bruteforce_tag(row):
+            return rl.lookUpToken('go', row, tag_encoders)
+    elif language == 'php':
+        @labeling_function()
+        def lf_bruteforce_tag(row):
+            return rl.lookUpToken('php', row, tag_encoders)
+    elif language == 'python':
+        @labeling_function()
+        def lf_bruteforce_tag(row):
+            return rl.lookUpToken('python', row, tag_encoders)
+    elif language == 'ruby':
+        @labeling_function()
+        def lf_bruteforce_tag(row):
+            return rl.lookUpToken('ruby', row, tag_encoders)
+    else:
+        lf_bruteforce_tag = None
+
+    return lf_bruteforce_tag
 
 
 @labeling_function()
