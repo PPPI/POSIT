@@ -1,13 +1,10 @@
-# Collection of classifiers for consideration
 import json
 
 import joblib
 import numpy as np
 from gensim.corpora import Dictionary
-from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from gensim.models import KeyedVectors
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.gaussian_process.kernels import RBF
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
@@ -17,50 +14,55 @@ from sklearn.tree import DecisionTreeClassifier
 from snorkel.labeling import labeling_function
 
 from src.preprocessor.codeSearch_preprocessor import languages
-from src.tagger.data_utils import camel, snake
 
-names = ["Nearest Neighbors", "Linear SVM", "RBF SVM", "Gaussian Process",
-         "Decision Tree", "Random Forest", "Neural Net", "AdaBoost",
-         "Naive Bayes", "QDA"]
+names = [
+    "Nearest Neighbors",
+    # "Gaussian Process",
+    "Decision Tree",
+    "Random Forest",
+    "Neural Net",
+    "AdaBoost",
+    "Naive Bayes",
+    "Linear SVM",
+    # "RBF SVM",
+]
+
+np.random.seed(42)
 
 
-def train_and_store():
+def train_and_store(word2vec_location):
     classifiers = [
-        KNeighborsClassifier(3),
-        SVC(kernel="linear", C=0.025),
-        SVC(gamma=2, C=1),
-        GaussianProcessClassifier(1.0 * RBF(1.0)),
-        DecisionTreeClassifier(max_depth=5),
-        RandomForestClassifier(max_depth=5, n_estimators=10, max_features=1),
+        KNeighborsClassifier(5),
+        # GaussianProcessClassifier(1.0 * RBF(1.0)),  # Not enough RAM to run this locally
+        DecisionTreeClassifier(max_depth=15),
+        RandomForestClassifier(max_depth=15, n_estimators=100),
         MLPClassifier(alpha=1, max_iter=1000),
         AdaBoostClassifier(),
         GaussianNB(),
-        QuadraticDiscriminantAnalysis()]
+        SVC(kernel="linear", C=0.025),
+        # SVC(gamma=2, C=1),  # Time out on 5h waiting
+    ]
 
+    word2vec_keyedvectors = KeyedVectors.load_word2vec_format(word2vec_location)
     for language in languages:
+        print('Working on %s' % language)
         # Load Dictionaries so it is consistent with snorkel calls
         tag_dict = Dictionary.load('./data/frequency_data/%s/tags.dct' % language)
-        word_dict = Dictionary.load('./data/frequency_data/%s/words.dct' % language)
         # Load Training data
         with open('./data/frequency_data/%s/tag_lookup.json' % language, encoding='utf8') as f:
             tag_lookup = json.loads(f.read())
 
         # Transform data for training
-        X, y = list(), list()
+        Xy = list()
         for tag, examples in tag_lookup.items():
-            X += [
-                (1 if word[0].isupper() else 0,
-                 1 if word[0].istitle() else 0,
-                 1 if word[0].islower() else 0,
-                 1 if camel(word[0]) else 0,
-                 1 if snake(word[0]) else 0,
-                 1 if any(char.isupper() for char in word[0][1:]) else 0,
-                 1 if any(char.isdigit() for char in word[0]) else 0,
-                 1 if set('[~!@#$%^&*()_+{}":;\']+$').intersection(word) else 0,
-                 word_dict.token2id[word[0]])
-                for word in examples]
-            y += [tag_dict.token2id[tag]] * len(examples)
+            np.random.shuffle(examples)
+            examples = examples[:]
+            Xy += [
+                (word2vec_keyedvectors[word[0]], tag_dict.token2id[tag])
+                for word in examples if word[0] in word2vec_keyedvectors.vocab.keys()
+            ]
 
+        X, y = list(zip(*Xy))
         X = np.asarray(X)
         y = np.asarray(y)
 
@@ -75,21 +77,21 @@ def train_and_store():
             _ = joblib.dump(clf, clf_fname, compress=9)
 
 
-def classify_labeler_factory(language):
+def classify_labeler_factory(language, word2vec_location):
     classifiers = [joblib.load('./data/frequency_data/%s/%s_clf.pkl' % (language, name)) for name in names]
 
-    word_dict = Dictionary.load('./data/frequency_data/%s/words.dct' % language)
+    word2vec_keyedvectors = KeyedVectors.load_word2vec_format(word2vec_location)
 
     def classify_using_nth(n):
 
-        @labeling_function()
+        @labeling_function(name='clf_labeler_%d' % n)
         def clf_labeler(token):
             try:
-                token_id = word_dict[token]
+                feature_vector = word2vec_keyedvectors[token]
             except KeyError:
-                return 0
+                feature_vector = np.zeros_like(word2vec_keyedvectors[word2vec_keyedvectors.index2word[0]])
 
-            return classifiers[n].predict([token_id])[0]
+            return classifiers[n].predict([feature_vector])[0]
 
         return clf_labeler
 
@@ -97,4 +99,5 @@ def classify_labeler_factory(language):
 
 
 if __name__ == '__main__':
-    train_and_store()
+    word2vec_location = 'G:\\wiki_w2v_models\\wiki-news-300d-1M.vec'  # Update this or move to cli arg
+    train_and_store(word2vec_location)

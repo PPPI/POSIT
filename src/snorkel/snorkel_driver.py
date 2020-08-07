@@ -1,6 +1,7 @@
 import os
 import sys
 
+import h5py
 from gensim.corpora import Dictionary
 from nltk import pos_tag, word_tokenize
 from snorkel.labeling import LabelModel
@@ -31,43 +32,55 @@ tag_decoders = {
     }
 }
 
-#clf_labeling_factories = {lang: classify_labeler_factory(lang) for lang in languages}
+word2vec_location = 'G:\\wiki_w2v_models\\wiki-news-300d-1M.vec'  # Update this or move to cli arg
+
+
+# XXX: Commented out for now as Levenshtein is slow
+# lang_factory = frequency_language_levenshtein_factory()
+# frequency_labeling_factories = {lang: frequency_labeling_function_levenshtein_factory(lang) for lang in languages}
+
 
 def main(argv):
     location = argv[0]
 
     all_languages = languages + natural_languages + formal_languages
 
-    # Define the set of labeling functions (LFs)
-    lfs_lang = [
-        #frequency_language_factory(),
-        lf_builtin_language,
-        lf_uri_lang,
-        lf_diff_lang,
-        lf_email_lang,
-    ]
     # Not all lf-s exist for all langs, we filter None to avoid issues.
-    lfs_tags_per_lang = {**{lang: [x for x in [#frequency_labeling_function_factory(lang),
-                                               lf_bruteforce_tag_factory(lang, tag_encoders),
-                                               lf_builtin_tag_factory(lang)] #+
-                                   #[clf_labeling_factories[lang][n] for n in range(10)]
-                                   #if x is not None
-                                  ] for lang in languages
-                            },
-                         **{
-                             'uri': [lf_uri_tok],
-                             'diff': [lf_diff_tok],
-                             'email': [lf_email_tok],
-                         }}
+    lfs_tags_per_lang_formal = {
+        'uri': [lf_uri_tok],
+        'diff': [lf_diff_tok],
+        'email': [lf_email_tok],
+    }
     size_lang_voc = len(all_languages)  # 6 (PL) + 1 (NL) + 3 (FL) = 10
 
     df_train = SO_to_pandas(location)
-    #df_train = df_train[df_train['Span'].str.startswith("(0,")]
-    #df_train = df_train[df_train['Language'] != 'English']
 
     # Apply the LFs to the unlabeled training data
-    applier = PandasLFApplier(lfs_lang)
-    L_lang_train = applier.apply(df_train)
+    try:
+        try:
+            h5f = h5py.File('./data/data_votes.h5', 'r')
+            L_lang_train = h5f['language_votes'][:]
+        finally:
+            if 'h5f' in locals().keys():
+                h5f.close()
+    except (OSError, FileNotFoundError, KeyError):
+        # Define the set of labeling functions (LFs)
+        lfs_lang = [
+            frequency_language_factory(),
+            # lang_factory(levenshtein_distance=3),
+            lf_builtin_language,
+            lf_user_language,
+            lf_formal_lang,
+        ]
+        applier = PandasLFApplier(lfs_lang)
+        L_lang_train = applier.apply(df_train)
+        try:
+            h5f = h5py.File('./data/data_votes.h5', 'w')
+            h5f.create_dataset('language_votes', data=L_lang_train)
+        finally:
+            if 'h5f' in locals().keys():
+                h5f.close()
+
 
     # Train the label model and compute the training labels
     lang_label_model = LabelModel(cardinality=size_lang_voc, verbose=True)
@@ -82,10 +95,33 @@ def main(argv):
             size_tag_voc = 2
         else:  # language = 'uri
             size_tag_voc = 7
-        # Apply the LFs to the unlabeled training data
-        tapplier = PandasLFApplier(lfs_tags_per_lang[language])
-        L_train = tapplier.apply(df_train)
-        continue
+
+        try:
+            try:
+                h5f = h5py.File('./data/frequency_data/%s/data_votes.h5' % language, 'r')
+                L_train = h5f['%s_votes' % language][:]
+            finally:
+                if 'h5f' in locals().keys():
+                    h5f.close()
+        except (OSError, FileNotFoundError, KeyError):
+            if language in languages:
+                clf_labeling_factory = classify_labeler_factory(language, word2vec_location)
+                lfs_tags = [x for x in [frequency_labeling_function_factory(language),
+                                        # frequency_labeling_factories[lang](levenshtein_distance=3),
+                                        lf_builtin_tag_factory(language)] +
+                            [clf_labeling_factory(n) for n in range(7)]
+                            if x is not None]
+            else:
+                lfs_tags = lfs_tags_per_lang_formal[language]
+            # Apply the LFs to the unlabeled training data
+            tapplier = PandasLFApplier(lfs_tags)
+            L_train = tapplier.apply(df_train)
+            try:
+                h5f = h5py.File('./data/frequency_data/%s/data_votes.h5' % language, 'w')
+                h5f.create_dataset('%s_votes' % language, data=L_train)
+            finally:
+                if 'h5f' in locals().keys():
+                    h5f.close()
 
         # Train the label model and compute the training labels
         label_model = LabelModel(cardinality=size_tag_voc, verbose=True)
