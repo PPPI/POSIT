@@ -75,12 +75,12 @@ def main(argv):
         applier = PandasLFApplier(lfs_lang)
         L_lang_train = applier.apply(df_train)
         try:
+            os.makedirs('./data', exist_ok=True)
             h5f = h5py.File('./data/data_votes.h5', 'w')
             h5f.create_dataset('language_votes', data=L_lang_train)
         finally:
             if 'h5f' in locals().keys():
                 h5f.close()
-
 
     # Train the label model and compute the training labels
     lang_label_model = LabelModel(cardinality=size_lang_voc, verbose=True)
@@ -106,10 +106,12 @@ def main(argv):
         except (OSError, FileNotFoundError, KeyError):
             if language in languages:
                 clf_labeling_factory = classify_labeler_factory(language, word2vec_location)
-                lfs_tags = [x for x in [frequency_labeling_function_factory(language),
-                                        # frequency_labeling_factories[lang](levenshtein_distance=3),
-                                        lf_builtin_tag_factory(language),
-                                        lf_bruteforce_tag_factory(language, tag_encoders[language])] +
+                lfs_tags = [x for x in [
+                    frequency_labeling_function_factory(language),
+                    # frequency_labeling_factories[lang](levenshtein_distance=3),
+                    lf_builtin_tag_factory(language),
+                    lf_bruteforce_tag_factory(language, tag_encoders)
+                ] +
                             [clf_labeling_factory(n) for n in range(7)]
                             if x is not None]
             else:
@@ -118,6 +120,7 @@ def main(argv):
             tapplier = PandasLFApplier(lfs_tags)
             L_train = tapplier.apply(df_train)
             try:
+                os.makedirs('./data/frequency_data/%s' % language, exist_ok=True)
                 h5f = h5py.File('./data/frequency_data/%s/data_votes.h5' % language, 'w')
                 h5f.create_dataset('%s_votes' % language, data=L_train)
             finally:
@@ -134,6 +137,9 @@ def main(argv):
     test_index = int(0.8 * max_post_id)
     os.makedirs('./data/corpora/multilingual/so', exist_ok=True)
     current_context = ''
+    for filename in ['eval.txt', 'dev.txt', 'train.txt']:
+        with open('./data/corpora/multilingual/so/corpus/%s' % filename, 'w') as f:
+            pass
     for index, row in df_train.iterrows():
         if row['PostIdx'] > max_post_id:
             break
