@@ -6,6 +6,7 @@ from snorkel.labeling import PandasLFApplier
 
 from src.preprocessor.codeSearch_preprocessor import languages
 from src.preprocessor.so_to_pandas import SO_to_pandas
+from src.snorkel.classification_based_weak_labelling import classify_labeler_factory, word2vec_location
 from src.snorkel.weak_labellers import *
 
 
@@ -13,6 +14,12 @@ def main(argv):
     location = argv[0]
 
     df_train = SO_to_pandas(location)
+
+    lfs_tags_per_lang_formal = {
+        'uri': [lf_uri_tok],
+        'diff': [lf_diff_tok],
+        'email': [lf_email_tok],
+    }
 
     for language in languages:
         try:
@@ -22,11 +29,23 @@ def main(argv):
             if 'h5f' in locals().keys():
                 h5f.close()
 
-        lfs_tags = [lf_bruteforce_tag_factory(language, tag_encoders)]
+        if language in languages:
+            clf_labeling_factory = classify_labeler_factory(language, word2vec_location)
+            lfs_tags = [x for x in [
+                frequency_labeling_function_factory(language),
+                # frequency_labeling_factories[lang](levenshtein_distance=3),
+                lf_builtin_tag_factory(language),
+                lf_bruteforce_tag_factory(language, tag_encoders)
+            ] +
+                        [clf_labeling_factory(n) for n in range(7)]
+                        if x is not None]
+        else:
+            lfs_tags = lfs_tags_per_lang_formal[language]
+
         tapplier = PandasLFApplier(lfs_tags)
         L_train = tapplier.apply(df_train)
 
-        # TODO: np.stack/merge L_train_existing and L_train
+        # TODO: np.concat, add data at end to L_train_existing from L_train
 
         try:
             os.makedirs('./data/frequency_data/%s' % language, exist_ok=True)
