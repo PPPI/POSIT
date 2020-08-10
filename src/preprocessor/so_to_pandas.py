@@ -73,12 +73,30 @@ def tokenize_SO_row_star(args):
     return tokenize_SO_row(*args)
 
 
-def SO_to_pandas(location, limit=None):
+def tokenise_SO(location_, offset_, limit_):
+    for location_, (row_, language_) in enumerate(parse_stackoverflow_posts(location_)):
+        if location_ < offset_:
+            continue
+        if location_ >= limit_:
+            break
+        yield row_, language_
+
+
+def SO_to_pandas(location, limit=None, offset=None):
     try:
         result_df = pd.read_csv(location[:-len('xml')] + 'csv')
     except FileNotFoundError:
         fn_out = location[:-len('xml')] + 'csv'
         number_of_posts_after_filter = 5748669  # Precomputed separately by iterating through the file once.
+
+        if offset is not None:
+            number_of_posts_after_filter = max(number_of_posts_after_filter - offset, 0)
+        else:
+            offset = 0
+
+        if number_of_posts_after_filter == 0:
+            return pd.DataFrame(columns=['PostIdx', 'Token', 'Language', 'Span', 'Context'], data=[])
+
         if limit is not None:
             number_of_posts_after_filter = min(limit, number_of_posts_after_filter)
 
@@ -86,7 +104,7 @@ def SO_to_pandas(location, limit=None):
             f.write(','.join(['PostIdx', 'Token', 'Language', 'Span', 'Context']) + '\n')
         with Pool(processes=len(psutil.Process().cpu_affinity()), maxtasksperchild=4) as wp:
             for pidx, toks in \
-                    tqdm(enumerate(wp.imap(tokenize_SO_row_star, parse_stackoverflow_posts(location))),
+                    tqdm(enumerate(wp.imap(tokenize_SO_row_star, tokenise_SO(location, offset, limit))),
                          total=number_of_posts_after_filter):
                 for token, lang, span, context in toks:
                     with open(fn_out, 'a', encoding='utf-8') as f:
@@ -98,7 +116,7 @@ def SO_to_pandas(location, limit=None):
                                             context])
                 if pidx == limit:
                     break
-            result_df = pd.read_csv(location[:-len('xml')] + 'csv')
+            result_df = pd.read_csv(fn_out)
 
     return result_df
 
@@ -106,7 +124,11 @@ def SO_to_pandas(location, limit=None):
 if __name__ == '__main__':
     location = sys.argv[1]
     try:
-        limiit = int(sys.argv[2])
+        limit = int(sys.argv[2])
     except (IndexError, ValueError):
-        limiit = None
-    df = SO_to_pandas(location, limiit)
+        limit = None
+    try:
+        offset = int(sys.argv[2])
+    except (IndexError, ValueError):
+        offset = None
+    df = SO_to_pandas(location, limit, offset)

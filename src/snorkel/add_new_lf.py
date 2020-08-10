@@ -2,7 +2,9 @@ import os
 import sys
 
 import h5py
+import numpy as np
 from snorkel.labeling import PandasLFApplier
+from tqdm import tqdm
 
 from src.preprocessor.codeSearch_preprocessor import languages
 from src.preprocessor.so_to_pandas import SO_to_pandas
@@ -14,7 +16,7 @@ def main(argv):
 
     df_train = SO_to_pandas(location)
 
-    for language in languages:
+    for language in tqdm(languages, desc='Languages'):
         try:
             h5f = h5py.File('./data/frequency_data/%s/data_votes.h5' % language, 'r')
             L_train_existing = h5f['%s_votes' % language][:]
@@ -26,7 +28,7 @@ def main(argv):
         tapplier = PandasLFApplier(lfs_tags)
         L_train = tapplier.apply(df_train)
 
-        # TODO: np.stack/merge L_train_existing and L_train
+        L_train = np.c_[L_train_existing, L_train]
 
         try:
             os.makedirs('./data/frequency_data/%s' % language, exist_ok=True)

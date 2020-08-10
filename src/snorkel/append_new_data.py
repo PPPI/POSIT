@@ -2,11 +2,14 @@ import os
 import sys
 
 import h5py
+import numpy as np
 from snorkel.labeling import PandasLFApplier
+from tqdm import tqdm
 
-from src.preprocessor.codeSearch_preprocessor import languages
+from src.preprocessor.codeSearch_preprocessor import languages, formal_languages
 from src.preprocessor.so_to_pandas import SO_to_pandas
-from src.snorkel.classification_based_weak_labelling import classify_labeler_factory, word2vec_location
+from src.snorkel.classification_based_weak_labelling import classify_labeler_factory
+from src.snorkel.snorkel_driver import word2vec_location
 from src.snorkel.weak_labellers import *
 
 
@@ -29,7 +32,7 @@ def main(argv):
             if 'h5f' in locals().keys():
                 h5f.close()
 
-        if language in languages:
+        if language in tqdm(languages + formal_languages, desc='Languages'):
             clf_labeling_factory = classify_labeler_factory(language, word2vec_location)
             lfs_tags = [x for x in [
                 frequency_labeling_function_factory(language),
@@ -45,7 +48,7 @@ def main(argv):
         tapplier = PandasLFApplier(lfs_tags)
         L_train = tapplier.apply(df_train)
 
-        # TODO: np.concat, add data at end to L_train_existing from L_train
+        L_train = np.r_[L_train_existing, L_train]
 
         try:
             os.makedirs('./data/frequency_data/%s' % language, exist_ok=True)
