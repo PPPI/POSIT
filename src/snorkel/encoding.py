@@ -47,7 +47,12 @@ def tag_encoding_factory(language):
     tag_dict = Dictionary.load('./data/frequency_data/%s/tags.dct' % language)
 
     def tag_encoding(tag):
-        return tag_dict.token2id[tag] + 1
+        try:
+            return tag_dict.token2id[tag] + 1
+        except KeyError:
+            tag_dict.add_documents([[tag]])
+            tag_dict.save('./data/frequency_data/%s/tags.dct' % language)
+            return tag_dict.token2id[tag] + 1
 
     def tag_decoding(idx):
         if idx == 0:
