@@ -58,8 +58,8 @@ class Configuration:
     # project += '5'
 
     # embeddings
-    dim_word = 50
-    dim_char = 25
+    dim_word = 200
+    dim_char = 12
     embeddings = None
 
     # dataset
@@ -78,7 +78,7 @@ class Configuration:
     train_embeddings = True
     nr_epochs = 30
     dropout = 0.5
-    batch_size = 2
+    batch_size = 16
     lr_method = "adam"
     lr = 0.01
     lr_decay = 0.95
@@ -87,19 +87,22 @@ class Configuration:
 
     # model hyperparameters
     n_features = 8  # This is predefined by design, should be the size of our feature vector
-    hidden_size_char = 12  # lstm on chars
-    hidden_size_features = 4  # lstm on feature vector
-    hidden_size_lstm = 24  # lstm on word embeddings
+    hidden_size_char = 24  # lstm on chars
+    hidden_size_features = 8  # lstm on feature vector
+    hidden_size_lstm = 48  # lstm on word embeddings
     if with_l_id:
         if project == 'SO_Freq_Id':
             class_weight = 1 - 0.144  # For SO_Freq_Id it is: 740438 / (740438 + 4394836)
         else:
             class_weight = 0.5
-        l_id_weight = 0.9
+        l_id_weight = 0.5
         # Hyper-params for MLP going from state to bi-LSTM output to L_ID
-        n_hidden_1 = 64  # 1st layer number of neurons
-        n_hidden_2 = 8  # 2nd layer number of neurons
-        n_lang = 2  # Number of languages being mixed
+        n_hidden_1 = 128  # 1st layer number of neurons
+        n_hidden_2 = 16  # 2nd layer number of neurons
+        if multilang:
+            n_lang = nlangs
+        else:
+            n_lang = 2  # Number of languages being mixed
 
     use_cpu = False
     # NOTE: if both chars and crf, only 1.6x slower on GPU
