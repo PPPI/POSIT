@@ -376,7 +376,7 @@ class CodePoSModel(BaseModel):
                 logits=self.logits, labels=self.labels)
             mask = tf.sequence_mask(self.sequence_lengths)
             # l_mask = tf.not_equal(self.labels, self.config.vocab_tags.token2id[O])
-            if self.config.with_l_id:
+            if self.config.with_l_id and not self.config.multilang:
                 class_weight = tf.constant([self.config.class_weight, 1 - self.config.class_weight])
                 weight_per_label = tf.reshape(tf.gather(class_weight, tf.reshape(self.labels_l, shape=[-1])),
                                               shape=[-1, self.nsteps])
@@ -386,8 +386,9 @@ class CodePoSModel(BaseModel):
             self.loss = tf.reduce_mean(losses)
             if self.config.with_l_id:
                 losses_l = tf.nn.sparse_softmax_cross_entropy_with_logits(
-                    logits=self.logits, labels=self.labels_l)
-                losses_l = tf.multiply(losses_l, weight_per_label)
+                    logits=self.logits_l, labels=self.labels_l)
+                if not self.config.multilang:
+                    losses_l = tf.multiply(losses_l, weight_per_label)
                 mask = tf.sequence_mask(self.sequence_lengths)
                 losses_l = tf.boolean_mask(losses_l, mask)
                 self.loss += self.config.l_id_weight * tf.reduce_mean(losses_l)
