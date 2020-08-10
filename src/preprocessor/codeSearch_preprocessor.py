@@ -153,7 +153,8 @@ def ast_to_tagged_list(tree):
             for child in current.children:
                 if isinstance(child, antlr4.tree.Tree.TerminalNodeImpl):
                     tag = extract_name_from_terminal(child)
-                    result.append((child.symbol.text, tag, child.symbol.line, child.symbol.start))
+                    if child.symbol.line is not None:
+                        result.append((child.symbol.text, tag, child.symbol.line, child.symbol.start))
                 else:
                     visit.append(child)
 
