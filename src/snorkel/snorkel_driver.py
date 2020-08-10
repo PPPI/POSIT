@@ -134,7 +134,7 @@ def main(argv):
                     h5f.close()
 
         # Train the label model and compute the training labels
-        label_model = LabelModel(cardinality=size_tag_voc, verbose=True)
+        label_model = LabelModel(cardinality=size_tag_voc + 1, verbose=True)
         label_model.fit(L_train, n_epochs=20000, log_freq=200, seed=42)
         df_train["label_%s" % language] = label_model.predict(L=L_train, tie_break_policy="random")
 
