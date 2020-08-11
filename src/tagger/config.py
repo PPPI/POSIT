@@ -105,7 +105,7 @@ class Configuration:
         else:
             n_lang = 2  # Number of languages being mixed
 
-    use_cpu = True
+    use_cpu = False
     # NOTE: if both chars and crf, only 1.6x slower on GPU
     use_crf = True  # if crf, training is 1.7x slower on CPU
     use_chars = True  # if char embedding, training is 3.5x slower on CPU
