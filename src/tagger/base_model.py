@@ -37,9 +37,9 @@ class BaseModel(object):
         """
         _optimiser_lower = optimiser.lower()  # lower to make sure
 
-        with tf.variable_scope("train_step"):
+        with tf.compat.v1.variable_scope("train_step"):
             if _optimiser_lower == 'adam':  # sgd method
-                optimizer = tf.train.AdamOptimizer(lr)
+                optimizer = tf.compat.v1.train.AdamOptimizer(lr)
             elif _optimiser_lower == 'adagrad':
                 optimizer = tf.train.AdagradOptimizer(lr)
             elif _optimiser_lower == 'sgd':
@@ -62,13 +62,13 @@ class BaseModel(object):
 
     def initialize_session(self):
         """Defines self.sess and initialize the variables"""
-        self.logger.info("Initializing tf session")
+        self.logger.info("Initializing tf.compat.v1.Session")
         if self.use_cpu:
-            config = tf.ConfigProto(
+            config = tf.compat.v1.ConfigProto(
                 device_count={'GPU': 0}
             )
         else:
-            config = tf.ConfigProto()
+            config = tf.compat.v1.ConfigProto()
             config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
             # config.log_device_placement = True  # to log device placement (on which device the operation ran)
             #                                     # (nothing gets printed in Jupyter, only if you run it standalone)
@@ -82,9 +82,9 @@ class BaseModel(object):
         config.graph_options.rewrite_options.arithmetic_optimization = off
         config.graph_options.rewrite_options.memory_optimization = off
 
-        self.sess = tf.Session(config=config)
-        self.sess.run(tf.global_variables_initializer())
-        self.saver = tf.train.Saver()
+        self.sess = tf.compat.v1.Session(config=config)
+        self.sess.run(tf.compat.v1.global_variables_initializer())
+        self.saver = tf.compat.v1.train.Saver()
 
     def restore_session(self, dir_model):
         """Reload weights into session
@@ -107,9 +107,9 @@ class BaseModel(object):
     def add_summary(self):
         """Defines variables for Tensorboard
         """
-        self.merged = tf.summary.merge_all()
-        self.file_writer = tf.summary.FileWriter(self.config.dir_output,
-                                                 self.sess.graph)
+        self.merged = tf.compat.v1.summary.merge_all()
+        self.file_writer = tf.compat.v1.summary.FileWriter(self.config.dir_output,
+                                                           self.sess.graph)
 
     def train(self, train, dev):
         """Performs training with early stopping and lr exponential decay

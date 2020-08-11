@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+from tensorflow.python.keras.api import keras
 
 from .base_model import BaseModel
 from .data_utils import pad_sequences, minibatches
@@ -18,48 +19,48 @@ class CodePoSModel(BaseModel):
     def add_placeholders(self):
         """Define placeholders = entries to computational graph"""
         # shape = (batch size, max length of sentence in batch)
-        self.word_ids = tf.placeholder(tf.int32, shape=[None, None],
-                                       name="word_ids")
+        self.word_ids = tf.compat.v1.placeholder(tf.int32, shape=[None, None],
+                                                 name="word_ids")
 
         # shape = (batch size)
-        self.sequence_lengths = tf.placeholder(tf.int32, shape=[None],
-                                               name="sequence_lengths")
+        self.sequence_lengths = tf.compat.v1.placeholder(tf.int32, shape=[None],
+                                                         name="sequence_lengths")
 
         # shape = (batch size, max length of sentence, max length of word)
-        self.char_ids = tf.placeholder(tf.int32, shape=[None, None, None],
-                                       name="char_ids")
+        self.char_ids = tf.compat.v1.placeholder(tf.int32, shape=[None, None, None],
+                                                 name="char_ids")
 
         # shape = (batch_size, max_length of sentence)
-        self.word_lengths = tf.placeholder(tf.int32, shape=[None, None],
-                                           name="word_lengths")
+        self.word_lengths = tf.compat.v1.placeholder(tf.int32, shape=[None, None],
+                                                     name="word_lengths")
 
         # shape = (batch size, max length of sentence, max length of word)
-        self.feature_vector = tf.placeholder(tf.int32, shape=[None, None, self.config.n_features],
-                                             name="feature_vector")
+        self.feature_vector = tf.compat.v1.placeholder(tf.int32, shape=[None, None, self.config.n_features],
+                                                       name="feature_vector")
 
         # shape = (batch_size, max_length of sentence)
-        self.feature_sizes = tf.placeholder(tf.int32, shape=[None, None],
-                                            name="feature_sizes")
+        self.feature_sizes = tf.compat.v1.placeholder(tf.int32, shape=[None, None],
+                                                      name="feature_sizes")
 
         if self.config.multilang:
             # shape = (batch size, max length of sentence in batch, number of languages)
-            self.labels = tf.placeholder(tf.int32, shape=[None, None, None],
-                                         name="labels")
+            self.labels = tf.compat.v1.placeholder(tf.int32, shape=[None, None, None],
+                                                   name="labels")
         else:
             # shape = (batch size, max length of sentence in batch)
-            self.labels = tf.placeholder(tf.int32, shape=[None, None],
-                                         name="labels")
+            self.labels = tf.compat.v1.placeholder(tf.int32, shape=[None, None],
+                                                   name="labels")
 
         if self.config.with_l_id:
             # shape = (batch size, max length of sentence in batch)
-            self.labels_l = tf.placeholder(tf.int32, shape=[None, None],
-                                           name="labels_l")
+            self.labels_l = tf.compat.v1.placeholder(tf.int32, shape=[None, None],
+                                                     name="labels_l")
 
         # hyper parameters
-        self.dropout = tf.placeholder(dtype=tf.float32, shape=[],
-                                      name="dropout")
-        self.lr = tf.placeholder(dtype=tf.float32, shape=[],
-                                 name="lr")
+        self.dropout = tf.compat.v1.placeholder(dtype=tf.float32, shape=[],
+                                                name="dropout")
+        self.lr = tf.compat.v1.placeholder(dtype=tf.float32, shape=[],
+                                           name="lr")
 
     def get_feed_dict(self, words, labels=None, labels_l=None, lr=None, dropout=None):
         """Given some data, pad it and build a feed dictionary
@@ -172,10 +173,10 @@ class CodePoSModel(BaseModel):
         and we don't train the vectors. Otherwise, a random matrix with
         the correct shape is initialized.
         """
-        with tf.variable_scope("words"):
+        with tf.compat.v1.variable_scope("words"):
             if self.config.embeddings is None:
                 self.logger.info("WARNING: randomly initializing word vectors")
-                _word_embeddings = tf.get_variable(
+                _word_embeddings = tf.compat.v1.get_variable(
                     name="_word_embeddings",
                     dtype=tf.float32,
                     shape=[self.config.nwords, self.config.dim_word])
@@ -189,10 +190,10 @@ class CodePoSModel(BaseModel):
             word_embeddings = tf.nn.embedding_lookup(_word_embeddings,
                                                      self.word_ids, name="word_embeddings")
 
-        with tf.variable_scope("chars"):
+        with tf.compat.v1.variable_scope("chars"):
             if self.config.use_chars:
                 # get char embeddings matrix
-                _char_embeddings = tf.get_variable(
+                _char_embeddings = tf.compat.v1.get_variable(
                     name="_char_embeddings",
                     dtype=tf.float32,
                     shape=[self.config.nchars, self.config.dim_char])
@@ -208,7 +209,7 @@ class CodePoSModel(BaseModel):
                 # bi lstm on chars
                 cell_fw = tf.keras.layers.LSTMCell(self.config.hidden_size_char)
                 cell_bw = tf.keras.layers.LSTMCell(self.config.hidden_size_char)
-                _output = tf.nn.bidirectional_dynamic_rnn(
+                _output = tf.compat.v1.nn.bidirectional_dynamic_rnn(
                     cell_fw, cell_bw, char_embeddings,
                     sequence_length=word_lengths, dtype=tf.float32)
 
@@ -221,7 +222,7 @@ class CodePoSModel(BaseModel):
                                     shape=[s[0], s[1], 2 * self.config.hidden_size_char])
                 word_embeddings = tf.concat([word_embeddings, output], axis=-1)
 
-        with tf.variable_scope("feature"):
+        with tf.compat.v1.variable_scope("feature"):
             if self.config.use_features:
                 s = tf.shape(self.feature_vector)
                 if self.use_cpu:
@@ -253,7 +254,7 @@ class CodePoSModel(BaseModel):
         For each word in each sentence of the batch, it corresponds to a vector
         of scores, of dimension equal to the number of tags.
         """
-        with tf.variable_scope("bi-lstm"):
+        with tf.compat.v1.variable_scope("bi-lstm"):
             cell_fw = tf.keras.layers.LSTMCell(self.config.hidden_size_lstm)
             cell_bw = tf.keras.layers.LSTMCell(self.config.hidden_size_lstm)
             (output_fw, output_bw), _ = tf.nn.bidirectional_dynamic_rnn(
@@ -262,19 +263,20 @@ class CodePoSModel(BaseModel):
             output = tf.concat([output_fw, output_bw], axis=-1)
             output = tf.nn.dropout(output, rate=1 - self.dropout)
 
-        with tf.variable_scope("proj"):
+        with tf.compat.v1.variable_scope("proj"):
             if self.config.multilang:
-                W = tf.get_variable("W", dtype=tf.float32,
-                                    shape=[2 * self.config.hidden_size_lstm, self.config.nlangs * self.config.ntags])
+                W = tf.compat.v1.get_variable("W", dtype=tf.float32,
+                                              shape=[2 * self.config.hidden_size_lstm,
+                                                     self.config.nlangs * self.config.ntags])
 
-                b = tf.get_variable("b", shape=[self.config.nlangs * self.config.ntags],
-                                    dtype=tf.float32, initializer=tf.zeros_initializer())
+                b = tf.compat.v1.get_variable("b", shape=[self.config.nlangs * self.config.ntags],
+                                              dtype=tf.float32, initializer=tf.zeros_initializer())
             else:
-                W = tf.get_variable("W", dtype=tf.float32,
-                                    shape=[2 * self.config.hidden_size_lstm, self.config.ntags])
+                W = tf.compat.v1.get_variable("W", dtype=tf.float32,
+                                              shape=[2 * self.config.hidden_size_lstm, self.config.ntags])
 
-                b = tf.get_variable("b", shape=[self.config.ntags],
-                                    dtype=tf.float32, initializer=tf.zeros_initializer())
+                b = tf.compat.v1.get_variable("b", shape=[self.config.ntags],
+                                              dtype=tf.float32, initializer=tf.zeros_initializer())
 
             self.nsteps = tf.shape(output)[1]
             output = tf.reshape(output, [-1, 2 * self.config.hidden_size_lstm])
@@ -288,14 +290,14 @@ class CodePoSModel(BaseModel):
             if self.config.with_l_id:
                 # Store layers weight & bias
                 weights = {
-                    'h1': tf.Variable(tf.random_normal([2 * self.config.hidden_size_lstm, self.config.n_hidden_1])),
-                    'h2': tf.Variable(tf.random_normal([self.config.n_hidden_1, self.config.n_hidden_2])),
-                    'out': tf.Variable(tf.random_normal([self.config.n_hidden_2, self.config.n_lang]))
+                    'h1': tf.Variable(tf.random.normal([2 * self.config.hidden_size_lstm, self.config.n_hidden_1])),
+                    'h2': tf.Variable(tf.random.normal([self.config.n_hidden_1, self.config.n_hidden_2])),
+                    'out': tf.Variable(tf.random.normal([self.config.n_hidden_2, self.config.n_lang]))
                 }
                 biases = {
-                    'b1': tf.Variable(tf.random_normal([self.config.n_hidden_1])),  # , name='b1'),
-                    'b2': tf.Variable(tf.random_normal([self.config.n_hidden_2])),  # , name='b2'),
-                    'out': tf.Variable(tf.random_normal([self.config.n_lang])),  # , name='bout')
+                    'b1': tf.Variable(tf.random.normal([self.config.n_hidden_1])),  # , name='b1'),
+                    'b2': tf.Variable(tf.random.normal([self.config.n_hidden_2])),  # , name='b2'),
+                    'out': tf.Variable(tf.random.normal([self.config.n_lang])),  # , name='bout')
                 }
 
                 layer_1 = tf.tanh(tf.add(tf.matmul(output, weights['h1']), biases['b1']))
@@ -339,11 +341,15 @@ class CodePoSModel(BaseModel):
                     self.current_labels = tf.reshape(self.labels[:, :, dim:dim + 1],
                                                      shape=[-1, self.nsteps],
                                                      )
-                    with tf.variable_scope("Language_%d" % dim):
+                    with tf.compat.v1.variable_scope("Language_%d" % dim):
                         current_log_likelihood, trans_params = tf.contrib.crf.crf_log_likelihood(
                             self.current_logits, self.current_labels, self.sequence_lengths)
                         self.trans_params.append(trans_params)
-                        log_likelihood += current_log_likelihood
+                        # Only propagate for the languages that exist in the current batch
+                        log_likelihood += tf.multiply(tf.cast(
+                            tf.reduce_any(tf.math.equal(self.labels_l, tf.constant(dim))),
+                            dtype=tf.float32),
+                            current_log_likelihood)
             else:
                 log_likelihood, trans_params = tf.contrib.crf.crf_log_likelihood(
                     self.logits, self.labels, self.sequence_lengths)
@@ -362,7 +368,7 @@ class CodePoSModel(BaseModel):
                 self.loss = tf.reduce_mean(-log_likelihood)
 
             if self.config.with_l_id:
-                with tf.variable_scope("l_id_loss"):
+                with tf.compat.v1.variable_scope("l_id_loss"):
                     log_likelihood_l, trans_params_l = tf.contrib.crf.crf_log_likelihood(
                         self.logits_l, self.labels_l, self.sequence_lengths)
                     self.trans_params_l = trans_params_l  # need to evaluate it for decoding
@@ -399,7 +405,7 @@ class CodePoSModel(BaseModel):
         # self.loss += 0.05 * regularization_cost
 
         # for tensorboard
-        tf.summary.scalar("loss", self.loss)
+        tf.compat.v1.summary.scalar("loss", self.loss)
 
     def build(self):
         self.add_placeholders()
@@ -546,7 +552,7 @@ class CodePoSModel(BaseModel):
         sacc = np.mean(saccs)
         if self.config.with_l_id:
             acc_l = np.mean(accs_l)
-            join_acc = np.mean(accs + accs_l)
+            join_acc = np.mean(accs + accs_l) if not self.config.multilang else np.mean(np.mean(accs) + accs_l)
             sacc_l = np.mean(saccs_l)
             join_sacc = np.mean(saccs + saccs_l)
 

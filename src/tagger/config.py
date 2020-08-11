@@ -53,6 +53,7 @@ class Configuration:
 
     # general config
     with_l_id = True
+    with_l_id = with_l_id or multilang
     project = "so"
     project += '_Id' if with_l_id and not multilang else ''
     # project += '5'
@@ -104,9 +105,9 @@ class Configuration:
         else:
             n_lang = 2  # Number of languages being mixed
 
-    use_cpu = False
+    use_cpu = True
     # NOTE: if both chars and crf, only 1.6x slower on GPU
-    use_crf = False  # if crf, training is 1.7x slower on CPU
+    use_crf = True  # if crf, training is 1.7x slower on CPU
     use_chars = True  # if char embedding, training is 3.5x slower on CPU
     use_features = True
 
