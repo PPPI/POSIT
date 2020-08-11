@@ -556,7 +556,7 @@ class CodePoSModel(BaseModel):
                            "sent_acc": 100 * sacc,
                            "sent_acc_l_id": 100 * sacc_l,
                            "sent_joint_acc": 100 * join_sacc, }
-                for i in range(self.config.nalangs):
+                for i in range(self.config.nlangs):
                     metrics['acc_%d' % i] = 100 * acc[i]
                 return metrics
             else:
