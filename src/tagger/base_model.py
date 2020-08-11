@@ -41,15 +41,15 @@ class BaseModel(object):
             if _optimiser_lower == 'adam':  # sgd method
                 optimizer = tf.compat.v1.train.AdamOptimizer(lr)
             elif _optimiser_lower == 'adagrad':
-                optimizer = tf.train.AdagradOptimizer(lr)
+                optimizer = tf.compat.v1.train.AdagradOptimizer(lr)
             elif _optimiser_lower == 'sgd':
-                optimizer = tf.train.GradientDescentOptimizer(lr)
+                optimizer = tf.compat.v1.train.GradientDescentOptimizer(lr)
             elif _optimiser_lower == 'rmsprop':
-                optimizer = tf.train.RMSPropOptimizer(lr)
+                optimizer = tf.compat.v1.train.RMSPropOptimizer(lr)
             elif _optimiser_lower == 'adadelta':
-                optimizer = tf.train.AdadeltaOptimizer(lr)
+                optimizer = tf.compat.v1.train.AdadeltaOptimizer(lr)
             elif _optimiser_lower == 'proximaladagrad':
-                optimizer = tf.train.ProximalAdagradOptimizer(lr)
+                optimizer = tf.compat.v1.train.ProximalAdagradOptimizer(lr)
             else:
                 raise NotImplementedError("Unknown method {}".format(_optimiser_lower))
 

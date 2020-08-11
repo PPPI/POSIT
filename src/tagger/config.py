@@ -81,7 +81,7 @@ class Configuration:
     dropout = 0.5
     batch_size = 32
     lr_method = "rmsprop"
-    lr = 0.001
+    lr = 0.05
     lr_decay = 0.90
     clip = None  # if None, no clipping
     nr_epochs_no_imprvmt = 10
@@ -105,7 +105,7 @@ class Configuration:
         else:
             n_lang = 2  # Number of languages being mixed
 
-    use_cpu = False
+    use_cpu = True
     # NOTE: if both chars and crf, only 1.6x slower on GPU
     use_crf = True  # if crf, training is 1.7x slower on CPU
     use_chars = True  # if char embedding, training is 3.5x slower on CPU
