@@ -514,7 +514,7 @@ class CodePoSModel(BaseModel):
         :param test: dataset that yields tuple of (sentences, tags)
         :return metrics: (dict) metrics["acc"] = 74.6, ...
         """
-        accs = []
+        accs = [] if not self.config.multilang else [[] for _ in range(self.config.nlangs)]
         saccs = []
         accs_l = []
         saccs_l = []
@@ -527,9 +527,10 @@ class CodePoSModel(BaseModel):
                                              sequence_lengths):
                 lab = lab[:length]
                 lab_pred = lab_pred[:length]
-                # accs += [a == b for (a, b) in zip(lab, lab_pred) if a != self.config.vocab_tags.token2id[O]]
                 if self.config.multilang:
-                    accs += [t1 == t2 for (a, b) in zip(lab, lab_pred) for (t1, t2) in zip(a, b)]
+                    for a, b in zip(lab, lab_pred):
+                        for i in range(self.config.nlangs):
+                            accs[i].append(a[i] == b[i])
                     saccs.append(all([t1 == t2 for (a, b) in zip(lab, lab_pred) for (t1, t2) in zip(a, b)]))
                 else:
                     accs += [a == b for (a, b) in zip(lab, lab_pred)]
@@ -541,7 +542,7 @@ class CodePoSModel(BaseModel):
                     accs_l += [a == b for (a, b) in zip(lab, lab_pred)]
                     saccs_l.append(all([a == b for (a, b) in zip(lab, lab_pred)]))
 
-        acc = np.mean(accs)
+        acc = np.mean(accs) if not self.config.multilang else np.asarray([np.mean(a) for a in accs])
         sacc = np.mean(saccs)
         if self.config.with_l_id:
             acc_l = np.mean(accs_l)
@@ -549,13 +550,23 @@ class CodePoSModel(BaseModel):
             sacc_l = np.mean(saccs_l)
             join_sacc = np.mean(saccs + saccs_l)
 
-            return {"acc": 100 * acc,
-                    "acc_l_id": 100 * acc_l,
-                    "joint_acc": 100 * join_acc,
-                    "sent_acc": 100 * sacc,
-                    "sent_acc_l_id": 100 * sacc_l,
-                    "sent_joint_acc": 100 * join_sacc,
-                    }
+            if self.config.multilang:
+                metrics = {"acc_l_id": 100 * acc_l,
+                           "joint_acc": 100 * join_acc,
+                           "sent_acc": 100 * sacc,
+                           "sent_acc_l_id": 100 * sacc_l,
+                           "sent_joint_acc": 100 * join_sacc, }
+                for i in range(self.config.nalangs):
+                    metrics['acc_%d' % i] = 100 * acc[i]
+                return metrics
+            else:
+                return {"acc": 100 * acc,
+                        "acc_l_id": 100 * acc_l,
+                        "joint_acc": 100 * join_acc,
+                        "sent_acc": 100 * sacc,
+                        "sent_acc_l_id": 100 * sacc_l,
+                        "sent_joint_acc": 100 * join_sacc,
+                        }
         else:
             return {"acc": 100 * acc, "sent_acc": 100 * sacc}
 
