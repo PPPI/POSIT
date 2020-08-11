@@ -554,12 +554,14 @@ class CodePoSModel(BaseModel):
                     saccs_l.append(all([a == b for (a, b) in zip(lab, lab_pred)]))
 
         if self.config.multilang:
-            normed_acc = np.mean([np.mean(acc[lid]) for acc, lid in zip(np.asarray(accs).T, lids)])
+            normed_accs = [np.mean(acc[lid]) for acc, lid in zip(np.asarray(accs).T, lids)]
         acc = np.mean(accs) if not self.config.multilang else np.asarray([np.mean(a) for a in accs])
         sacc = np.mean(saccs)
         if self.config.with_l_id:
+            if self.config.multilang:
+                normed_acc = np.mean(normed_accs)
             acc_l = np.mean(accs_l)
-            join_acc = np.mean(accs + accs_l) if not self.config.multilang else np.mean(np.mean(accs) + accs_l)
+            join_acc = np.mean(accs + accs_l) if not self.config.multilang else np.mean(normed_accs + accs_l)
             sacc_l = np.mean(saccs_l)
             join_sacc = np.mean(saccs + saccs_l)
 
