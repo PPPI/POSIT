@@ -80,7 +80,7 @@ class Configuration:
     nr_epochs = 100
     dropout = 0.5
     batch_size = 32
-    lr_method = "adam"
+    lr_method = "rmsprop"
     lr = 0.001
     lr_decay = 0.90
     clip = None  # if None, no clipping
@@ -88,9 +88,9 @@ class Configuration:
 
     # model hyperparameters
     n_features = 8  # This is predefined by design, should be the size of our feature vector
-    hidden_size_char = 64  # lstm on chars
+    hidden_size_char = 32  # lstm on chars
     hidden_size_features = 16  # lstm on feature vector
-    hidden_size_lstm = 256  # lstm on word embeddings
+    hidden_size_lstm = 64  # lstm on word embeddings
     if with_l_id:
         if project == 'SO_Freq_Id':
             class_weight = 1 - 0.144  # For SO_Freq_Id it is: 740438 / (740438 + 4394836)
@@ -98,21 +98,21 @@ class Configuration:
             class_weight = 0.5
         l_id_weight = 0.5
         # Hyper-params for MLP going from state to bi-LSTM output to L_ID
-        n_hidden_1 = 1024  # 1st layer number of neurons
-        n_hidden_2 = 128  # 2nd layer number of neurons
+        n_hidden_1 = 256  # 1st layer number of neurons
+        n_hidden_2 = 64  # 2nd layer number of neurons
         if multilang:
             n_lang = nlangs
         else:
             n_lang = 2  # Number of languages being mixed
 
-    use_cpu = True
+    use_cpu = False
     # NOTE: if both chars and crf, only 1.6x slower on GPU
     use_crf = True  # if crf, training is 1.7x slower on CPU
     use_chars = True  # if char embedding, training is 3.5x slower on CPU
     use_features = True
 
     # In batch shuffle of training examples
-    seed = 32
+    seed = 42
     shuffle = True
 
     # storage config
