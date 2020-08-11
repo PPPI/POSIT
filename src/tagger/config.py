@@ -79,7 +79,7 @@ class Configuration:
     train_embeddings = True
     nr_epochs = 100
     dropout = 0.5
-    batch_size = 32
+    batch_size = 16
     lr_method = "rmsprop"
     lr = 0.05
     lr_decay = 0.90
@@ -88,9 +88,9 @@ class Configuration:
 
     # model hyperparameters
     n_features = 8  # This is predefined by design, should be the size of our feature vector
-    hidden_size_char = 32  # lstm on chars
-    hidden_size_features = 16  # lstm on feature vector
-    hidden_size_lstm = 64  # lstm on word embeddings
+    hidden_size_char = 16  # lstm on chars
+    hidden_size_features = 8  # lstm on feature vector
+    hidden_size_lstm = 48  # lstm on word embeddings
     if with_l_id:
         if project == 'SO_Freq_Id':
             class_weight = 1 - 0.144  # For SO_Freq_Id it is: 740438 / (740438 + 4394836)
@@ -98,8 +98,8 @@ class Configuration:
             class_weight = 0.5
         l_id_weight = 0.5
         # Hyper-params for MLP going from state to bi-LSTM output to L_ID
-        n_hidden_1 = 256  # 1st layer number of neurons
-        n_hidden_2 = 64  # 2nd layer number of neurons
+        n_hidden_1 = 128  # 1st layer number of neurons
+        n_hidden_2 = 32  # 2nd layer number of neurons
         if multilang:
             n_lang = nlangs
         else:

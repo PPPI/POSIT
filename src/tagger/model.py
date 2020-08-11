@@ -1,6 +1,5 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.python.keras.api import keras
 
 from .base_model import BaseModel
 from .data_utils import pad_sequences, minibatches
@@ -461,6 +460,8 @@ class CodePoSModel(BaseModel):
                     viterbi_sequences += [viterbi_seq]
 
             if self.config.with_l_id:
+                if self.config.multilang:
+                    viterbi_sequences = [np.asarray(list(inner)).T for inner in np.asarray(viterbi_sequences).T]
                 return viterbi_sequences, viterbi_l_ids, sequence_lengths
             else:
                 return viterbi_sequences, sequence_lengths
@@ -521,6 +522,8 @@ class CodePoSModel(BaseModel):
         :return metrics: (dict) metrics["acc"] = 74.6, ...
         """
         accs = [] if not self.config.multilang else [[] for _ in range(self.config.nlangs)]
+        if self.config.multilang:
+            lids = []
         saccs = []
         accs_l = []
         saccs_l = []
@@ -543,11 +546,15 @@ class CodePoSModel(BaseModel):
                     saccs.append(all([a == b for (a, b) in zip(lab, lab_pred)]))
             if self.config.with_l_id:
                 for lab, lab_pred, length in zip(l_id, labels_pred_l, sequence_lengths):
+                    if self.config.multilang:
+                        lids += lab
                     lab = lab[:length]
                     lab_pred = lab_pred[:length]
                     accs_l += [a == b for (a, b) in zip(lab, lab_pred)]
                     saccs_l.append(all([a == b for (a, b) in zip(lab, lab_pred)]))
 
+        if self.config.multilang:
+            normed_acc = np.mean([np.mean(acc[lid]) for acc, lid in zip(np.asarray(accs).T, lids)])
         acc = np.mean(accs) if not self.config.multilang else np.asarray([np.mean(a) for a in accs])
         sacc = np.mean(saccs)
         if self.config.with_l_id:
@@ -557,11 +564,13 @@ class CodePoSModel(BaseModel):
             join_sacc = np.mean(saccs + saccs_l)
 
             if self.config.multilang:
-                metrics = {"acc_l_id": 100 * acc_l,
-                           "joint_acc": 100 * join_acc,
-                           "sent_acc": 100 * sacc,
-                           "sent_acc_l_id": 100 * sacc_l,
-                           "sent_joint_acc": 100 * join_sacc, }
+                metrics = {
+                    "acc": 100 * normed_acc,
+                    "acc_l_id": 100 * acc_l,
+                    "joint_acc": 100 * join_acc,
+                    "sent_acc": 100 * sacc,
+                    "sent_acc_l_id": 100 * sacc_l,
+                    "sent_joint_acc": 100 * join_sacc, }
                 for i in range(self.config.nlangs):
                     metrics['acc_%d' % i] = 100 * acc[i]
                 return metrics
