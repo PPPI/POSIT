@@ -41,7 +41,7 @@ def frequency_labeling_function_factory(language):
         try:
             tags = [(t, fq) for t, fq in frequency_table[str(row['Token'])].items() if t != UNDEF]
             sorted(tags, key=lambda p: p[-1], reverse=True)
-            return tag_encoders[language](tags[0])
+            return tag_encoders[language](tags[0][0])
         except (KeyError, IndexError):
             return ABSTAIN
 
@@ -99,7 +99,7 @@ def frequency_labeling_function_levenshtein_factory(language):
                                 tags[t] += fq
                     tags = list(tags.items())
                     tags = sorted(tags, key=lambda p: p[-1], reverse=True)
-                    return tag_encoders[language](tags[0])
+                    return tag_encoders[language](tags[0][0])
                 else:
                     return ABSTAIN
             except IndexError:

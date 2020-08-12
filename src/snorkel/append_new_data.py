@@ -24,6 +24,34 @@ def main(argv):
         'email': [lf_email_tok],
     }
 
+    # Define the set of labeling functions (LFs)
+    lfs_lang = [
+        frequency_language_factory(),
+        # lang_factory(levenshtein_distance=3),
+        lf_builtin_language,
+        lf_user_language,
+        lf_formal_lang,
+    ]
+    try:
+        h5f = h5py.File('./data/data_votes.h5', 'r')
+        L_lang_train_existing = h5f['language_votes'][:]
+    finally:
+        if 'h5f' in locals().keys():
+            h5f.close()
+
+    applier = PandasLFApplier(lfs_lang)
+    L_lang_train = applier.apply(df_train)
+
+    L_lang_train = np.r_[L_lang_train_existing, L_lang_train]
+
+    try:
+        os.makedirs('./data', exist_ok=True)
+        h5f = h5py.File('./data/data_votes.h5', 'w')
+        h5f.create_dataset('language_votes', data=L_lang_train)
+    finally:
+        if 'h5f' in locals().keys():
+            h5f.close()
+
     for language in languages:
         try:
             h5f = h5py.File('./data/frequency_data/%s/data_votes.h5' % language, 'r')
