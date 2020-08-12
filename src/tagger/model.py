@@ -555,6 +555,8 @@ class CodePoSModel(BaseModel):
 
         if self.config.multilang:
             normed_accs = [acc[lid] for acc, lid in zip(np.asarray(accs).T, lids)]
+            # This is just PL languages, 0 is Eng, 7,8,9 are formals that are non-PL
+            normed_pl_accs = [acc[lid] for acc, lid in zip(np.asarray(accs).T, lids) if lid not in [0, 7, 8, 9]]
         acc = np.mean(accs) if not self.config.multilang else \
             np.asarray([np.mean([acc[dim]for acc, lid in zip(np.asarray(accs).T, lids) if lid == dim])
                         for dim in range(self.config.nlangs)])
@@ -562,6 +564,7 @@ class CodePoSModel(BaseModel):
         if self.config.with_l_id:
             if self.config.multilang:
                 normed_acc = np.mean(normed_accs)
+                normed_pl_acc = np.mean(normed_pl_accs)
             acc_l = np.mean(accs_l)
             join_acc = np.mean(accs + accs_l) if not self.config.multilang else np.mean(normed_accs + accs_l)
             sacc_l = np.mean(saccs_l)
@@ -570,6 +573,7 @@ class CodePoSModel(BaseModel):
             if self.config.multilang:
                 metrics = {
                     "acc": 100 * normed_acc,
+                    "acc_pl": 100 * normed_pl_acc,
                     "acc_l_id": 100 * acc_l,
                     "joint_acc": 100 * join_acc,
                     "sent_acc": 100 * sacc,
@@ -601,9 +605,9 @@ class CodePoSModel(BaseModel):
         pred = self.predict_batch([words])
         pred_ids = np.asarray(pred[0])
         if self.config.multilang:
-            preds = [self.idx_to_tag[idx] for idx in list(pred_ids[0])]
-        else:
             preds = [[self.idx_to_tag[idx] for idx in list(pred_ids[0].T[n])] for n in range(self.config.nlangs)]
+        else:
+            preds = [self.idx_to_tag[idx] for idx in list(pred_ids[0])]
 
         if self.config.with_l_id:
             pred_lid = pred[1][0]
