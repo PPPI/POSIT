@@ -83,14 +83,18 @@ def tokenise_SO(location_, offset_, limit_):
 
 
 def SO_to_pandas(location, limit=None, offset=None):
+    fn_out = location[:-len('.xml')]
+    if offset is not None:
+        fn_out += '_%d' % offset
+    fn_out += '.csv'
     try:
-        result_df = pd.read_csv(location[:-len('xml')] + 'csv')
+        result_df = pd.read_csv(fn_out)
     except FileNotFoundError:
-        fn_out = location[:-len('xml')] + 'csv'
         number_of_posts_after_filter = 5748669  # Precomputed separately by iterating through the file once.
 
         if offset is not None:
             number_of_posts_after_filter = max(number_of_posts_after_filter - offset, 0)
+            limit += offset
         else:
             offset = 0
 
@@ -98,7 +102,7 @@ def SO_to_pandas(location, limit=None, offset=None):
             return pd.DataFrame(columns=['PostIdx', 'Token', 'Language', 'Span', 'Context'], data=[])
 
         if limit is not None:
-            number_of_posts_after_filter = min(limit, number_of_posts_after_filter)
+            number_of_posts_after_filter = min(limit-offset, number_of_posts_after_filter)
 
         with open(fn_out, 'w', encoding='utf-8') as f:
             f.write(','.join(['PostIdx', 'Token', 'Language', 'Span', 'Context']) + '\n')
@@ -128,7 +132,7 @@ if __name__ == '__main__':
     except (IndexError, ValueError):
         limit = None
     try:
-        offset = int(sys.argv[2])
+        offset = int(sys.argv[3])
     except (IndexError, ValueError):
         offset = None
     df = SO_to_pandas(location, limit, offset)
