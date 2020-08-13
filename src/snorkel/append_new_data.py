@@ -6,7 +6,6 @@ import numpy as np
 from snorkel.labeling import PandasLFApplier
 from tqdm import tqdm
 
-from src.preprocessor.codeSearch_preprocessor import languages, formal_languages
 from src.preprocessor.so_to_pandas import SO_to_pandas
 from src.snorkel.classification_based_weak_labelling import classify_labeler_factory
 from src.snorkel.snorkel_driver import word2vec_location
@@ -15,6 +14,9 @@ from src.snorkel.weak_labellers import *
 
 def main(argv):
     location = argv[0]
+    languages = argv[1:]
+    if len(languages) == 0:
+        print("You should provide a list of languages to process", file=sys.stderr)
 
     df_train = SO_to_pandas(location)
 
@@ -23,73 +25,73 @@ def main(argv):
         'diff': [lf_diff_tok],
         'email': [lf_email_tok],
     }
-
-    # Define the set of labeling functions (LFs)
-    lfs_lang = [
-        frequency_language_factory(),
-        # lang_factory(levenshtein_distance=3),
-        lf_builtin_language,
-        lf_user_language,
-        lf_formal_lang,
-    ]
-    try:
-        h5f = h5py.File('./data/data_votes.h5', 'r')
-        L_lang_train_existing = h5f['language_votes'][:]
-    finally:
-        if 'h5f' in locals().keys():
-            h5f.close()
-
-    applier = PandasLFApplier(lfs_lang)
-    L_lang_train = applier.apply(df_train)
-
-    L_lang_train = np.r_[L_lang_train_existing, L_lang_train]
-
-    try:
-        os.makedirs('./data', exist_ok=True)
-        h5f = h5py.File('./data/data_votes.h5', 'w')
-        h5f.create_dataset('language_votes', data=L_lang_train)
-    finally:
-        if 'h5f' in locals().keys():
-            h5f.close()
-
-    for language in languages:
+    if len(languages) == 1 and languages[0].tolower() == "language":
+        # Define the set of labeling functions (LFs)
+        lfs_lang = [
+            frequency_language_factory(),
+            # lang_factory(levenshtein_distance=3),
+            lf_builtin_language,
+            lf_user_language,
+            lf_formal_lang,
+        ]
         try:
-            h5f = h5py.File('./data/frequency_data/%s/data_votes.h5' % language, 'r')
-            L_train_existing = h5f['%s_votes' % language][:]
+            h5f = h5py.File('./data/data_votes.h5', 'r')
+            L_lang_train_existing = h5f['language_votes'][:]
         finally:
             if 'h5f' in locals().keys():
                 h5f.close()
 
-        if language in tqdm(languages + formal_languages, desc='Languages'):
-            clf_labeling_factory = classify_labeler_factory(language, word2vec_location)
-            lfs_tags = [x
-                        for x in [
-                            frequency_labeling_function_factory(language),
-                            # frequency_labeling_factories[lang](levenshtein_distance=3),
-                            lf_builtin_tag_factory(language),
-                        ] +
-                        [
-                            clf_labeling_factory(n) for n in range(7)
-                        ] + [
-                            lf_bruteforce_tag_factory(language, tag_encoders)
-                        ]
-                        if x is not None
-                        ]
-        else:
-            lfs_tags = lfs_tags_per_lang_formal[language]
+        applier = PandasLFApplier(lfs_lang)
+        L_lang_train = applier.apply(df_train)
 
-        tapplier = PandasLFApplier(lfs_tags)
-        L_train = tapplier.apply(df_train)
-
-        L_train = np.r_[L_train_existing, L_train]
+        L_lang_train = np.r_[L_lang_train_existing, L_lang_train]
 
         try:
-            os.makedirs('./data/frequency_data/%s' % language, exist_ok=True)
-            h5f = h5py.File('./data/frequency_data/%s/data_votes.h5' % language, 'w')
-            h5f.create_dataset('%s_votes' % language, data=L_train)
+            os.makedirs('./data', exist_ok=True)
+            h5f = h5py.File('./data/data_votes.h5', 'w')
+            h5f.create_dataset('language_votes', data=L_lang_train)
         finally:
             if 'h5f' in locals().keys():
                 h5f.close()
+    else:
+        for language in languages:
+            try:
+                h5f = h5py.File('./data/frequency_data/%s/data_votes.h5' % language, 'r')
+                L_train_existing = h5f['%s_votes' % language][:]
+            finally:
+                if 'h5f' in locals().keys():
+                    h5f.close()
+
+            if language in tqdm(languages, desc='Languages'):
+                clf_labeling_factory = classify_labeler_factory(language, word2vec_location)
+                lfs_tags = [x
+                            for x in [
+                                frequency_labeling_function_factory(language),
+                                # frequency_labeling_factories[lang](levenshtein_distance=3),
+                                lf_builtin_tag_factory(language),
+                            ] +
+                            [
+                                clf_labeling_factory(n) for n in range(7)
+                            ] + [
+                                lf_bruteforce_tag_factory(language, tag_encoders)
+                            ]
+                            if x is not None
+                            ]
+            else:
+                lfs_tags = lfs_tags_per_lang_formal[language]
+
+            tapplier = PandasLFApplier(lfs_tags)
+            L_train = tapplier.apply(df_train)
+
+            L_train = np.r_[L_train_existing, L_train]
+
+            try:
+                os.makedirs('./data/frequency_data/%s' % language, exist_ok=True)
+                h5f = h5py.File('./data/frequency_data/%s/data_votes.h5' % language, 'w')
+                h5f.create_dataset('%s_votes' % language, data=L_train)
+            finally:
+                if 'h5f' in locals().keys():
+                    h5f.close()
 
 
 if __name__ == '__main__':
