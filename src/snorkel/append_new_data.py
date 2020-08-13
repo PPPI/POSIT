@@ -6,6 +6,7 @@ import numpy as np
 from snorkel.labeling import PandasLFApplier
 from tqdm import tqdm
 
+from src.preprocessor.codeSearch_preprocessor import formal_languages
 from src.preprocessor.so_to_pandas import SO_to_pandas
 from src.snorkel.classification_based_weak_labelling import classify_labeler_factory
 from src.snorkel.snorkel_driver import word2vec_location
@@ -54,7 +55,7 @@ def main(argv):
             if 'h5f' in locals().keys():
                 h5f.close()
     else:
-        for language in languages:
+        for language in tqdm(languages, desc='Languages'):
             try:
                 h5f = h5py.File('./data/frequency_data/%s/data_votes.h5' % language, 'r')
                 L_train_existing = h5f['%s_votes' % language][:]
@@ -62,7 +63,7 @@ def main(argv):
                 if 'h5f' in locals().keys():
                     h5f.close()
 
-            if language in tqdm(languages, desc='Languages'):
+            if language in formal_languages:
                 clf_labeling_factory = classify_labeler_factory(language, word2vec_location)
                 lfs_tags = [x
                             for x in [
