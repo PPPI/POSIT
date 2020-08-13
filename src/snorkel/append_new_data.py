@@ -25,7 +25,7 @@ def main(argv):
         'diff': [lf_diff_tok],
         'email': [lf_email_tok],
     }
-    if len(languages) == 1 and languages[0].tolower() == "language":
+    if len(languages) == 1 and languages[0].lower() == "language":
         # Define the set of labeling functions (LFs)
         lfs_lang = [
             frequency_language_factory(),
