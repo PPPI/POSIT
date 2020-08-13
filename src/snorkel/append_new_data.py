@@ -102,7 +102,8 @@ def main(argv):
             if sys.platform.startswith('win'):
                 L_train = parallelize_dataframe(df_train, tapplier.apply, len(psutil.Process().cpu_affinity()) - 1)
             else:
-                L_train = tapplier.apply(df_train)
+                # modin is not compatible with progress_apply
+                L_train = tapplier.apply(df_train, progress_bar=False)
 
             L_train = np.r_[L_train_existing, L_train]
 
