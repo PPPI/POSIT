@@ -12,8 +12,10 @@ from src.preprocessor.so_to_pandas import SO_to_pandas
 from src.snorkel.classification_based_weak_labelling import classify_labeler_factory
 from src.snorkel.weak_labellers import *
 
-word2vec_location = 'G:\\wiki_w2v_models\\wiki-news-300d-1M.vec'  # Update this or move to cli arg
-
+if sys.platform.startswith('win'):
+    word2vec_location = 'G:\\wiki_w2v_models\\wiki-news-300d-1M.vec'  # Update this or move to cli arg
+else:
+    word2vec_location = '/mnt/g/wiki_w2v_models/wiki-news-300d-1M.vec'  # Update this or move to cli arg
 
 # XXX: Commented out for now as Levenshtein is slow
 # lang_factory = frequency_language_levenshtein_factory()

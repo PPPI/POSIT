@@ -6,11 +6,11 @@ from collections import defaultdict
 from Levenshtein import distance as levenshtein
 from snorkel.labeling import labeling_function
 
+from .brute_parse import RowLabeller
 from .encoding import lang_encoding, tag_encoding_factory, uri_encoding
 from ..preprocessor.builtin_lists import *
 from ..preprocessor.codeSearch_preprocessor import UNDEF
 from ..preprocessor.formal_lang_heuristics import is_URI, is_diff_header, is_email
-from .brute_parse import RowLabeller
 
 ABSTAIN = 0
 
@@ -293,3 +293,7 @@ def lf_email_tok(row):
         return 1  # THere is only an 'email' option
     else:
         return ABSTAIN
+
+
+if __name__ == '__main__':
+    pass
