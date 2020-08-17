@@ -75,6 +75,7 @@ def main(argv):
     else:
         print('Working on Language Tags.')
         for language in tqdm(languages, desc='Languages'):
+            L_train_existing = None
             try:
                 h5f = h5py.File('./data/frequency_data/%s/data_votes.h5' % language, 'r')
                 L_train_existing = h5f['%s_votes' % language][:]
@@ -83,7 +84,7 @@ def main(argv):
                     h5f.close()
 
             if language not in formal_languages:
-                clf_labeling_factory = classify_labeler_factory(language)
+                # clf_labeling_factory = classify_labeler_factory(language)
                 lfs_tags = [x
                             for x in [
                                 frequency_labeling_function_factory(language),
@@ -91,9 +92,9 @@ def main(argv):
                                 lf_builtin_tag_factory(language),
                             ] +
                             [
-                                clf_labeling_factory(n) for n in range(7)
+                                # clf_labeling_factory(n) for n in range(7)
                             ] + [
-                                lf_bruteforce_tag_factory(language, tag_encoders)
+                                # lf_bruteforce_tag_factory(language, tag_encoders)
                             ]
                             if x is not None
                             ]
@@ -107,7 +108,8 @@ def main(argv):
                 # modin is not compatible with progress_apply
                 L_train = tapplier.apply(df_train, progress_bar=False)
 
-            L_train = np.r_[L_train_existing, L_train]
+            if L_train_existing is not None:
+                L_train = np.r_[L_train_existing, L_train]
 
             try:
                 os.makedirs('./data/frequency_data/%s' % language, exist_ok=True)

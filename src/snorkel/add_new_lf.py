@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 from src.preprocessor.codeSearch_preprocessor import languages
 from src.preprocessor.so_to_pandas import SO_to_pandas
+from src.snorkel.classification_based_weak_labelling_fv import classify_labeler_factory
 from src.snorkel.weak_labellers import *
 
 
@@ -23,8 +24,12 @@ def main(argv):
         finally:
             if 'h5f' in locals().keys():
                 h5f.close()
-
-        lfs_tags = [lf_bruteforce_tag_factory(language, tag_encoders)]
+        clf_labeling_factory = classify_labeler_factory(language)
+        lfs_tags = [
+                       clf_labeling_factory(n) for n in range(7)
+                   ] + [
+                       lf_bruteforce_tag_factory(language, tag_encoders)
+                   ]
         tapplier = PandasLFApplier(lfs_tags)
         L_train = tapplier.apply(df_train)
 
