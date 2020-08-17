@@ -9,13 +9,14 @@ from tqdm import tqdm
 
 from src.preprocessor.codeSearch_preprocessor import languages, natural_languages, formal_languages
 from src.preprocessor.so_to_pandas import SO_to_pandas
-from src.snorkel.classification_based_weak_labelling import classify_labeler_factory
+from src.snorkel.classification_based_weak_labelling_fv import classify_labeler_factory
 from src.snorkel.weak_labellers import *
 
 if sys.platform.startswith('win'):
     word2vec_location = 'G:\\wiki_w2v_models\\wiki-news-300d-1M.vec'  # Update this or move to cli arg
 else:
     word2vec_location = '/mnt/g/wiki_w2v_models/wiki-news-300d-1M.vec'  # Update this or move to cli arg
+
 
 # XXX: Commented out for now as Levenshtein is slow
 # lang_factory = frequency_language_levenshtein_factory()
@@ -87,7 +88,7 @@ def main(argv):
                     h5f.close()
         except (OSError, FileNotFoundError, KeyError):
             if language in languages:
-                clf_labeling_factory = classify_labeler_factory(language, word2vec_location)
+                clf_labeling_factory = classify_labeler_factory(language)
                 lfs_tags = [x
                             for x in [
                                 frequency_labeling_function_factory(language),

@@ -1,9 +1,8 @@
 import os
 import sys
-from multiprocess.pool import Pool
 
 import h5py
-import psutil
+from multiprocess.pool import Pool
 
 if sys.platform.startswith('win'):
     import pandas as pd
@@ -14,18 +13,21 @@ from snorkel.labeling import PandasLFApplier
 from tqdm import tqdm
 
 from src.preprocessor.codeSearch_preprocessor import formal_languages
-from src.snorkel.classification_based_weak_labelling import classify_labeler_factory
-from src.snorkel.snorkel_driver import word2vec_location
+from src.snorkel.classification_based_weak_labelling_fv import classify_labeler_factory
 from src.snorkel.weak_labellers import *
 
 
 def parallelize_dataframe(df, func, n_cores=4):
     df_split = np.array_split(df, n_cores)
     pool = Pool(n_cores)
-    result = np.r_[list(pool.map(func, df_split))]
+    results = list(pool.map(func, df_split))
+    result = results[0]
+    for i in range(1, len(results)):
+        result = np.r_[result, results[i]]
     pool.close()
     pool.join()
     return result
+
 
 def main(argv):
     location = argv[0]
@@ -81,7 +83,7 @@ def main(argv):
                     h5f.close()
 
             if language not in formal_languages:
-                clf_labeling_factory = classify_labeler_factory(language, word2vec_location)
+                clf_labeling_factory = classify_labeler_factory(language)
                 lfs_tags = [x
                             for x in [
                                 frequency_labeling_function_factory(language),
@@ -100,7 +102,7 @@ def main(argv):
 
             tapplier = PandasLFApplier(lfs_tags)
             if sys.platform.startswith('win'):
-                L_train = parallelize_dataframe(df_train, tapplier.apply, len(psutil.Process().cpu_affinity()) - 1)
+                L_train = parallelize_dataframe(df_train, tapplier.apply, 6)
             else:
                 # modin is not compatible with progress_apply
                 L_train = tapplier.apply(df_train, progress_bar=False)
