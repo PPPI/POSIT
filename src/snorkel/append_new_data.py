@@ -56,6 +56,8 @@ def main(argv):
         try:
             h5f = h5py.File('./data/data_votes.h5', 'r')
             L_lang_train_existing = h5f['language_votes'][:]
+        except OSError:
+            L_lang_train_existing = None
         finally:
             if 'h5f' in locals().keys():
                 h5f.close()
@@ -63,7 +65,8 @@ def main(argv):
         applier = PandasLFApplier(lfs_lang)
         L_lang_train = applier.apply(df_train)
 
-        L_lang_train = np.r_[L_lang_train_existing, L_lang_train]
+        if L_lang_train_existing is not None:
+            L_lang_train = np.r_[L_lang_train_existing, L_lang_train]
 
         try:
             os.makedirs('./data', exist_ok=True)
@@ -79,6 +82,8 @@ def main(argv):
             try:
                 h5f = h5py.File('./data/frequency_data/%s/data_votes.h5' % language, 'r')
                 L_train_existing = h5f['%s_votes' % language][:]
+            except OSError:
+                L_train_existing = None
             finally:
                 if 'h5f' in locals().keys():
                     h5f.close()
