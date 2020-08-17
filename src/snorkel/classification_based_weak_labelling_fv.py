@@ -1,4 +1,5 @@
 import json
+from multiprocessing.pool import Pool
 
 import joblib
 import numpy as np
@@ -11,10 +12,11 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from snorkel.labeling import labeling_function
-from tqdm import tqdm
 
 from src.preprocessor.codeSearch_preprocessor import languages
 from src.tagger.data_utils import camel, snake
+
+classifiers = []
 
 names = [
     "Nearest Neighbors",
@@ -42,8 +44,42 @@ def to_feature_vector(word):
             1 if set('[~!@#$%^&*()_+{}":;\']+$').intersection(word) else 0]
 
 
+def process_language(language):
+    print('Working on %s' % language)
+    # Load Dictionaries so it is consistent with snorkel calls
+    tag_dict = Dictionary.load('./data/frequency_data/%s/tags.dct' % language)
+    # Load Training data
+    with open('./data/frequency_data/%s/tag_lookup.json' % language, encoding='utf8') as f:
+        tag_lookup = json.loads(f.read())
+
+    # Transform data for training
+    Xy = list()
+    for tag, examples in tag_lookup.items():
+        np.random.shuffle(examples)
+        examples = examples[:]
+        Xy += [
+            (to_feature_vector(word[0]), tag_dict.token2id[tag])
+            for word in examples
+        ]
+
+    X, y = list(zip(*Xy))
+    X = np.asarray(X)
+    y = np.asarray(y)
+
+    split_ratio = 0.4
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=split_ratio, random_state=42)
+
+    for name, clf in zip(names, classifiers):
+        clf.fit(X_train, y_train)
+        score = clf.score(X_test, y_test)
+        print('%s has a mean accuracy of %2.3f' % (name, score))
+        clf_fname = './data/frequency_data/%s/%s_clf_fv.pkl' % (language, name)
+        _ = joblib.dump(clf, clf_fname, compress=9)
+
+
 def train_and_store():
-    classifiers = [
+    global classifiers
+    classifiers += [
         KNeighborsClassifier(5),
         # GaussianProcessClassifier(1.0 * RBF(1.0)),  # Not enough RAM to run this locally
         DecisionTreeClassifier(max_depth=15),
@@ -55,37 +91,12 @@ def train_and_store():
         # SVC(gamma=2, C=1),  # Time out on 5h waiting
     ]
 
-    for language in tqdm(languages):
-        print('Working on %s' % language)
-        # Load Dictionaries so it is consistent with snorkel calls
-        tag_dict = Dictionary.load('./data/frequency_data/%s/tags.dct' % language)
-        # Load Training data
-        with open('./data/frequency_data/%s/tag_lookup.json' % language, encoding='utf8') as f:
-            tag_lookup = json.loads(f.read())
+    n_cores = 6
 
-        # Transform data for training
-        Xy = list()
-        for tag, examples in tag_lookup.items():
-            np.random.shuffle(examples)
-            examples = examples[:]
-            Xy += [
-                (to_feature_vector(word[0]), tag_dict.token2id[tag])
-                for word in examples
-            ]
-
-        X, y = list(zip(*Xy))
-        X = np.asarray(X)
-        y = np.asarray(y)
-
-        split_ratio = 0.4
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=split_ratio, random_state=42)
-
-        for name, clf in zip(names, classifiers):
-            clf.fit(X_train, y_train)
-            score = clf.score(X_test, y_test)
-            print('%s has a mean accuracy of %2.3f' % (name, score))
-            clf_fname = './data/frequency_data/%s/%s_clf_fv.pkl' % (language, name)
-            _ = joblib.dump(clf, clf_fname, compress=9)
+    pool = Pool(n_cores)
+    pool.map(process_language, languages)
+    pool.close()
+    pool.join()
 
 
 def classify_labeler_factory(language):
