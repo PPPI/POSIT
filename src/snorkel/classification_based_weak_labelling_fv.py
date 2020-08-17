@@ -12,11 +12,10 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from snorkel.labeling import labeling_function
+from tqdm import tqdm
 
 from src.preprocessor.codeSearch_preprocessor import languages
 from src.tagger.data_utils import camel, snake
-
-classifiers = []
 
 names = [
     "Nearest Neighbors",
@@ -45,6 +44,17 @@ def to_feature_vector(word):
 
 
 def process_language(language):
+    classifiers = [
+        KNeighborsClassifier(5),
+        # GaussianProcessClassifier(1.0 * RBF(1.0)),  # Not enough RAM to run this locally
+        DecisionTreeClassifier(max_depth=15),
+        RandomForestClassifier(max_depth=15, n_estimators=100),
+        MLPClassifier(alpha=1, max_iter=1000),
+        AdaBoostClassifier(),
+        GaussianNB(),
+        SVC(kernel="linear", C=0.025),
+        # SVC(gamma=2, C=1),  # Time out on 5h waiting
+    ]
     print('Working on %s' % language)
     # Load Dictionaries so it is consistent with snorkel calls
     tag_dict = Dictionary.load('./data/frequency_data/%s/tags.dct' % language)
@@ -69,7 +79,7 @@ def process_language(language):
     split_ratio = 0.4
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=split_ratio, random_state=42)
 
-    for name, clf in zip(names, classifiers):
+    for name, clf in tqdm(zip(names, classifiers), total=len(classifiers), desc='Classifiers for %s' % language):
         clf.fit(X_train, y_train)
         score = clf.score(X_test, y_test)
         print('%s has a mean accuracy of %2.3f' % (name, score))
@@ -78,19 +88,6 @@ def process_language(language):
 
 
 def train_and_store():
-    global classifiers
-    classifiers += [
-        KNeighborsClassifier(5),
-        # GaussianProcessClassifier(1.0 * RBF(1.0)),  # Not enough RAM to run this locally
-        DecisionTreeClassifier(max_depth=15),
-        RandomForestClassifier(max_depth=15, n_estimators=100),
-        MLPClassifier(alpha=1, max_iter=1000),
-        AdaBoostClassifier(),
-        GaussianNB(),
-        SVC(kernel="linear", C=0.025),
-        # SVC(gamma=2, C=1),  # Time out on 5h waiting
-    ]
-
     n_cores = 6
 
     pool = Pool(n_cores)
