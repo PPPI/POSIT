@@ -37,11 +37,18 @@ def main():
                              if len(l.strip()) > 0]
 
             predictions = model.predict([marked_code_tokens_regex.sub(r"\1", w) for w in words_raw])
-            if isinstance(predictions, tuple):
-                out = [{'word': str(w), 'tag': str(t), 'language': str(int(lid))} for w, (t, lid) in
-                       zip(words_raw, zip(*predictions))]
+            if config.multilang:
+                out = list()
+                for w, predictions in zip(words_raw, zip(*predictions)):
+                    current_out = {'word': str(w), 'language': str(int(predictions[-1]))}
+                    for lid, tag in enumerate(predictions[:-1]):
+                        current_out['tag_%d' % lid] = tag
             else:
-                out = [{'word': str(w), 'tag': str(t)} for w, t in zip(words_raw, predictions)]
+                if isinstance(predictions, tuple):
+                    out = [{'word': str(w), 'tag': str(t), 'language': str(int(lid))} for w, (t, lid) in
+                           zip(words_raw, zip(*predictions))]
+                else:
+                    out = [{'word': str(w), 'tag': str(t)} for w, t in zip(words_raw, predictions)]
             print(json.dumps(out))
             return out
 
@@ -52,6 +59,9 @@ def main():
         class PredictionFunctions:
             def predict_sent(self, sentence):
                 return process_sent(sentence)
+
+            def is_multilang(self,):
+                return {'multilang': config.multilang}
 
         server.register_instance(PredictionFunctions())
         print('Loading done, entering serve loop')
