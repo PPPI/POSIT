@@ -54,7 +54,9 @@ class BruteParse:
         # p._errHandler = antlr4.error.ErrorStrategy.BailErrorStrategy()
         for r in self.langinfo[lang]['toprules']:
             try:
+                sys.setrecursionlimit(5000)
                 tree = getattr(p, r)()
+                sys.setrecursionlimit(1000)
                 return ast_to_tagged_list(tree)
             except ParseCancellationException:
                 None
