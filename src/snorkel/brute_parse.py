@@ -3,6 +3,7 @@ import antlr4, sys, re
 from antlr4 import ParseTreeListener, ParserRuleContext, ParseTreeWalker, TerminalNode, ErrorNode, NoViableAltException
 from antlr4.error.ErrorListener import ErrorListener
 from antlr4.error.Errors import ParseCancellationException
+from func_timeout import func_timeout, FunctionTimedOut
 
 from src.antlr4_language_parsers.golang.GoLexer import GoLexer as gol
 from src.antlr4_language_parsers.golang.GoParser import GoParser as gop
@@ -54,11 +55,9 @@ class BruteParse:
         # p._errHandler = antlr4.error.ErrorStrategy.BailErrorStrategy()
         for r in self.langinfo[lang]['toprules']:
             try:
-                sys.setrecursionlimit(5000)
                 tree = getattr(p, r)()
-                sys.setrecursionlimit(1000)
                 return ast_to_tagged_list(tree)
-            except ParseCancellationException:
+            except (ParseCancellationException, RecursionError):
                 None
         return []
 
@@ -95,7 +94,10 @@ class RowLabeller:
             self.tokenIndex = 0
             ip = str(row['Context'])
             while len(ip.split()) > 1:
-                res = self.bp.parse(language, ip)
+                try:
+                    res = func_timeout(10, self.bp.parse, (language, ip))
+                except FunctionTimedOut:
+                    res = None
                 if res:
                     self.tagsForPost[postIdx][context] = res
                     parsable = True
