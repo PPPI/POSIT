@@ -115,3 +115,7 @@ def main(argv):
         df_train["label_%s" % language] = pd.Series(L_train)
 
     df_train.to_csv(location[:-len('.csv')] + '_annotated_majority.csv')
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
