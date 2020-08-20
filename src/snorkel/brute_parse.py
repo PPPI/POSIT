@@ -1,6 +1,7 @@
-import antlr4, sys, re
+import antlr4
+import re
+import sys
 # Individual languages that we want to parse
-from antlr4 import ParseTreeListener, ParserRuleContext, ParseTreeWalker, TerminalNode, ErrorNode, NoViableAltException
 from antlr4.error.ErrorListener import ErrorListener
 from antlr4.error.Errors import ParseCancellationException
 from func_timeout import func_timeout, FunctionTimedOut
@@ -9,19 +10,14 @@ from src.antlr4_language_parsers.golang.GoLexer import GoLexer as gol
 from src.antlr4_language_parsers.golang.GoParser import GoParser as gop
 from src.antlr4_language_parsers.java.Java9Lexer import Java9Lexer as javal
 from src.antlr4_language_parsers.java.Java9Parser import Java9Parser as javap
-from src.antlr4_language_parsers.javadoc.JavadocLexer import JavadocLexer as javadocl
-from src.antlr4_language_parsers.javadoc.JavadocParser import JavadocParser as javadocp
 from src.antlr4_language_parsers.javascript.ECMAScriptLexer import ECMAScriptLexer as jsl
 from src.antlr4_language_parsers.javascript.ECMAScriptParser import ECMAScriptParser as jsp
 from src.antlr4_language_parsers.php.PhpLexer import PhpLexer as phpl
 from src.antlr4_language_parsers.php.PhpParser import PhpParser as phpp
 from src.antlr4_language_parsers.python.Python3Lexer import Python3Lexer as pyl
 from src.antlr4_language_parsers.python.Python3Parser import Python3Parser as pyp
-from src.antlr4_language_parsers.python.Python3Listener import Python3Listener as pylis
 from src.antlr4_language_parsers.ruby.CorundumLexer import CorundumLexer as rubyl
 from src.antlr4_language_parsers.ruby.CorundumParser import CorundumParser as rubyp
-from src.preprocessor.formal_lang_heuristics import is_diff_header, is_email, is_URI
-
 from src.preprocessor.codeSearch_preprocessor import ast_to_tagged_list
 
 
