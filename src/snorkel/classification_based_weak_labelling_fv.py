@@ -15,6 +15,7 @@ from snorkel.labeling import labeling_function
 from tqdm import tqdm
 
 from src.preprocessor.codeSearch_preprocessor import languages
+from src.snorkel.weak_labellers import ABSTAIN
 from src.tagger.data_utils import camel, snake
 
 names = [
@@ -97,14 +98,22 @@ def train_and_store():
 
 
 def classify_labeler_factory(language):
-    classifiers = [joblib.load('./data/frequency_data/%s/%s_clf_fv.pkl' % (language, name)) for name in names]
+    classifiers = list()
+    for name in names:
+        try:
+            classifiers.append(joblib.load('./data/frequency_data/%s/%s_clf_fv.pkl' % (language, name)))
+        except FileNotFoundError:
+            classifiers.append(None)
 
     def classify_using_nth(n):
         @labeling_function(name='clf_labeler_%d' % n)
         def clf_labeler(row):
             feature_vector = to_feature_vector(str(row['Token']))
 
-            return classifiers[n].predict([feature_vector])[0]
+            if classifiers[n] is not None:
+                return classifiers[n].predict([feature_vector])[0]
+            else:
+                return ABSTAIN
 
         return clf_labeler
 
