@@ -2,8 +2,9 @@ import os
 import sys
 
 import h5py
-import scipy.stats as st
+import numpy as np
 import pandas as pd
+import scipy.stats as st
 from gensim.corpora import Dictionary
 from snorkel.labeling import PandasLFApplier
 from tqdm import tqdm
@@ -62,7 +63,7 @@ def main(argv):
                 h5f.close()
 
     # Take the mode and ignore the counts array
-    L_lang_train = st.mode(L_lang_train, axis=1, nan_policy='omit')[0]
+    L_lang_train = np.reshape(st.mode(L_lang_train, axis=1, nan_policy='omit').mode, newshape=(-1))
     df_train["lang_label"] = pd.Series(L_lang_train)
 
     for language in tqdm(languages + formal_languages, desc='Languages'):
@@ -111,7 +112,7 @@ def main(argv):
                     h5f.close()
 
         # Take the mode and ignore the counts array
-        L_train = st.mode(L_train, axis=1, nan_policy='omit')[0]
+        L_train = np.reshape(st.mode(L_train, axis=1, nan_policy='omit').mode, newshape=(-1))
         df_train["label_%s" % language] = pd.Series(L_train)
 
     df_train.to_csv(location[:-len('.csv')] + '_annotated_majority.csv')
