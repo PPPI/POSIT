@@ -34,12 +34,12 @@ def main(argv):
         lfs_tags = [
                        lf_bruteforce_tag_factory(language, tag_encoders)
                    ] + [
-                       clf_labeling_factory(n) for n in range(7) if n != 5  # Exclude Naive Bayes
+                       clf_labeling_factory(n) for n in range(7) if n not in [0, 2, 5, 6]  # Exclude Naive Bayes
                    ]
         tapplier = PandasLFApplier(lfs_tags)
 
         if sys.platform.startswith('win'):
-            L_train = parallelize_dataframe(df_train, tapplier.apply, 6)
+            L_train = parallelize_dataframe(df_train, tapplier.apply, 12)
         else:
             # modin is not compatible with progress_apply
             L_train = tapplier.apply(df_train, progress_bar=False)
