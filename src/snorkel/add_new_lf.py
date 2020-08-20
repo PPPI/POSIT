@@ -30,11 +30,11 @@ def main(argv):
         finally:
             if 'h5f' in locals().keys():
                 h5f.close()
-        # clf_labeling_factory = classify_labeler_factory(language)
+        clf_labeling_factory = classify_labeler_factory(language)
         lfs_tags = [
                        lf_bruteforce_tag_factory(language, tag_encoders)
                    ] + [
-                       # clf_labeling_factory(n) for n in range(7) if n != 5  # Exclude Naive Bayes
+                       clf_labeling_factory(n) for n in range(7) if n != 5  # Exclude Naive Bayes
                    ]
         tapplier = PandasLFApplier(lfs_tags)
 

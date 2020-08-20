@@ -101,8 +101,8 @@ def classify_labeler_factory(language):
 
     def classify_using_nth(n):
         @labeling_function(name='clf_labeler_%d' % n)
-        def clf_labeler(token):
-            feature_vector = to_feature_vector(token)
+        def clf_labeler(row):
+            feature_vector = to_feature_vector(str(row['Token']))
 
             return classifiers[n].predict([feature_vector])[0]
 
