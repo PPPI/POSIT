@@ -30,5 +30,6 @@ setup(name='POSIT',
             'psutil',
             'joblib',
             'h5py',
+            'scipy',
       ], install_requires=['snorkel', 'pandas']
       )
