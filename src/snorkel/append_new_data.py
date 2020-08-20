@@ -89,7 +89,7 @@ def main(argv):
                     h5f.close()
 
             if language not in formal_languages:
-                # clf_labeling_factory = classify_labeler_factory(language)
+                clf_labeling_factory = classify_labeler_factory(language)
                 lfs_tags = [x
                             for x in [
                                 frequency_labeling_function_factory(language),
@@ -97,9 +97,9 @@ def main(argv):
                                 lf_builtin_tag_factory(language),
                             ] +
                             [
-                                # clf_labeling_factory(n) for n in range(7)
+                                clf_labeling_factory(n) for n in range(7)
                             ] + [
-                                # lf_bruteforce_tag_factory(language, tag_encoders)
+                                lf_bruteforce_tag_factory(language, tag_encoders)
                             ]
                             if x is not None
                             ]
