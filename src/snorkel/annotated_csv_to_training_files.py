@@ -31,16 +31,17 @@ tag_decoders = {
 
 def main(argv):
     location = argv[0]
+    corpus = argv[1]
     df_train = pd.read_csv(location, index_col=0)
 
     max_post_id = df_train.iloc[-1]['PostIdx']
     valid_index = int(0.6 * max_post_id)
     test_index = int(0.8 * max_post_id)
-    os.makedirs('./data/corpora/multilingual/so', exist_ok=True)
+    os.makedirs('./data/corpora/multilingual/%s' % corpus, exist_ok=True)
     current_context = ''
-    os.makedirs('./data/corpora/multilingual/so/corpus', exist_ok=True)
+    os.makedirs('./data/corpora/multilingual/%s/corpus' % corpus, exist_ok=True)
     for filename in ['eval.txt', 'dev.txt', 'train.txt']:
-        with open('./data/corpora/multilingual/so/corpus/%s' % filename, 'w') as f:
+        with open('./data/corpora/multilingual/%s/corpus/%s' % (corpus, filename), 'w') as f:
             pass
     for index, row in tqdm(df_train.iterrows(), desc='Output'):
         if row['PostIdx'] > max_post_id:
@@ -53,7 +54,7 @@ def main(argv):
         else:
             filename = 'train.txt'
         if row['Context'] != current_context:
-            with open('./data/corpora/multilingual/so/corpus/%s' % filename, 'a') as f:
+            with open('./data/corpora/multilingual/%s/corpus/%s' % (corpus, filename), 'a') as f:
                 f.write('\n')
             current_context = row['Context']
 
@@ -64,7 +65,7 @@ def main(argv):
                 eng_tag = tag
                 break
 
-        with open('./data/corpora/multilingual/so/corpus/%s' % filename, 'a') as f:
+        with open('./data/corpora/multilingual/%s/corpus/%s' % (corpus, filename), 'a') as f:
             to_output = [str(row['Token']), eng_tag] \
                         + [tag_decoders[language](row['label_%s' % language])
                            if row['label_%s' % language] != 0 else O
