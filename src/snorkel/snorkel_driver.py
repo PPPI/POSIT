@@ -117,7 +117,7 @@ def main(argv):
 
         # Train the label model and compute the training labels
         label_model = LabelModel(cardinality=size_tag_voc + 1, verbose=True)
-        label_model.fit(L_train, n_epochs=1000, lr=0.005, log_freq=1, seed=42)
+        label_model.fit(L_train[:100000, :], n_epochs=1000, lr=0.005, log_freq=1, seed=42)
         df_train["label_%s" % language] = label_model.predict(L=L_train, tie_break_policy="random")
 
     df_train.to_csv(location[:-len('.csv')] + '_annotated.csv')
