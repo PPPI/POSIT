@@ -54,7 +54,7 @@ class Configuration:
     # general config
     with_l_id = True
     with_l_id = with_l_id or multilang
-    project = "so"
+    project = "so_majority"
     project += '_Id' if with_l_id and not multilang else ''
     # project += '5'
 
@@ -68,7 +68,7 @@ class Configuration:
     filename_test = "data/corpora/%s/corpus/eval.txt" % ('multilingual/%s' % project if multilang else project)
     filename_train = "data/corpora/%s/corpus/train.txt" % ('multilingual/%s' % project if multilang else project)
 
-    max_iter = None  # if not None, max number of examples in dataset
+    max_iter = 2200000  # if not None, max number of examples in dataset
 
     # vocab
     filename_words = "data/corpora/%s/words.dct" % ('multilingual/%s' % project if multilang else project)
@@ -77,12 +77,12 @@ class Configuration:
 
     # training
     train_embeddings = True
-    nr_epochs = 100
+    nr_epochs = 30
     dropout = 0.5
-    batch_size = 16
-    lr_method = "rmsprop"
-    lr = 0.05
-    lr_decay = 0.99
+    batch_size = 10
+    lr_method = "adam"
+    lr = 0.005
+    lr_decay = 0.90
     clip = None  # if None, no clipping
     nr_epochs_no_imprvmt = 10
 
@@ -108,8 +108,8 @@ class Configuration:
     use_cpu = True
     # NOTE: if both chars and crf, only 1.6x slower on GPU
     use_crf = True  # if crf, training is 1.7x slower on CPU
-    use_chars = True  # if char embedding, training is 3.5x slower on CPU
-    use_features = True
+    use_chars = False  # if char embedding, training is 3.5x slower on CPU
+    use_features = False
 
     # In batch shuffle of training examples
     seed = 42
