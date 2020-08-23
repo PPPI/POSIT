@@ -77,13 +77,14 @@ class CodePoSModel(BaseModel):
             dict {placeholder: value}
 
         """
-        # perform padding of the given data
-        words = words[:self.max_len]
+        # Use labels as proxy for training, only reduce to max_len in training
+        if labels is not None:
+            words = words[:self.max_len]
         if labels is not None:
             labels = labels[:self.max_len]
         if labels_l is not None:
             labels_l = labels_l[:self.max_len]
-
+        # perform padding of the given data
         if self.config.use_chars:
             if self.config.use_features:
                 features, char_ids, word_ids = zip(*words)

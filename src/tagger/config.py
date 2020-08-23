@@ -68,7 +68,7 @@ class Configuration:
     filename_test = "data/corpora/%s/corpus/eval.txt" % ('multilingual/%s' % project if multilang else project)
     filename_train = "data/corpora/%s/corpus/train.txt" % ('multilingual/%s' % project if multilang else project)
 
-    max_iter = 15000  # if not None, max number of examples in dataset
+    max_iter = None  # if not None, max number of examples in dataset
 
     # vocab
     filename_words = "data/corpora/%s/words.dct" % ('multilingual/%s' % project if multilang else project)
