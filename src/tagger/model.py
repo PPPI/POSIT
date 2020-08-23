@@ -14,6 +14,7 @@ class CodePoSModel(BaseModel):
         self.use_cpu = config.use_cpu
         self.idx_to_tag = {idx: tag for tag, idx in
                            self.config.vocab_tags.token2id.items()}
+        self.max_len = config.max_len
 
     def add_placeholders(self):
         """Define placeholders = entries to computational graph"""
@@ -77,6 +78,12 @@ class CodePoSModel(BaseModel):
 
         """
         # perform padding of the given data
+        words = words[:self.max_len]
+        if labels is not None:
+            labels = labels[:self.max_len]
+        if labels_l is not None:
+            labels_l = labels_l[:self.max_len]
+
         if self.config.use_chars:
             if self.config.use_features:
                 features, char_ids, word_ids = zip(*words)

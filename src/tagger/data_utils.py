@@ -61,7 +61,6 @@ class CorpusIterator(object):
                         line = line.strip()
                         if len(line) > 0:
                             parse = line.split(' ')
-                            # XXX: Hard coded for now, should be a param
                             tags_ = parse[-(self.nlangs + 1):]
                             word = ' '.join(parse[:-(self.nlangs + 1)])
                     else:

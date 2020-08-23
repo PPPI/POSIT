@@ -68,7 +68,7 @@ class Configuration:
     filename_test = "data/corpora/%s/corpus/eval.txt" % ('multilingual/%s' % project if multilang else project)
     filename_train = "data/corpora/%s/corpus/train.txt" % ('multilingual/%s' % project if multilang else project)
 
-    max_iter = 2200000  # if not None, max number of examples in dataset
+    max_iter = 15000  # if not None, max number of examples in dataset
 
     # vocab
     filename_words = "data/corpora/%s/words.dct" % ('multilingual/%s' % project if multilang else project)
@@ -87,6 +87,7 @@ class Configuration:
     nr_epochs_no_imprvmt = 10
 
     # model hyperparameters
+    max_len = 100  # The maximum sentence/snippet length we train on
     n_features = 8  # This is predefined by design, should be the size of our feature vector
     hidden_size_char = 16  # lstm on chars
     hidden_size_features = 8  # lstm on feature vector
