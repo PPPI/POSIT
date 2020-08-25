@@ -15,7 +15,7 @@ def process_data(model, target_data, stackoverflow=False):
             if len(words_raw) > 0:
                 preds = model.predict(words_raw)
                 with open('./results/for_manual_investigation.txt', 'a') as f:
-                    f.write(' '.join(['%s+%s+%d' % (w, str(t), l) for w, (t, l) in zip(words_raw, zip(*preds))]))
+                    f.write(' '.join(['%s+%s+%s' % (w, str(t), l) for w, (t, l) in zip(words_raw, zip(*preds))]))
                     f.write(' ')
         with open('./results/for_manual_investigation.txt', 'a') as f:
             f.write('\n\n' + ''.join(['_'] * 80) + '\n\n')

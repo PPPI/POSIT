@@ -15,7 +15,8 @@ def process_one_rev(model, target_data, rev, post_id):
         if len(words_raw) > 0:
             preds = model.predict(words_raw)
             with open('./results/paired_posts/%s/%d.txt' % (post_id, rev), 'a') as f:
-                f.write(' '.join(['%s+%s+%d' % (w, str(t), l) for w, (t, l) in zip(words_raw, zip(*preds))]))
+                f.write(' '.join(['%s+%s+%d' % (w, str(t), int(model.config.lang_to_id[l]))
+                                  for w, (t, l) in zip(words_raw, zip(*preds))]))
                 f.write(' ')
 
 
