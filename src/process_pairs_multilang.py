@@ -40,7 +40,7 @@ def main():
     model.build()
     model.restore_session(config.dir_model)
 
-    if config.multilang:
+    if not config.multilang:
         print('This code path assumes a multilang model!', file=sys.stderr)
         exit(1)
 
