@@ -59,8 +59,8 @@ def main():
             tags, lids = model.predict(words_raw)
             for tags, lid in zip(tags, lids):
                 for t in tags:
-                    tags_feature_vector[tag_vocab.token2id(t)] += 1
-                lid_feature_vector[int(lid)] += 1
+                    tags_feature_vector[tag_vocab.token2id[t]] += 1
+                lid_feature_vector[model.config.lang_to_id[lid]] += 1
         t_feature_vectors.append(tags_feature_vector)
         l_feature_vectors.append(lid_feature_vector)
 
