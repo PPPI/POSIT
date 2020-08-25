@@ -7,8 +7,24 @@ import numpy as np
 from nltk import casual_tokenize
 
 from src.preprocessor.preprocess import CODE_TOKENISATION_REGEX, tokenise_lkml
+from src.preprocessor.preprocess import tokenize_SO_row
 from src.tagger.config import Configuration
 from src.tagger.model import CodePoSModel
+
+
+def process_one_rev(target_data, rev, post_id):
+    with open(os.path.join(os.path.dirname(target_data), 'SO_Posts', post_id, '%d.html' % rev)) as f:
+        html = f.read()
+    sents_raw = tokenize_SO_row(html, tag_name='div', all_as_code=True)
+    return sents_raw
+
+
+def process_data(target_data):
+    with open(target_data) as f:
+        lines_and_revs = [l.strip().split(',') for l in f.readlines()][1:]
+    for postId, rev in lines_and_revs:
+        rev = int(rev)
+        yield [w for w in process_one_rev(target_data, rev, postId) if len(w) > 0]
 
 
 def process_sent(sentence, casual):
@@ -46,8 +62,11 @@ def main():
     tag_vocab = config.vocab_tags
 
     # We preprocess different sources into LKML style then load that
-    source = tokenise_lkml(sys.argv[2])
     source_name = sys.argv[3]
+    if source_name == 'SO':
+        source = process_data(sys.argv[2])
+    else:
+        source = tokenise_lkml(sys.argv[2])
 
     t_feature_vectors = list()
     l_feature_vectors = list()
@@ -68,7 +87,6 @@ def main():
     for idx, (tags, lids) in enumerate(zip(t_feature_vectors, l_feature_vectors)):
         np.savez_compressed(file='./data/source_identification/%s/feature_vector_%d.npz' % (source_name, idx),
                             tags=tags, lids=lids)
-    os.makedirs('./data/%s' % source_name, exist_ok=True)
 
 
 if __name__ == "__main__":
