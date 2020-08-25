@@ -44,7 +44,6 @@ def main():
     model = restore_model(config)
 
     tag_vocab = config.vocab_tags
-    cooccur = np.zeros(shape=tuple([len(tag_vocab)] * config.nlangs))
 
     # We preprocess different sources into LKML style then load that
     source = tokenise_lkml(sys.argv[2])
@@ -53,15 +52,15 @@ def main():
     t_feature_vectors = list()
     l_feature_vectors = list()
 
-    for words_raw in source:
+    for sents_raw in source:
         tags_feature_vector = np.zeros(shape=len(tag_vocab))
         lid_feature_vector = np.zeros(shape=config.nlangs)
-        tags, lids = model.predict(words_raw)
-        for tags, lid in zip(tags, lids):
-            for t in tags:
-                tags_feature_vector[tag_vocab.token2id(t)] += 1
-            cooccur[tuple([tag_vocab.token2id(t) for t in tags])] += 1
-            lid_feature_vector[int(lid)] += 1
+        for words_raw in sents_raw:
+            tags, lids = model.predict(words_raw)
+            for tags, lid in zip(tags, lids):
+                for t in tags:
+                    tags_feature_vector[tag_vocab.token2id(t)] += 1
+                lid_feature_vector[int(lid)] += 1
         t_feature_vectors.append(tags_feature_vector)
         l_feature_vectors.append(lid_feature_vector)
 
@@ -70,7 +69,6 @@ def main():
         np.savez_compressed(file='./data/source_identification/%s/feature_vector_%d.npz' % (source_name, idx),
                             tags=tags, lids=lids)
     os.makedirs('./data/%s' % source_name, exist_ok=True)
-    np.savez_compressed(file='./data/%s/cooccurrence_matrix.npz' % source_name)
 
 
 if __name__ == "__main__":

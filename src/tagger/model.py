@@ -623,7 +623,7 @@ class CodePoSModel(BaseModel):
             if self.config.multilang:
                 resulting_lids = list()
                 for lid in pred_lid:
-                    resulting_lids.append(self.config.id_to_lang[str(lid)])
+                    resulting_lids.append(self.config.id_to_lang[lid])
                 pred_lid = resulting_lids
             return preds, pred_lid
         else:
