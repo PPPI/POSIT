@@ -17,9 +17,7 @@ def main(argv):
     for source in sources:
         for file in glob.glob('./data/source_identification/word2vec/%s/feature_vector_*.npz' % source):
             loaded = np.load(file)
-            tags = loaded['tags']
-            lids = loaded['lids']
-            fv = np.concatenate((tags, lids))
+            fv = loaded['w2v']
             Xy.append((fv, source))
 
     X, y = list(zip(*Xy))
