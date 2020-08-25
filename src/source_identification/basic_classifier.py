@@ -4,16 +4,17 @@ import sys
 import numpy as np
 from daal4py.sklearn.ensemble import RandomForestClassifier
 from sklearn import preprocessing
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold
 
 
 def main(argv):
     name = 'Random Forest Classifier'
-    clf = RandomForestClassifier(max_depth=15, n_estimators=100)
+    clf = RandomForestClassifier(n_estimators=100)
     sources = argv
     Xy = list()
     le = preprocessing.LabelEncoder()
     le.fit(sources)
+    scaler = preprocessing.RobustScaler()
     for source in sources:
         for file in glob.glob('./data/source_identification/%s/feature_vector_*.npz' % source):
             loaded = np.load(file)
@@ -25,13 +26,15 @@ def main(argv):
     X, y = list(zip(*Xy))
     X = np.asarray(X)
     y = le.transform(np.asarray(y))
+    scaler.fit(X)
 
-    split_ratio = 0.4
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=split_ratio, random_state=42)
-
-    clf.fit(X_train, y_train)
-    score = clf.score(X_test, y_test)
-    print('%s has a mean accuracy of %2.3f' % (name, score))
+    kf = KFold(10)
+    scores = list()
+    for k, (train, test) in enumerate(kf.split(X, y)):
+        clf.fit(scaler.transform(X[train]), y[train])
+        score = clf.score(scaler.transform(X[test]), y[test])
+        scores.append(score)
+    print('%s has a mean accuracy of %2.3f' % (name, np.mean(scores)))
 
 
 if __name__ == '__main__':
