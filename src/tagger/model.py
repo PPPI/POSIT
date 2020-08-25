@@ -613,7 +613,8 @@ class CodePoSModel(BaseModel):
         pred = self.predict_batch([words])
         pred_ids = np.asarray(pred[0])
         if self.config.multilang:
-            preds = [[self.idx_to_tag[idx] for idx in list(pred_ids[0].T[n])] for n in range(self.config.nlangs)]
+            preds = [[self.idx_to_tag[idx] for idx in list(pred_ids.T[0][n])] for n in range(self.config.nlangs)]
+            preds = [list(inner) for inner in np.asarray(preds).T]
         else:
             preds = [self.idx_to_tag[idx] for idx in list(pred_ids[0])]
 
@@ -622,7 +623,7 @@ class CodePoSModel(BaseModel):
             if self.config.multilang:
                 resulting_lids = list()
                 for lid in pred_lid:
-                    resulting_lids.append(self.config.id_to_lang[lid])
+                    resulting_lids.append(self.config.id_to_lang[str(lid)])
                 pred_lid = resulting_lids
             return preds, pred_lid
         else:

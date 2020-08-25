@@ -39,11 +39,13 @@ def interactive_shell(model, casual=False):
 
         preds = model.predict(words_raw)
         if isinstance(preds, tuple):
-            preds = preds[0]
+            preds, lids = preds
 
         if isinstance(preds[0], list):
             for tags in preds:
                 print(' '.join(['%s_%s' % (w, t) for w, t in zip(words_raw, tags)]))
+            print(' '.join(['%s_%s' % (w, tags[int(model.config.lang_to_id[l])])
+                            for w, tags, l in zip(words_raw, preds, lids)]))
         else:
             print(' '.join(['%s_%s' % (w, t) for w, t in zip(words_raw, preds)]))
 

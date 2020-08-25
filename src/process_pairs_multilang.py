@@ -18,6 +18,7 @@ def process_one_rev(model, target_data, rev, post_id):
                 f.write(' '.join(['%s+%s+%d' % (w, str(t), l) for w, (t, l) in zip(words_raw, zip(*preds))]))
                 f.write(' ')
 
+
 def process_data(model, target_data):
     with open(target_data) as f:
         lines_and_revs = [l.strip().split(',') for l in f.readlines()][1:]

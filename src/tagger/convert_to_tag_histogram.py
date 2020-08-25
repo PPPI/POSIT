@@ -56,8 +56,8 @@ def main():
     for words_raw in source:
         tags_feature_vector = np.zeros(shape=len(tag_vocab))
         lid_feature_vector = np.zeros(shape=config.nlangs)
-        preds = model.predict(words_raw)
-        for tags, lid in zip(*preds):
+        tags, lids = model.predict(words_raw)
+        for tags, lid in zip(tags, lids):
             for t in tags:
                 tags_feature_vector[tag_vocab.token2id(t)] += 1
             cooccur[tuple([tag_vocab.token2id(t) for t in tags])] += 1
