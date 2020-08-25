@@ -25,7 +25,10 @@ def main():
         word2vec_fv = np.zeros_like(word2vec_keyedvectors['I'])
         for words_raw in sents_raw:
             for word in words_raw:
-                word2vec_fv += word2vec_keyedvectors[word]
+                try:
+                    word2vec_fv += word2vec_keyedvectors[word]
+                except KeyError:
+                    pass
         w_feature_vectors.append(word2vec_fv)
 
     os.makedirs('./data/source_identification/word2vec/%s' % source_name, exist_ok=True)
