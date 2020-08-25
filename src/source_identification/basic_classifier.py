@@ -34,7 +34,7 @@ def main(argv):
         clf.fit(scaler.transform(X[train]), y[train])
         score = clf.score(scaler.transform(X[test]), y[test])
         scores.append(score)
-    print('%s has a mean accuracy of %2.3f' % (name, np.mean(scores)))
+    print('%s has a mean accuracy of %2.3f+-%2.3f' % (name, np.mean(scores), 1.6449*np.std(scores)))
 
 
 if __name__ == '__main__':
