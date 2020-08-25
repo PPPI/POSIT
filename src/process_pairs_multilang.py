@@ -10,11 +10,11 @@ def process_one_rev(model, target_data, rev, post_id):
     with open(os.path.join(os.path.dirname(target_data), 'SO_Posts', post_id, '%d.html' % rev)) as f:
         html = f.read()
     sents_raw = tokenize_SO_row(html, tag_name='div', all_as_code=True)
-    os.makedirs('./results/paired_posts/%s/' % post_id, exist_ok=True)
+    os.makedirs('./results/multilang/paired_posts/%s/' % post_id, exist_ok=True)
     for words_raw in sents_raw:
         if len(words_raw) > 0:
             preds = model.predict(words_raw)
-            with open('./results/paired_posts/%s/%d.txt' % (post_id, rev), 'a') as f:
+            with open('./results/multilang/paired_posts/%s/%d.txt' % (post_id, rev), 'a') as f:
                 f.write(' '.join(['%s+%s+%d' % (w, str(t), int(model.config.lang_to_id[l]))
                                   for w, (t, l) in zip(words_raw, zip(*preds))]))
                 f.write(' ')

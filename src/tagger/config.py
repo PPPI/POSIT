@@ -84,7 +84,7 @@ class Configuration:
     lr = 0.005
     lr_decay = 0.90
     clip = None  # if None, no clipping
-    nr_epochs_no_imprvmt = 10
+    nr_epochs_no_imprvmt = 3
 
     # model hyperparameters
     max_len = 100  # The maximum sentence/snippet length we train on

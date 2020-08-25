@@ -14,10 +14,10 @@ def process_data(model, target_data, stackoverflow=False):
         for words_raw in sents_raw:
             if len(words_raw) > 0:
                 preds = model.predict(words_raw)
-                with open('./results/for_manual_investigation.txt', 'a') as f:
+                with open('./results/multilang/for_manual_investigation.txt', 'a') as f:
                     f.write(' '.join(['%s+%s+%s' % (w, str(t), l) for w, (t, l) in zip(words_raw, zip(*preds))]))
                     f.write(' ')
-        with open('./results/for_manual_investigation.txt', 'a') as f:
+        with open('./results/multilang/for_manual_investigation.txt', 'a') as f:
             f.write('\n\n' + ''.join(['_'] * 80) + '\n\n')
 
 
@@ -26,6 +26,7 @@ def main():
     config = Configuration()
     config.dir_model = sys.argv[1]
     target_data = sys.argv[2]
+    stackoverflow = sys.argv[3].lower() == 'true'
 
     # build model
     model = CodePoSModel(config)
@@ -36,7 +37,7 @@ def main():
         exit(1)
 
     # run model over given data
-    process_data(model, target_data)
+    process_data(model, target_data, stackoverflow=stackoverflow)
 
 
 if __name__ == "__main__":
