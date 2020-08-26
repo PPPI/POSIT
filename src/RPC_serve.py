@@ -61,7 +61,7 @@ def main():
                 return process_sent(sentence)
 
             def is_multilang(self,):
-                return {'multilang': config.multilang}
+                return {'multilang': str(config.multilang)}
 
         server.register_instance(PredictionFunctions())
         print('Loading done, entering serve loop')
