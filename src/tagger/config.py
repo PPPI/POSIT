@@ -50,11 +50,13 @@ class Configuration:
                       enumerate(
                           ['English', 'go', 'java', 'javascript', 'php', 'python', 'ruby', 'uri', 'email', 'diff'])}
         lang_to_id = {v: k for k, v in id_to_lang.items()}
+        # This is to allow accuracy for just PL languages, 0 is Eng, 7,8,9 are formals that are non-PL
+        non_pl_lang_ids = [0, 7, 8, 9]
 
     # general config
     with_l_id = True
     with_l_id = with_l_id or multilang
-    project = "so_majority"
+    project = "so_snorkel"
     project += '_Id' if with_l_id and not multilang else ''
     # project += '5'
 

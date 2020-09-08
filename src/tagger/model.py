@@ -543,6 +543,8 @@ class CodePoSModel(BaseModel):
             for lab, lab_pred, length in zip(labels, labels_pred,
                                              sequence_lengths):
                 lab = lab[:length]
+                if lab_pred.shape[0] == self.config.nlangs and lab_pred.shape[1] == length:
+                    lab_pred = lab_pred.T
                 lab_pred = lab_pred[:length]
                 if self.config.multilang:
                     for a, b in zip(lab, lab_pred):
@@ -563,8 +565,8 @@ class CodePoSModel(BaseModel):
 
         if self.config.multilang:
             normed_accs = [acc[lid] for acc, lid in zip(np.asarray(accs).T, lids)]
-            # This is just PL languages, 0 is Eng, 7,8,9 are formals that are non-PL
-            normed_pl_accs = [acc[lid] for acc, lid in zip(np.asarray(accs).T, lids) if lid not in [0, 7, 8, 9]]
+            normed_pl_accs = [acc[lid] for acc, lid in zip(np.asarray(accs).T, lids)
+                              if lid not in self.config.non_pl_lang_ids]
         acc = np.mean(accs) if not self.config.multilang else \
             np.asarray([np.mean([acc[dim]for acc, lid in zip(np.asarray(accs).T, lids) if lid == dim])
                         for dim in range(self.config.nlangs)])
