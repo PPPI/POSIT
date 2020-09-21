@@ -4,7 +4,7 @@ import re
 import sys
 
 import numpy as np
-from nltk import casual_tokenize
+from nltk import casual_tokenize, sent_tokenize
 
 from src.preprocessor.preprocess import CODE_TOKENISATION_REGEX, tokenise_lkml
 from src.preprocessor.preprocess import tokenize_SO_row
@@ -39,6 +39,15 @@ def process_sent(sentence, casual):
     return words_raw
 
 
+def process_docstring(target_data):
+    with open(target_data) as f:
+        docstrings = f.read().split('<DOC-END>')
+
+    for docstring in docstrings:
+        sentences = sent_tokenize(docstring)
+        yield [process_sent(sent, False) for sent in sentences]
+
+
 def restore_model(config):
     try:
         with open(os.path.join(os.path.dirname(config.dir_model), 'config.json')) as f:
@@ -65,8 +74,10 @@ def main():
     source_name = sys.argv[3]
     if source_name == 'SO':
         source = process_data(sys.argv[2])
-    else:
+    elif source_name == 'LKML':
         source = tokenise_lkml(sys.argv[2])
+    elif source_name == 'DOCSTRING':
+        source = process_docstring(sys.argv[2])
 
     t_feature_vectors = list()
     l_feature_vectors = list()

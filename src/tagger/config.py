@@ -56,7 +56,7 @@ class Configuration:
     # general config
     with_l_id = True
     with_l_id = with_l_id or multilang
-    project = "so_snorkel"
+    project = "so_majority"
     project += '_Id' if with_l_id and not multilang else ''
     # project += '5'
 
@@ -70,7 +70,7 @@ class Configuration:
     filename_test = "data/corpora/%s/corpus/eval.txt" % ('multilingual/%s' % project if multilang else project)
     filename_train = "data/corpora/%s/corpus/train.txt" % ('multilingual/%s' % project if multilang else project)
 
-    max_iter = 20000  # if not None, max number of examples in dataset
+    max_iter = 20000  # 20000  # if not None, max number of examples in dataset
 
     # vocab
     filename_words = "data/corpora/%s/words.dct" % ('multilingual/%s' % project if multilang else project)
@@ -82,6 +82,7 @@ class Configuration:
     nr_epochs = 30
     dropout = 0.5
     batch_size = 10
+     
     lr_method = "adam"
     lr = 0.005
     lr_decay = 0.90
