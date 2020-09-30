@@ -11,7 +11,7 @@ def main():
     # Fixed for reproducibility
     np.random.seed(42)
 
-    docstrings = list()
+    docstrings = {l: list() for l in languages}
     for language in tqdm(languages, desc="Languages"):
         for fold in tqdm(folds, leave=False, desc="Fold"):
             # Determine number of files, we error fast, but don't actually read the file by using jl.open()
@@ -31,16 +31,17 @@ def main():
                 location = (location_format + jsonl_location_format) % (language, language, fold, language, fold, i)
                 with jl.open(location) as f:
                     for entry in tqdm(f, leave=False, desc="Entries"):
-                        docstrings.append(entry['docstring'])
+                        docstrings[language].append(entry['docstring'])
 
-    selected_idx = list(np.random.choice(len(docstrings), 30, replace=False))
-    selected = list()
-    for idx in selected_idx:
-        selected.append(docstrings[idx])
+    for language in tqdm(languages, desc="Languages"):
+        selected_idx = list(np.random.choice(len(docstrings[language]), 30, replace=False))
+        selected = list()
+        for idx in selected_idx:
+            selected.append(docstrings[idx])
 
-    os.makedirs('./data/corpora/docstring', exist_ok=True)
-    with open('./data/corpora/docstring/sampled_docstring.txt', 'w') as f:
-        f.write('\n<DOC-END>\n'.join(selected))
+        os.makedirs('./data/corpora/docstring/%s' % language, exist_ok=True)
+        with open('./data/corpora/docstring/%s/sampled_docstring.txt', 'w') as f:
+            f.write('\n<DOC-END>\n'.join(selected))
 
 
 if __name__ == '__main__':
