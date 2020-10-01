@@ -40,7 +40,7 @@ def main():
             selected.append(docstrings[language][idx])
 
         os.makedirs('./data/corpora/docstring/%s' % language, exist_ok=True)
-        with open('./data/corpora/docstring/%s/sampled_docstring.txt', 'w') as f:
+        with open('./data/corpora/docstring/%s/sampled_docstring.txt' % language, 'w') as f:
             f.write('\n<DOC-END>\n'.join(selected))
 
 
