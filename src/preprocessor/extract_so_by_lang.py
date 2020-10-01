@@ -27,8 +27,8 @@ def main(args):
     np.random.seed(42)
 
     # CLI Args
-    location = args[1]
-    languages = args[2:]
+    location = args[0]
+    languages = args[1:]
 
     posts_overall = {l: list() for l in languages}
     for language in tqdm(languages, desc="Languages"):
