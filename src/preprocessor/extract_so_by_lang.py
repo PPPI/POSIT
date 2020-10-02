@@ -18,6 +18,13 @@ def parse_stackoverflow_posts(file_location, condition):
             if line.startswith("<row"):
                 row_ = xmltodict.parse(line)['row']
                 if '@Tags' in row_.keys():
+                    if '><' in row_['@Tags']:
+                        tags = row_['@Tags'][1:-1].split('><')
+                    elif len(row_['@Tags']) > 0:
+                        tags = [row_['@Tags'][1:-1]]
+                    else:
+                        tags = []
+                    tags = set(tags)
                     if set(row_['@Tags']).intersection(condition) == condition:
                         yield row_['@Body']
 
@@ -32,7 +39,7 @@ def main(args):
 
     posts_overall = {l: list() for l in languages}
     for language in tqdm(languages, desc="Languages"):
-        posts_overall[language] = list(parse_stackoverflow_posts(location, ['<%s>' % language]))
+        posts_overall[language] = [b for b in parse_stackoverflow_posts(location, [language])]
 
     for language in tqdm(languages, desc="Languages"):
         selected_idx = list(np.random.choice(len(posts_overall[language]), 30, replace=False))
