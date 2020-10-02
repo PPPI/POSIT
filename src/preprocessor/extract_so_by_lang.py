@@ -25,7 +25,7 @@ def parse_stackoverflow_posts(file_location, condition):
                     else:
                         tags = []
                     tags = set(tags)
-                    if set(row_['@Tags']).intersection(condition) == condition:
+                    if tags.intersection(condition) == condition:
                         yield row_['@Body']
 
 
