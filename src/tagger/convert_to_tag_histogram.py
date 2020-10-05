@@ -48,6 +48,15 @@ def process_docstring(target_data):
         yield [process_sent(sent, False) for sent in sentences]
 
 
+def process_so_conditional(target_data):
+    with open(target_data) as f:
+        so_conditional = f.read().split('<DOC-END>')
+
+    for html in so_conditional:
+        sents_raw = tokenize_SO_row(html, tag_name='div', all_as_code=True)
+        return sents_raw
+
+
 def restore_model(config):
     try:
         with open(os.path.join(os.path.dirname(config.dir_model), 'config.json')) as f:
@@ -78,6 +87,8 @@ def main():
         source = tokenise_lkml(sys.argv[2])
     elif source_name == 'DOCSTRING':
         source = process_docstring(sys.argv[2])
+    elif source_name in ['SO-%s' % l for l in ['java', 'go', 'php', 'ruby', 'python', 'javascript']]:
+        source = process_so_conditional(sys.argv[2])
 
     t_feature_vectors = list()
     l_feature_vectors = list()
