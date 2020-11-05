@@ -6,7 +6,7 @@ from gensim.models import KeyedVectors
 import numpy as np
 
 from src.preprocessor.preprocess import tokenise_lkml
-from src.tagger.convert_to_tag_histogram import process_data, process_docstring
+from src.tagger.convert_to_tag_histogram import process_data, process_docstring, process_so_conditional
 
 
 def main():
@@ -18,8 +18,10 @@ def main():
         source = process_data(sys.argv[2])
     elif source_name == 'LKML':
         source = tokenise_lkml(sys.argv[2])
-    elif source_name == 'DOCSTRING':
+    elif source_name.startswith('DOCSTRING'):
         source = process_docstring(sys.argv[2])
+    elif source_name in ['SO-%s' % l for l in ['java', 'go', 'php', 'ruby', 'python', 'javascript']]:
+        source = process_so_conditional(sys.argv[2])
 
     w_feature_vectors = list()
 
