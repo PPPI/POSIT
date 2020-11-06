@@ -568,7 +568,7 @@ class CodePoSModel(BaseModel):
             normed_pl_accs = [acc[lid] for acc, lid in zip(np.asarray(accs).T, lids)
                               if lid not in self.config.non_pl_lang_ids]
         acc = np.mean(accs) if not self.config.multilang else \
-            np.asarray([np.mean([acc[dim]for acc, lid in zip(np.asarray(accs).T, lids) if lid == dim])
+            np.asarray([np.mean([acc[dim] for acc, lid in zip(np.asarray(accs).T, lids) if lid == dim])
                         for dim in range(self.config.nlangs)])
         sacc = np.mean(saccs)
         if self.config.with_l_id:
@@ -610,23 +610,29 @@ class CodePoSModel(BaseModel):
         :return preds: list of tags (string), one for each word in the sentence
         """
         words = [self.config.processing_word(w) for w in words_raw]
-        if type(words[0]) == tuple:
-            words = list(zip(*words))
-        pred = self.predict_batch([words])
-        pred_ids = np.asarray(pred[0])
-        if self.config.multilang:
-            preds = [[self.idx_to_tag[idx] for idx in list(pred_ids.T[0][n])] for n in range(self.config.nlangs)]
-            preds = [list(inner) for inner in np.asarray(preds).T]
-        else:
-            preds = [self.idx_to_tag[idx] for idx in list(pred_ids[0])]
-
-        if self.config.with_l_id:
-            pred_lid = pred[1][0]
+        if len(words) > 0:
+            if type(words[0]) == tuple:
+                words = list(zip(*words))
+            pred = self.predict_batch([words])
+            pred_ids = np.asarray(pred[0])
             if self.config.multilang:
-                resulting_lids = list()
-                for lid in pred_lid:
-                    resulting_lids.append(self.config.id_to_lang[lid])
-                pred_lid = resulting_lids
-            return preds, pred_lid
+                preds = [[self.idx_to_tag[idx] for idx in list(pred_ids.T[0][n])] for n in range(self.config.nlangs)]
+                preds = [list(inner) for inner in np.asarray(preds).T]
+            else:
+                preds = [self.idx_to_tag[idx] for idx in list(pred_ids[0])]
+
+            if self.config.with_l_id:
+                pred_lid = pred[1][0]
+                if self.config.multilang:
+                    resulting_lids = list()
+                    for lid in pred_lid:
+                        resulting_lids.append(self.config.id_to_lang[lid])
+                    pred_lid = resulting_lids
+                return preds, pred_lid
+            else:
+                return preds
         else:
-            return preds
+            if self.config.with_l_id:
+                return [], []
+            else:
+                return []
