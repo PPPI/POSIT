@@ -55,6 +55,15 @@ src/ -> baseline/        {rulebased and SVM baselines}
 ```
 The model configuration and hyperparameters can be seen in `./src/tagger/config.py`
 
+## Possible issue when running on CPU
+
+If running POSIT on CPU without changing the CPU flag, an error that can be root-caused to:
+```
+tensorflow.python.framework.errors_impl.InvalidArgumentError: seq_lens(0) > input.dims(1)
+         [[{{node feature/bidirectional_rnn/bw/ReverseSequence}}]]
+```
+may happen. In such case, please find the `use_CPU = False` line in `src/tagger/config.py` and flip the flag to `True`.
+
 ## Preprocessing
 To generate training data from `Posts.xml`, first run:
 ```bash
