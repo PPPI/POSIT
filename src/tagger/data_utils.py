@@ -163,7 +163,7 @@ def get_processing_word(vocab_words=None, vocab_chars=None,
         # 0. get chars of words
         if vocab_chars is not None and chars is True:
             chars_ = [c for c in word]
-            char_ids = vocab_chars.doc2idx(chars_, unknown_word_index=-1)
+            char_ids = vocab_chars.doc2idx(chars_, unknown_word_index=0)
 
         # 1. preprocess word
         if lowercase:
