@@ -542,8 +542,9 @@ class CodePoSModel(BaseModel):
                 labels_pred, sequence_lengths = self.predict_batch(words)
             for lab, lab_pred, length in zip(labels, labels_pred,
                                              sequence_lengths):
+                lab_pred = np.asarray(lab_pred)
                 lab = lab[:length]
-                if lab_pred.shape[0] == self.config.nlangs and lab_pred.shape[1] == length:
+                if self.config.multilang and lab_pred.shape[0] == self.config.nlangs and lab_pred.shape[1] == length:
                     lab_pred = lab_pred.T
                 lab_pred = lab_pred[:length]
                 if self.config.multilang:
