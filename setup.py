@@ -31,5 +31,6 @@ setup(name='POSIT',
             'joblib',
             'h5py',
             'scipy',
+            'tensorflow_addons',
       ], install_requires=['snorkel', 'pandas']
       )

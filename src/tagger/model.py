@@ -1,5 +1,9 @@
 import numpy as np
 import tensorflow as tf
+import tensorflow_addons as tfa
+if tf.__version__[0] == '2':
+    import tensorflow.compat.v1 as tf
+    tf.disable_v2_behavior()
 
 from .base_model import BaseModel
 from .data_utils import pad_sequences, minibatches
@@ -264,7 +268,7 @@ class CodePoSModel(BaseModel):
         with tf.compat.v1.variable_scope("bi-lstm"):
             cell_fw = tf.keras.layers.LSTMCell(self.config.hidden_size_lstm)
             cell_bw = tf.keras.layers.LSTMCell(self.config.hidden_size_lstm)
-            (output_fw, output_bw), _ = tf.nn.bidirectional_dynamic_rnn(
+            (output_fw, output_bw), _ = tf.compat.v1.nn.bidirectional_dynamic_rnn(
                 cell_fw, cell_bw, self.word_embeddings,
                 sequence_length=self.sequence_lengths, dtype=tf.float32)
             output = tf.concat([output_fw, output_bw], axis=-1)
@@ -349,7 +353,7 @@ class CodePoSModel(BaseModel):
                                                      shape=[-1, self.nsteps],
                                                      )
                     with tf.compat.v1.variable_scope("Language_%d" % dim):
-                        current_log_likelihood, trans_params = tf.contrib.crf.crf_log_likelihood(
+                        current_log_likelihood, trans_params = tfa.text.crf.crf_log_likelihood(
                             self.current_logits, self.current_labels, self.sequence_lengths)
                         self.trans_params.append(trans_params)
                         # Only propagate for the languages that exist in the current batch
@@ -358,7 +362,7 @@ class CodePoSModel(BaseModel):
                             dtype=tf.float32),
                             current_log_likelihood)
             else:
-                log_likelihood, trans_params = tf.contrib.crf.crf_log_likelihood(
+                log_likelihood, trans_params = tfa.text.crf.crf_log_likelihood(
                     self.logits, self.labels, self.sequence_lengths)
                 self.trans_params = trans_params  # need to evaluate it for decoding
             # mask = tf.not_equal(self.labels, self.config.vocab_tags.token2id[O])
@@ -376,7 +380,7 @@ class CodePoSModel(BaseModel):
 
             if self.config.with_l_id:
                 with tf.compat.v1.variable_scope("l_id_loss"):
-                    log_likelihood_l, trans_params_l = tf.contrib.crf.crf_log_likelihood(
+                    log_likelihood_l, trans_params_l = tfa.text.crf.crf_log_likelihood(
                         self.logits_l, self.labels_l, self.sequence_lengths)
                     self.trans_params_l = trans_params_l  # need to evaluate it for decoding
                     if not self.config.multilang:
@@ -443,7 +447,7 @@ class CodePoSModel(BaseModel):
                     feed_dict=fd)
                 for logit, sequence_length in zip(logits_l, sequence_lengths):
                     logit = logit[:sequence_length]  # keep only the valid steps
-                    viterbi_seq, viterbi_score = tf.contrib.crf.viterbi_decode(
+                    viterbi_seq, viterbi_score = tfa.text.crf.viterbi_decode(
                         logit, trans_params_l)
                     viterbi_l_ids += [viterbi_seq]
             else:
@@ -457,13 +461,13 @@ class CodePoSModel(BaseModel):
                                                 newshape=[-1, nsteps, self.config.ntags])
                     for logit, sequence_length in zip(current_logits, sequence_lengths):
                         logit = logit[:sequence_length]  # keep only the valid steps
-                        viterbi_seq, viterbi_score = tf.contrib.crf.viterbi_decode(
+                        viterbi_seq, viterbi_score = tfa.text.crf.viterbi_decode(
                             logit, trans_params[dim])
                         viterbi_sequences[dim] += [viterbi_seq]
             else:
                 for logit, sequence_length in zip(logits, sequence_lengths):
                     logit = logit[:sequence_length]  # keep only the valid steps
-                    viterbi_seq, viterbi_score = tf.contrib.crf.viterbi_decode(
+                    viterbi_seq, viterbi_score = tfa.text.crf.viterbi_decode(
                         logit, trans_params)
                     viterbi_sequences += [viterbi_seq]
 
