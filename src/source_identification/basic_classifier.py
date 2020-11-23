@@ -2,7 +2,10 @@ import glob
 import sys
 
 import numpy as np
-from daal4py.sklearn.ensemble import RandomForestClassifier
+try:
+    from daal4py.sklearn.ensemble import RandomForestClassifier
+except ModuleNotFoundError:
+    from sklearn.ensemble import RandomForestClassifier
 from sklearn import preprocessing
 from sklearn.model_selection import KFold
 
