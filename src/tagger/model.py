@@ -1,6 +1,8 @@
 import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
+from tensorflow import keras
+
 if tf.__version__[0] == '2':
     import tensorflow.compat.v1 as tf
     tf.disable_v2_behavior()
@@ -266,8 +268,13 @@ class CodePoSModel(BaseModel):
         of scores, of dimension equal to the number of tags.
         """
         with tf.compat.v1.variable_scope("bi-lstm"):
-            cell_fw = tf.keras.layers.LSTMCell(self.config.hidden_size_lstm)
-            cell_bw = tf.keras.layers.LSTMCell(self.config.hidden_size_lstm)
+            # Use implementation = 1 to force more ops of smaller size (to fit our GPU)
+            cell_fw = tf.keras.layers.LSTMCell(self.config.hidden_size_lstm,
+                                               implementation=1,
+                                               recurrent_dropout=self.config.dropout)
+            cell_bw = tf.keras.layers.LSTMCell(self.config.hidden_size_lstm,
+                                               implementation=1,
+                                               recurrent_dropout=self.config.dropout)
             (output_fw, output_bw), _ = tf.compat.v1.nn.bidirectional_dynamic_rnn(
                 cell_fw, cell_bw, self.word_embeddings,
                 sequence_length=self.sequence_lengths, dtype=tf.float32)
