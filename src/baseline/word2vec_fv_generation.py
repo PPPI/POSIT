@@ -6,7 +6,7 @@ from gensim.models import KeyedVectors
 import numpy as np
 
 from src.preprocessor.preprocess import tokenise_lkml
-from src.tagger.convert_to_tag_histogram import process_data, process_docstring, process_so_conditional
+from src.convert_to_tag_histogram import process_data, process_docstring, process_so_conditional
 
 
 def main():
