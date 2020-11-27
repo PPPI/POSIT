@@ -82,15 +82,6 @@ class BaseModel(object):
             # config.log_device_placement = True  # to log device placement (on which device the operation ran)
             #                                     # (nothing gets printed in Jupyter, only if you run it standalone)
 
-        # XXX: Non-adam optimisers have a TEMP VAR reuse issue on TF 1.13+
-        # Disabling arithmetic operation optimisations makes the model run
-        # It has been accessed by other users (on different models) that
-        # this issue can manifest as model sizes are increased.
-        # On 1.14+, memory optimisation also causes issues.
-        off = rewriter_config_pb2.RewriterConfig.OFF
-        config.graph_options.rewrite_options.arithmetic_optimization = off
-        config.graph_options.rewrite_options.memory_optimization = off
-
         tf.compat.v1.keras.layers.enable_v2_dtype_behavior()
         if not self.config.use_cpu:
             policy = mixed_precision.Policy('mixed_float16')
