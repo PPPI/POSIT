@@ -86,9 +86,9 @@ class Configuration:
     train_embeddings = True
     nr_epochs = 30
     dropout = 0.5
-    batch_size = 16
+    batch_size = 8
      
-    lr_method = "rmsprop"
+    lr_method = "adam"
     lr = 0.005
     lr_decay = 0.90
     clip = None  # if None, no clipping

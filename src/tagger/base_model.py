@@ -1,8 +1,11 @@
 import os
 
 import tensorflow as tf
+from tensorflow.keras.mixed_precision import experimental as mixed_precision
+
 if tf.__version__[0] == '2':
     import tensorflow.compat.v1 as tf
+
     tf.disable_v2_behavior()
 from tensorflow.core.protobuf import rewriter_config_pb2
 
@@ -57,11 +60,14 @@ class BaseModel(object):
                 raise NotImplementedError("Unknown method {}".format(_optimiser_lower))
 
             if clip is not None:  # gradient clipping if clip is defined
-                grads, vs = zip(*optimizer.compute_gradients(loss))
+                grads, vs = zip(
+                    *optimizer.compute_gradients(loss,
+                                                 aggregation_method=tf.AggregationMethod.EXPERIMENTAL_ACCUMULATE_N))
                 grads, gnorm = tf.clip_by_global_norm(grads, clip)
                 self.train_op = optimizer.apply_gradients(zip(grads, vs))
             else:
-                self.train_op = optimizer.minimize(loss)
+                self.train_op = optimizer.minimize(loss,
+                                                   aggregation_method=tf.AggregationMethod.EXPERIMENTAL_ACCUMULATE_N)
 
     def initialize_session(self):
         """Defines self.sess and initialize the variables"""
@@ -84,6 +90,14 @@ class BaseModel(object):
         off = rewriter_config_pb2.RewriterConfig.OFF
         config.graph_options.rewrite_options.arithmetic_optimization = off
         config.graph_options.rewrite_options.memory_optimization = off
+
+        tf.compat.v1.keras.layers.enable_v2_dtype_behavior()
+        if not self.config.use_cpu:
+            policy = mixed_precision.Policy('mixed_float16')
+            mixed_precision.set_policy(policy)
+
+        # Make use of XLA
+        tf.config.optimizer.set_jit(True)
 
         self.sess = tf.compat.v1.Session(config=config)
         self.sess.run(tf.compat.v1.global_variables_initializer())
