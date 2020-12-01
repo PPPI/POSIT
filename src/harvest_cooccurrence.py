@@ -107,7 +107,7 @@ def main():
 
     co_oc_matrix = co_oc_matrix.tocsr()
     os.makedirs('./data/cooccurrence_maps/%s' % source_name, exist_ok=True)
-    sparse.save_npz(file='./data/source_identification/%s/cooccurrence_map.npz' % source_name,
+    sparse.save_npz(file='./data/cooccurrence_maps/%s/cooccurrence_map.npz' % source_name,
                     matrix=co_oc_matrix,
                     compressed=True)
 
