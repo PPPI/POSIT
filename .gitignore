@@ -118,3 +118,5 @@ data/*
 articles/
 articles/*
 /misc/
+
+/src/analysis/plots/
