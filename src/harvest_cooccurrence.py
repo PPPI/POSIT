@@ -92,7 +92,7 @@ def main():
     elif source_name in ['SO-%s' % l for l in ['java', 'go', 'php', 'ruby', 'python', 'javascript']]:
         source = process_so_conditional(sys.argv[2])
 
-    co_oc_matrix = sparse.lil_matrix((N, N), dtype=np.int8)
+    co_oc_matrix = sparse.lil_matrix((N, N), dtype=np.int64)
 
     for sents_raw in source:
         for words_raw in sents_raw:
