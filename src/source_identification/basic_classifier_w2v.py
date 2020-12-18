@@ -32,7 +32,7 @@ def generate_xy(sources, file_path):
 
 def main():
     file_path = './data/source_identification/word2vec/%s/feature_vector_*.npz'
-    run_all_config(file_path, generate_xy)
+    run_all_config(file_path, generate_xy, 'w2v')
 
 
 if __name__ == '__main__':

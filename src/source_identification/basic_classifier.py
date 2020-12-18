@@ -72,7 +72,7 @@ def run_eval(clf, scaler, X, y):
     return scores
 
 
-def run_all_config(file_path, generate_xy=generate_xy):
+def run_all_config(file_path, generate_xy=generate_xy, suffix='posit'):
     results = {'Method': list(), 'Mean': list(), 'STD': list()}
     configs = generate_all_configs()
     for sources in configs:
@@ -87,7 +87,7 @@ def run_all_config(file_path, generate_xy=generate_xy):
         results['STD'].append(np.std(scores))
 
     df = pd.DataFrame(data=results)
-    df.to_csv('./results/source_separation.csv', index_label='Method')
+    df.to_csv(f"./results/source_separation_{suffix}.csv", index_label='Method')
 
 
 def main():
