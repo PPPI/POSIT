@@ -1,25 +1,23 @@
 import glob
-import sys
 
 import numpy as np
+from sklearn import preprocessing
+
+from src.source_identification.basic_classifier import run_all_config
+
 try:
     from daal4py.sklearn.ensemble import RandomForestClassifier
 except ModuleNotFoundError:
     from sklearn.ensemble import RandomForestClassifier
-from sklearn import preprocessing
-from sklearn.model_selection import KFold
 
 
-def main(argv):
-    name = 'Random Forest Classifier'
-    clf = RandomForestClassifier(n_estimators=100)
-    sources = argv
+def generate_xy(sources, file_path):
     Xy = list()
     le = preprocessing.LabelEncoder()
     le.fit(sources)
     scaler = preprocessing.RobustScaler()
     for source in sources:
-        for file in glob.glob('./data/source_identification/word2vec/%s/feature_vector_*.npz' % source):
+        for file in glob.glob(file_path % source):
             loaded = np.load(file)
             fv = loaded['w2v']
             Xy.append((fv, source))
@@ -29,14 +27,13 @@ def main(argv):
     y = le.transform(np.asarray(y))
     scaler.fit(X)
 
-    kf = KFold(10)
-    scores = list()
-    for k, (train, test) in enumerate(kf.split(X, y)):
-        clf.fit(scaler.transform(X[train]), y[train])
-        score = clf.score(scaler.transform(X[test]), y[test])
-        scores.append(score)
-    print('%s has a mean accuracy of %2.3f+-%2.3f' % (name, np.mean(scores), 1.6449*np.std(scores)))
+    return X, y, scaler
+
+
+def main():
+    file_path = './data/source_identification/word2vec/%s/feature_vector_*.npz'
+    run_all_config(file_path, generate_xy)
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    main()
