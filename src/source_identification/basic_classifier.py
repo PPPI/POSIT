@@ -5,11 +5,17 @@ import numpy as np
 import pandas as pd
 from sklearn import preprocessing
 from sklearn.model_selection import StratifiedKFold
+from sklearn.neural_network import MLPClassifier
 
 try:
     from daal4py.sklearn.ensemble import RandomForestClassifier
 except ModuleNotFoundError:
     from sklearn.ensemble import RandomForestClassifier
+
+CLASSIFIERS = {
+    'RandomForestClassifier': RandomForestClassifier(n_estimators=100),
+    'MLPClassifier': MLPClassifier(),
+}
 
 
 def all_subsets(ss):
@@ -73,18 +79,19 @@ def run_eval(clf, scaler, X, y):
 
 
 def run_all_config(file_path, generate_xy=generate_xy, suffix='posit'):
-    results = {'Method': list(), 'Mean': list(), 'STD': list()}
+    results = {'Method': list(), 'Clf': list(), 'Mean': list(), 'STD': list()}
     configs = generate_all_configs()
     for sources in configs:
-        print(f"Solving for {sources}")
-        name = 'Random Forest Classifier'
-        clf = RandomForestClassifier(n_estimators=100)
-        X, y, scaler = generate_xy(sources, file_path)
-        scores = run_eval(clf, scaler, X, y)
-        print(f"{name} has a mean accuracy of {np.mean(scores)}+-{1.6449 * np.std(scores)}")
-        results['Method'].append(str(sources))
-        results['Mean'].append(np.mean(scores))
-        results['STD'].append(np.std(scores))
+        for clf_name, clf in CLASSIFIERS.items():
+            print(f"Solving for {sources} with {clf_name}")
+            clf = RandomForestClassifier(n_estimators=100)
+            X, y, scaler = generate_xy(sources, file_path)
+            scores = run_eval(clf, scaler, X, y)
+            print(f"{clf_name} has a mean accuracy of {np.mean(scores)}+-{1.6449 * np.std(scores)}")
+            results['Method'].append(str(sources))
+            results['Clf'].append(clf_name)
+            results['Mean'].append(np.mean(scores))
+            results['STD'].append(np.std(scores))
 
     df = pd.DataFrame(data=results)
     df.to_csv(f"./results/source_separation_{suffix}.csv", index_label='Method')
