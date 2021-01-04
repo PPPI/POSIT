@@ -14,15 +14,21 @@ from src.preprocessor.util import operators, line_comment_start, _UNIVERSAL_TAGS
 from src.tagger.data_utils import O, snake, camel
 
 
-def parse_stackoverflow_posts(file_location, for_stormed_=False):
+def parse_stackoverflow_posts(file_location, for_stormed_=False, return_tags=False):
     with fileinput.input(file_location, openhook=fileinput.hook_encoded("utf-8")) as f_:
         for line in f_:
             line = line.strip()
-            if line.startswith("<row_"):
+            if line.startswith("<row "):
                 row_ = xmltodict.parse(line)['row']
                 if for_stormed_ and ('@Tags' not in row_.keys() or '<java>' not in row_['@Tags']):
                     continue
-                yield row_['@Body']
+                if return_tags:
+                    if '@Tags' not in row_.keys():
+                        continue
+                    else:
+                        yield row_['@Body'], row_['@Tags']
+                else:
+                    yield row_['@Body']
 
 
 def heuristic_tag(tok, pos, tokens):
@@ -146,13 +152,17 @@ def tokenize_SO_row(row_, tag_name='body', all_as_code=False):
     return text___
 
 
-def tokenise_SO(location_, offset_, limit_):
-    for location_, row_ in enumerate(parse_stackoverflow_posts(location_)):
+def tokenise_SO(location_, offset_, limit_, return_tags=False):
+    for location_, row_ in enumerate(parse_stackoverflow_posts(location_, return_tags=return_tags)):
         if location_ < offset_:
             continue
         if location_ >= limit_:
             break
-        yield tokenize_SO_row(row_)
+        if return_tags:
+            row_, tags = row_
+            yield tokenize_SO_row(row_), tags[1:-1].split('><')
+        else:
+            yield tokenize_SO_row(row_)
 
 
 def remove_leading_symbols(line):
