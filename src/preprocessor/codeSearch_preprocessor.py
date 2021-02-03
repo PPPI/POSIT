@@ -12,7 +12,6 @@ import antlr4
 # Enables reading the corpus
 import json_lines as jl
 # NLP tokenisation and tagging
-import psutil
 from nltk import sent_tokenize, casual_tokenize, pos_tag
 # Progress bars
 from tqdm import tqdm
@@ -314,8 +313,7 @@ def main():
 
                     processed_data = list()
                     with jl.open(location) as json_generator:
-                        # Using len(psutil.Process().cpu_affinity()) allows us to only get the number of affinity CPUs
-                        with Pool(processes=len(psutil.Process().cpu_affinity()), maxtasksperchild=8) as wp:
+                        with Pool(processes=os.cpu_count() - 1, maxtasksperchild=8) as wp:
                             for processed_entry in tqdm(wp.imap_unordered(process_entry_mp, json_generator,
                                                                           chunksize=16),
                                                         leave=False,
