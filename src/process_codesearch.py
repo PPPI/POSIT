@@ -60,7 +60,7 @@ def process_with_posit(model, location, language):
 
     lid_hits = list()
     lid_hits_at_3 = list()
-    for sents_raw, tags in source:
+    for sents_raw in source:
         all_lids = list()
         for words_raw in sents_raw:
             if len(words_raw) > 0:
@@ -78,9 +78,9 @@ def process_with_posit(model, location, language):
 
         top_3 = set(all_lids)
 
-        if any([t in tags for t in PLs_trained_on]) and len(lid_pred) > 0:
-            lid_hits.append(1 if lid_pred in tags else 0)
-            lid_hits_at_3.append(1 if any([lid in tags for lid in top_3]) else 0)
+        if any([t in [language] for t in PLs_trained_on]) and len(lid_pred) > 0:
+            lid_hits.append(1 if lid_pred in [language] else 0)
+            lid_hits_at_3.append(1 if any([lid in [language] for lid in top_3]) else 0)
         with open(f"./results/multilang/for_manual_investigation_codesearch_{language}.txt", 'a') as f:
             f.write('\n\n' + ''.join(['_'] * 80) + '\n\n')
     print(f"For posts over trained languages, we guessed correctly the user tag in {np.mean(lid_hits):2.3f} cases.")

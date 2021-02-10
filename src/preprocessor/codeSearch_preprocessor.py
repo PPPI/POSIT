@@ -54,7 +54,7 @@ formal_languages = [
 ]
 
 # language
-location_format = 'H:\\CodeSearch\\%s\\'
+location_format = 'K:\\CodeSearch\\%s\\'
 # language
 pickles = [
     '%s_dedupe_definitions_v2.pkl',
