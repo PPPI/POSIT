@@ -6,13 +6,14 @@ import numpy as np
 from nltk import sent_tokenize
 from tqdm import tqdm
 
-from src.preprocessor.codeSearch_preprocessor import folds, location_format, jsonl_location_format
+from src.preprocessor.codeSearch_preprocessor import folds, location_format
 from src.preprocessor.util import CODE_TOKENISATION_REGEX
 from src.tagger.config import Configuration
 from src.tagger.model import CodePoSModel
 
 PLs_trained_on = ['go', 'java', 'javascript', 'php', 'python', 'ruby']
-
+# (language, fold, language, fold, fold number)
+jsonl_location_format = '%s\\final\\jsonl\\%s\\%s_%s_%d_parsed.jsonl.gz'
 
 def load_and_process(model, language):
     for fold in tqdm(folds, leave=False, desc="Fold"):
@@ -60,6 +61,11 @@ def process_with_posit(model, location, language):
 
     lid_hits = list()
     lid_hits_at_3 = list()
+
+    # Clear file before run
+    with open(f"./results/multilang/for_manual_investigation_codesearch_{language}.txt", 'w') as _:
+        pass
+
     for sents_raw in source:
         all_lids = list()
         for words_raw in sents_raw:
@@ -92,7 +98,6 @@ def main():
     # create instance of config
     config = Configuration()
     config.dir_model = sys.argv[1]
-    language = sys.argv[2]
 
     # build model
     model = CodePoSModel(config)
@@ -103,7 +108,8 @@ def main():
         exit(1)
 
     # run model over given data
-    load_and_process(model, language)
+    for language in PLs_trained_on:
+        load_and_process(model, language)
 
 
 if __name__ == "__main__":
