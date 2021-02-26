@@ -8,6 +8,26 @@ from src.preprocessor.preprocess import tokenise_SO, tokenise_lkml
 from src.tagger.config import Configuration
 from src.tagger.model import CodePoSModel
 
+conversion_from_udep_to_upenn = {
+    'NOUN': 'NN',
+    'ADJ': 'JJ',
+    'ADP': 'IN',
+    'ADV': 'RB',
+    'AUX': 'MD',
+    'CCONJ': 'CC',
+    'DET': 'DT',
+    'INTJ': 'UH',
+    'NUM': 'CD',
+    'PART': 'RP',
+    'PRON': 'PRP',
+    'PROPN': 'NNP',
+    'PUNCT': '.',
+    'SCONJ': 'IN',
+    'SYM': 'SYM',
+    'VERB': 'VB',
+    'X': 'X',
+}
+
 
 def process_data(model, target_data, stackoverflow=False):
     if stackoverflow:
@@ -73,8 +93,13 @@ def main():
     nltk_tagging = process_nltk(target_data, stackoverflow=stackoverflow)
     spacy_tagging = process_spacy(target_data, stackoverflow=stackoverflow)
 
-    for first, second in [(posit_tagging, nltk_tagging), (posit_tagging, spacy_tagging), (nltk_tagging, spacy_tagging)]:
-        print("%2.3f" % cohen_kappa_score([p[-1] for p in first], [p[-1] for p in second]))
+    for first, second, convert in [(posit_tagging, nltk_tagging, False),
+                                   (posit_tagging, spacy_tagging, True),
+                                   (nltk_tagging, spacy_tagging), True]:
+        first, second = [p[-1] for inner in first for p in inner], [p[-1] for inner in second for p in inner]
+        if convert:
+            second = [conversion_from_udep_to_upenn[t] for t in second]
+        print("%2.3f" % cohen_kappa_score(first, second))
 
 
 if __name__ == "__main__":
