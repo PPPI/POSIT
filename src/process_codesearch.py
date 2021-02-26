@@ -6,17 +6,17 @@ import numpy as np
 from nltk import sent_tokenize
 from tqdm import tqdm
 
-from src.preprocessor.codeSearch_preprocessor import folds, location_format
+from src.preprocessor.codeSearch_preprocessor import location_format
 from src.preprocessor.util import CODE_TOKENISATION_REGEX
 from src.tagger.config import Configuration
 from src.tagger.model import CodePoSModel
 
-PLs_trained_on = ['go', 'java', 'javascript', 'php', 'python', 'ruby']
+PLs_trained_on = ['java', 'javascript', 'php', 'python', 'ruby', 'go']
 # (language, fold, language, fold, fold number)
 jsonl_location_format = '%s\\final\\jsonl\\%s\\%s_%s_%d_parsed.jsonl.gz'
 
 def load_and_process(model, language):
-    for fold in tqdm(folds, leave=False, desc="Fold"):
+    for fold in tqdm(['test'], leave=False, desc="Fold"):
         # Determine number of files, we error fast, but don't actually read the file by using jl.open()
         n_files = 0
         while True:
@@ -89,6 +89,7 @@ def process_with_posit(model, location, language):
             lid_hits_at_3.append(1 if any([lid in [language] for lid in top_3]) else 0)
         with open(f"./results/multilang/for_manual_investigation_codesearch_{language}.txt", 'a') as f:
             f.write('\n\n' + ''.join(['_'] * 80) + '\n\n')
+    print(f'Language: {language}')
     print(f"For posts over trained languages, we guessed correctly the user tag in {np.mean(lid_hits):2.3f} cases.")
     print(f"For posts over trained languages, we guessed correctly in top 3 "
           f"the user tag in {np.mean(lid_hits):2.3f} cases.")
