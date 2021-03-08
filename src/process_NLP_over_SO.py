@@ -2,6 +2,7 @@ import sys
 
 import nltk
 import spacy
+from gensim.corpora import Dictionary
 from sklearn.metrics import cohen_kappa_score
 
 from src.preprocessor.preprocess import tokenise_SO, tokenise_lkml
@@ -96,10 +97,28 @@ def main():
     for first, second, convert in [(posit_tagging, nltk_tagging, False),
                                    (posit_tagging, spacy_tagging, True),
                                    (nltk_tagging, spacy_tagging), True]:
-        first, second = [p[-1] for inner in first for p in inner], [p[-1] for inner in second for p in inner]
+        first, second = [p for inner in first for p in inner], [p for inner in second for p in inner]
+        first_, second_ = list(), list()
+        offset = 0
+        max_lookahead = 5
+        for idx, (tok, tag) in enumerate(first):
+            while offset <= max_lookahead:
+                other_tok, other_tag = second[idx + offset]
+                if tok == other_tok:
+                    first_.append(tag)
+                    second_.append(other_tag)
+                    break
+                elif offset > max_lookahead:
+                    offset = 0
+                    break
+                else:
+                    offset += 1
         if convert:
-            second = [conversion_from_udep_to_upenn[t] for t in second]
-        print("%2.3f" % cohen_kappa_score(first, second))
+            second_ = [conversion_from_udep_to_upenn[t] for t in second_]
+
+        # TODO: TypeError: doc2bow expects an array of unicode tokens on input, not a single string
+        dct = Dictionary([first_, second_])
+        print("%2.3f" % cohen_kappa_score(dct.doc2idx(first_), dct.doc2idx(second_)))
 
 
 if __name__ == "__main__":

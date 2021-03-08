@@ -43,7 +43,7 @@ def generate_all_configs():
     return configs
 
 
-def generate_xy(sources, file_path):
+def generate_xy(sources, file_path, use_tags=True, use_lids=True):
     Xy = list()
     le = preprocessing.LabelEncoder()
     le.fit(sources)
@@ -51,9 +51,16 @@ def generate_xy(sources, file_path):
     for source in sources:
         for file in glob.glob(file_path % source):
             loaded = np.load(file)
-            tags = loaded['tags']
-            lids = loaded['lids']
-            fv = np.concatenate((tags, lids))
+            if use_tags and use_lids:
+                tags = loaded['tags']
+                lids = loaded['lids']
+                fv = np.concatenate((tags, lids))
+            elif use_tags:
+                fv = loaded['tags']
+            elif use_lids:
+                fv = loaded['lids']
+            else:
+                raise ValueError('Either use_tags or use_lids should be set to True.')
             Xy.append((fv, source))
 
     X, y = list(zip(*Xy))
@@ -78,14 +85,14 @@ def run_eval(clf, scaler, X, y):
     return scores
 
 
-def run_all_config(file_path, generate_xy=generate_xy, suffix='posit'):
+def run_all_config(file_path, generate_xy=generate_xy, suffix='posit', use_tags=True, use_lids=True):
     results = {'Method': list(), 'Clf': list(), 'Mean': list(), 'STD': list()}
     configs = generate_all_configs()
     for sources in configs:
         for clf_name, clf in CLASSIFIERS.items():
             print(f"Solving for {sources} with {clf_name}")
             clf = RandomForestClassifier(n_estimators=100)
-            X, y, scaler = generate_xy(sources, file_path)
+            X, y, scaler = generate_xy(sources, file_path, use_tags=use_tags, use_lids=use_lids)
             scores = run_eval(clf, scaler, X, y)
             print(f"{clf_name} has a mean accuracy of {np.mean(scores)}+-{1.6449 * np.std(scores)}")
             results['Method'].append(str(sources))
@@ -93,13 +100,16 @@ def run_all_config(file_path, generate_xy=generate_xy, suffix='posit'):
             results['Mean'].append(np.mean(scores))
             results['STD'].append(np.std(scores))
 
+    suffix += 't' if use_tags else ''
+    suffix += 'l' if use_lids else ''
     df = pd.DataFrame(data=results)
     df.to_csv(f"./results/source_separation_{suffix}.csv", index_label='Method')
 
 
 def main():
     file_path = './data/source_identification/%s/feature_vector_*.npz'
-    run_all_config(file_path)
+    for use_tags, use_lids in [(True, True), (True, False), (False, True)]:
+        run_all_config(file_path, use_tags=use_tags, use_lids=use_lids)
 
 
 if __name__ == '__main__':

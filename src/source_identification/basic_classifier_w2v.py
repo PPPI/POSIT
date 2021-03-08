@@ -11,7 +11,7 @@ except ModuleNotFoundError:
     from sklearn.ensemble import RandomForestClassifier
 
 
-def generate_xy(sources, file_path):
+def generate_xy(sources, file_path, use_tags=True, use_lids=True):
     Xy = list()
     le = preprocessing.LabelEncoder()
     le.fit(sources)
