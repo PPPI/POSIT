@@ -253,7 +253,7 @@ and scripts used to perform and analyse the manual investigation are made availa
 If you use this project, please cite the paper as follows:
 ```bibtex
 @inproceedings{10.1145/3377811.3380440,
-author = {P\^{a}rtachi, Profir-Petru and Dash, Santanu Kumar and Treude, Christoph and Barr, Earl T.},
+author = {P\^{a}rțachi, Profir-Petru and Dash, Santanu Kumar and Treude, Christoph and Barr, Earl T.},
 title = {POSIT: Simultaneously Tagging Natural and Programming Languages},
 year = {2020},
 isbn = {9781450371216},
