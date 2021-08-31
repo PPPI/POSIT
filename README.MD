@@ -248,6 +248,28 @@ POSIT's output on this dataset is under `./misc/SO_Posts_Edited/results/paired_p
 While the TaskNav source-code is not provided in this repository, the TaskNav++ output, manual investigation results
 and scripts used to perform and analyse the manual investigation are made available via the zip: `./TaskNav++_LKML.zip`.
 
+## Cite
+
+If you use this project, please cite the paper as follows:
+```bibtex
+@inproceedings{10.1145/3377811.3380440,
+author = {P\^{a}rtachi, Profir-Petru and Dash, Santanu Kumar and Treude, Christoph and Barr, Earl T.},
+title = {POSIT: Simultaneously Tagging Natural and Programming Languages},
+year = {2020},
+isbn = {9781450371216},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3377811.3380440},
+doi = {10.1145/3377811.3380440},
+booktitle = {Proceedings of the ACM/IEEE 42nd International Conference on Software Engineering},
+pages = {1348–1358},
+numpages = {11},
+keywords = {mixed-code, part-of-speech tagging, code-switching, language identification},
+location = {Seoul, South Korea},
+series = {ICSE '20}
+}
+```
+
 ## References
 
 [1] Ponzanelli, L., Mocci, A., & Lanza, M. (2015). 
