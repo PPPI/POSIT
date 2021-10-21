@@ -1,7 +1,6 @@
 import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
-from tensorflow import keras
 
 if tf.__version__[0] == '2':
     import tensorflow.compat.v1 as tf

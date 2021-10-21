@@ -5,9 +5,7 @@ from tensorflow.keras.mixed_precision import experimental as mixed_precision
 
 if tf.__version__[0] == '2':
     import tensorflow.compat.v1 as tf
-
     tf.disable_v2_behavior()
-from tensorflow.core.protobuf import rewriter_config_pb2
 
 
 class BaseModel(object):
