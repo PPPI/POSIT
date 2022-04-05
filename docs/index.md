@@ -1,13 +1,8 @@
 # POSIT
 
-
-
-<img src="Posit_Network.png" alt="POSIT's Network Architecture]" style="width:1280px;"/>
-
-
-
 [![DOI](https://zenodo.org/badge/233908281.svg)](https://zenodo.org/badge/latestdoi/233908281)
 
+<img src="Posit_Network.png" alt="POSIT's Network Architecture]" style="width:640px;"/>
 
 Software developers use a mix of source code and natural language text to communicate with each other: 
 Stack Overflow and Developer mailing lists abound with this mixed text. 
@@ -17,7 +12,7 @@ Our technique, POSIT, simultaneously provides abstract syntax tree tags for sour
 To realize POSIT, we trained a biLSTM network with a Conditional Random Field output layer using abstract syntax tree tags from the CLANG compiler and part-of-speech tags from the Standard Stanford part-of-speech tagger.
 POSIT improves the state-of-the-art on language identification by 10.6% and PoS/AST tagging by 23.7% in accuracy.
 
-Slides are available [here](https://github.com/PPPI/POSIT/blob/master/docs/slides_icse20_posit.pdf).
+Slides are available [here](./slides_icse20_posit.pdf).
 
 The pre-recorded video from ICSE2020 is available below:
 
