@@ -18,5 +18,5 @@ The pre-recorded video from ICSE2020 is available below:
 
 [![POSIT ICSE2020 Talk](http://img.youtube.com/vi/5AGkCDj6zyE/0.jpg)](http://www.youtube.com/watch?v=5AGkCDj6zyE "POSIT")
 
-This work was done under the supervision of [Earl T. Barr](http://earlbarr.com/) and 
-in collaboration with [Santanu K. Dash](http://santanu.uk/), and [Christoph Treude](ctreude.ca).
+This work was done under the supervision of [Earl T. Barr](https://earlbarr.com/) and 
+in collaboration with [Santanu K. Dash](https://santanu.uk/), and [Christoph Treude](https://ctreude.ca).
