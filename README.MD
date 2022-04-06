@@ -20,6 +20,10 @@ slightly smaller weight given to language IDs. We do not condition Tag output on
 language IDs in this version of the model.
 
 ## Dependencies
+Cloning this project requires `git-lfs` to be installed _if you wish to download the zip files as well_.
+If you wish to clone _only_ the code, `git-lfs` is not needed, in that case you can download the zip 
+files that you wish manually from the GitHub web-interface.
+
 This project requires the following python libraries:
 ```
 tensorflow<=1.15, numpy, gensim, nltk
