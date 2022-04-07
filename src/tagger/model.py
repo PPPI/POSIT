@@ -1,9 +1,12 @@
 import numpy as np
-import tensorflow_addons as tfa
+
 import tensorflow as tf
 if tf.__version__[0] == '2':
     import tensorflow.compat.v1 as tf
+    import tensorflow_addons.text as tfat
     tf.disable_v2_behavior()
+elif tf.__version__[0] == '1':
+    import tf.contrib as tfat
 
 from .base_model import BaseModel
 from .general_utils import Progbar
@@ -314,7 +317,7 @@ class CodePoSModel(BaseModel):
         # Note from a future Profir: Balancing code was written with this comment, use git blame if needed
         # to do the same for per label in the multiclass prediction case.
         if self.config.use_crf:
-            log_likelihood, trans_params = tfa.text.crf.crf_log_likelihood(
+            log_likelihood, trans_params = tfat.crf.crf_log_likelihood(
                 self.logits, self.labels, self.sequence_lengths)
             self.trans_params = trans_params  # need to evaluate it for decoding
             # mask = tf.not_equal(self.labels, self.config.vocab_tags.token2id[O])
@@ -332,7 +335,7 @@ class CodePoSModel(BaseModel):
 
             if self.config.with_l_id:
                 with tf.compat.v1.variable_scope("l_id_loss"):
-                    log_likelihood_l, trans_params_l = tfa.text.crf.crf_log_likelihood(
+                    log_likelihood_l, trans_params_l = tfat.crf.crf_log_likelihood(
                         self.logits_l, self.labels_l, self.sequence_lengths)
                     self.trans_params_l = trans_params_l  # need to evaluate it for decoding
                     self.loss += self.config.l_id_weight * tf.reduce_mean(-tf.multiply(log_likelihood_l,
@@ -395,7 +398,7 @@ class CodePoSModel(BaseModel):
                     feed_dict=fd)
                 for logit, sequence_length in zip(logits_l, sequence_lengths):
                     logit = logit[:sequence_length]  # keep only the valid steps
-                    viterbi_seq, viterbi_score = tfa.text.crf.viterbi_decode(
+                    viterbi_seq, viterbi_score = tfat.crf.viterbi_decode(
                         logit, trans_params_l)
                     viterbi_l_ids += [viterbi_seq]
             else:
@@ -405,7 +408,7 @@ class CodePoSModel(BaseModel):
             # iterate over the sentences because no batching in vitervi_decode
             for logit, sequence_length in zip(logits, sequence_lengths):
                 logit = logit[:sequence_length]  # keep only the valid steps
-                viterbi_seq, viterbi_score = tfa.text.crf.viterbi_decode(
+                viterbi_seq, viterbi_score = tfat.crf.viterbi_decode(
                     logit, trans_params)
                 viterbi_sequences += [viterbi_seq]
 
