@@ -85,7 +85,7 @@ files needed to convert to and from integers. This can be done as such:
 $ python src/preprocessor/generaty_vocabulary.py <corpus name> <language id?>
 ```
 
-For the CodeComment corpus, please use the zip: `data/corpora/lucid.zip`. 
+For the CodeComment corpus, please use the zip: `data/corpora/lucid.zip` (also available [here](https://drive.proton.me/urls/H6R5J0TK78#0mHMUhppmHoz)). 
 To generate the training data, please use the lucid scripts under `src/preprocessor`.
 For example:
 ```bash
@@ -100,7 +100,7 @@ For example:
                             corpus name (under data/corpora) --^      ^--- Use Language IDs?
 ```
 
-A convenience zip is provided under: `data/corpora/SO_n_Lucid_Id.zip` and ``.
+A convenience zip is provided under: `data/corpora/SO_n_Lucid_Id.zip` and [here](https://drive.proton.me/urls/T1CF9HMV8G#AfSgSo1lTcOq).
 
 ## Running the BiLSTM model
 To run the model, make sure that the necessary `train/dev/eval.txt` files have been generated with 
